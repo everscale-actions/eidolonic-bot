@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot", "EidolonicBot\EidolonicBot.csproj", "{D15676E4-6C18-4ABC-913E-394AE94CF83B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.Business", "EidolonicBot.Business\EidolonicBot.Business.csproj", "{2EEC095B-7983-450A-9117-2C0FA8EA9D2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.Utils", "EidolonicBot.Utils\EidolonicBot.Utils.csproj", "{D0F9F7E9-E48C-4E75-BD6C-11EB3F48FE44}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.Wallet.Tests", "EidolonicBot.Wallet.Tests\EidolonicBot.Wallet.Tests.csproj", "{2D0A7607-974C-40BC-A582-D8C2F148E3BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.Wallet", "EidolonicBot.Wallet\EidolonicBot.Wallet.csproj", "{33C68ED6-CB73-479F-827E-8F4D36E752DA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.Constants", "EidolonicBot.Constants\EidolonicBot.Constants.csproj", "{06615E4C-3DEA-47DF-8357-7CE64CBE21BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.TelegramBot", "EidolonicBot.TelegramBot\EidolonicBot.TelegramBot.csproj", "{7D692A34-D3E9-4529-ABDE-1CDABDA8CE44}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D15676E4-6C18-4ABC-913E-394AE94CF83B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D15676E4-6C18-4ABC-913E-394AE94CF83B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D15676E4-6C18-4ABC-913E-394AE94CF83B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D15676E4-6C18-4ABC-913E-394AE94CF83B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2EEC095B-7983-450A-9117-2C0FA8EA9D2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EEC095B-7983-450A-9117-2C0FA8EA9D2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EEC095B-7983-450A-9117-2C0FA8EA9D2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EEC095B-7983-450A-9117-2C0FA8EA9D2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0F9F7E9-E48C-4E75-BD6C-11EB3F48FE44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0F9F7E9-E48C-4E75-BD6C-11EB3F48FE44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0F9F7E9-E48C-4E75-BD6C-11EB3F48FE44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0F9F7E9-E48C-4E75-BD6C-11EB3F48FE44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D0A7607-974C-40BC-A582-D8C2F148E3BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D0A7607-974C-40BC-A582-D8C2F148E3BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D0A7607-974C-40BC-A582-D8C2F148E3BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D0A7607-974C-40BC-A582-D8C2F148E3BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33C68ED6-CB73-479F-827E-8F4D36E752DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33C68ED6-CB73-479F-827E-8F4D36E752DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33C68ED6-CB73-479F-827E-8F4D36E752DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33C68ED6-CB73-479F-827E-8F4D36E752DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06615E4C-3DEA-47DF-8357-7CE64CBE21BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06615E4C-3DEA-47DF-8357-7CE64CBE21BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06615E4C-3DEA-47DF-8357-7CE64CBE21BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06615E4C-3DEA-47DF-8357-7CE64CBE21BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D692A34-D3E9-4529-ABDE-1CDABDA8CE44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D692A34-D3E9-4529-ABDE-1CDABDA8CE44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D692A34-D3E9-4529-ABDE-1CDABDA8CE44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D692A34-D3E9-4529-ABDE-1CDABDA8CE44}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
