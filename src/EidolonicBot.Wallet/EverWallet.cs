@@ -65,28 +65,31 @@ public class EverWallet : IEverWallet {
             : null;
     }
 
-    public async Task<string> SendCoins(long userId, decimal coins, CancellationToken cancellationToken) {
+    public async Task<(string transactionId, decimal totalOutputCoins)> SendCoins(long userId, decimal coins, bool allBalance,
+        CancellationToken cancellationToken) {
         if (_keyPair is null) {
             throw new NotInitializedException();
-        }
-
-        var balance = await GetBalance(cancellationToken) ?? throw new AccountInsufficientBalanceException(0);
-        if (balance - coins < 0.1m) {
-            throw new AccountInsufficientBalanceException(balance);
         }
 
         var destStateInitBoc = await GetStateInitBoc(userId, _keyPair.Public, cancellationToken);
         var dest = await GetAddress(destStateInitBoc, cancellationToken);
 
-        try {
-            await SendTransaction(dest, coins.CoinsToNano(), false, cancellationToken);
-        } catch (EverClientException exception) {
-            if (exception.Code == (uint)TvmErrorCode.LowBalance) {
-                throw new AccountInsufficientBalanceException(balance);
-            }
+        return await SendCoins(dest, coins, allBalance, cancellationToken);
+    }
+
+    public async Task<(string transactionId, decimal totalOutputCoins)> SendCoins(string address, decimal coins, bool allBalance,
+        CancellationToken cancellationToken) {
+        var balance = await GetBalance(cancellationToken) ?? throw new AccountInsufficientBalanceException(0);
+        if (balance - coins < 0.1m) {
+            throw new AccountInsufficientBalanceException(balance);
         }
 
-        return dest;
+        try {
+            return await SendTransaction(address, coins.CoinsToNano(), false, allBalance, cancellationToken);
+        } catch (EverClientException exception) when (exception.Code == (uint)TvmErrorCode.LowBalance) {
+            var balanceEx = await GetBalance(cancellationToken) ?? throw new AccountInsufficientBalanceException(0);
+            throw new AccountInsufficientBalanceException(balanceEx);
+        }
     }
 
     public async Task<EverWallet> Init(long userId, CancellationToken cancellationToken) {
@@ -104,7 +107,8 @@ public class EverWallet : IEverWallet {
 
     public string Address => _address ?? throw new NotInitializedException();
 
-    private async Task SendTransaction(string dest, decimal nanoCoins, bool bounce,
+    private async Task<(string transactionId, decimal totalOutputCoins)> SendTransaction(string dest, decimal nanoCoins, bool bounce,
+        bool allBalance,
         CancellationToken cancellationToken) {
         if (_keyPair is null || _stateInitBoc is null || _address is null) {
             throw new NotInitializedException();
@@ -117,7 +121,7 @@ public class EverWallet : IEverWallet {
                 dest,
                 value,
                 bounce,
-                flags = 1,
+                flags = allBalance ? 130 : 1,
                 payload = "te6ccgEBAQEAAgAAAA=="
             }.ToJsonElement()
         };
@@ -141,10 +145,15 @@ public class EverWallet : IEverWallet {
             Message = callMessage
         }, cancellationToken: cancellationToken)).ShardBlockId;
 
-        await _everClient.Processing.WaitForTransaction(new ParamsOfWaitForTransaction {
+        var resultOfProcessMessage = await _everClient.Processing.WaitForTransaction(new ParamsOfWaitForTransaction {
             Message = callMessage,
             ShardBlockId = shardBlockId
         }, cancellationToken: cancellationToken);
+
+        var transactionId = resultOfProcessMessage.Transaction!.Get<string>("id");
+        var totalOutputCoins = resultOfProcessMessage.Fees.TotalOutput.NanoToCoins();
+
+        return (transactionId, totalOutputCoins);
     }
 
     private async Task<KeyPair> GetKeyPair(string seedPhrase, CancellationToken cancellationToken) {

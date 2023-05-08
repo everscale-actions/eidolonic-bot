@@ -8,9 +8,13 @@ public enum Command {
     [Command("/help", Description = "Show this help", IsWalletNeeded = false)]
     Help,
 
-    [Command("/wallet", Description = "Wallet info")]
+    [Command("/wallet", Description = "Wallet address and balance")]
     Wallet,
 
-    [Command("/send", Description = "Sends tokens from your wallet to user that you reply to. Usage: /send [amount]")]
+    [Command("/send", Description = "Sends tokens from to another user",
+        Help = "Sends tokens from your wallet to user that you reply to or special address\n" +
+               " Usage: /send \\[amount] \\[address]\n" +
+               "  amount - minimum 0.1, default 1 coin, or all to send the whole balance\n" +
+               "  address - get some coins for withdrawal")]
     Send
 }

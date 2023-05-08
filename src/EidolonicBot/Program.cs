@@ -1,5 +1,8 @@
+using System.Globalization;
 using EidolonicBot;
 using EidolonicBot.Services;
+
+CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 
 var host = Host.CreateApplicationBuilder(args)
     .AddLogging()

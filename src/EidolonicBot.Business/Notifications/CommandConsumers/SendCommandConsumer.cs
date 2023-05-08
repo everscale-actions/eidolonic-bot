@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using EidolonicBot.Exceptions;
 using EidolonicBot.Notifications.CommandConsumers.Base;
 using Microsoft.Extensions.Caching.Memory;
@@ -6,16 +7,14 @@ using Telegram.Bot.Types;
 
 namespace EidolonicBot.Notifications.CommandConsumers;
 
-public class SendCommandConsumer : CommandConsumerBase {
-    private const string SendMessage = "{0} send to {1} {2}{3}";
+public partial class SendCommandConsumer : CommandConsumerBase {
+    private const string SendMessage = "{0} sent to {1} {2:F}{3}";
     private const decimal DefaultTipCoins = 1m;
 
-    private readonly ITelegramBotClient _botClient;
     private readonly IEverWallet _wallet;
 
     public SendCommandConsumer(ITelegramBotClient botClient, IEverWallet wallet, IMemoryCache memoryCache) : base(Command.Send, botClient,
         memoryCache) {
-        _botClient = botClient;
         _wallet = wallet;
     }
 
@@ -27,23 +26,60 @@ public class SendCommandConsumer : CommandConsumerBase {
             Constants.Currency);
     }
 
+    private static string FormatSendMessage(User fromUser, string dest, decimal coins) {
+        return string.Format(SendMessage,
+            fromUser.ToMentionString(),
+            $"`{dest}`",
+            coins,
+            Constants.Currency);
+    }
+
     protected override async Task<string?> Consume(string[] args, Message message, long chatId, bool isAdmin,
         CancellationToken cancellationToken) {
-        if (message is not ({ ReplyToMessage.From: { } toUser } and { From: { } fromUser })) {
+        if (message is not { From: { } fromUser }) {
             return null;
         }
 
-        var tipCoins = args.Length >= 1
-                       && decimal.TryParse(args[0], out var coins)
-            ? coins
-            : DefaultTipCoins;
-
-        try {
-            await _wallet.SendCoins(toUser.Id, tipCoins, cancellationToken);
-        } catch (AccountInsufficientBalanceException ex) {
-            return @$"You balance\({ex.Balance}{Constants.Currency}\) is too low to send {tipCoins}{Constants.Currency}";
+        bool allBalance;
+        decimal sendCoins;
+        switch (args) {
+            case []:
+                allBalance = false;
+                sendCoins = DefaultTipCoins;
+                break;
+            case ["all", ..]:
+                allBalance = true;
+                sendCoins = 0.1m;
+                break;
+            case [{ } c, ..] when decimal.TryParse(c.Replace(',', '.'), out var coins):
+                allBalance = false;
+                sendCoins = coins;
+                break;
+            default:
+                return CommandHelpers.CommandAttributeByCommand[Command.Send]?.Help;
         }
 
-        return FormatSendMessage(fromUser, toUser, tipCoins);
+        if (sendCoins < 0.1m) {
+            return $"You should send at least {0.1:F}{Constants.Currency}";
+        }
+
+        try {
+            if (args is [_, { } dest] && AddressRegex().IsMatch(dest)) {
+                var (transactionId, coins) = await _wallet.SendCoins(dest, sendCoins, allBalance, cancellationToken);
+                return FormatSendMessage(fromUser, dest, coins);
+            }
+
+            if (message is { ReplyToMessage.From: { } toUser }) {
+                var (transactionId, coins) = await _wallet.SendCoins(toUser.Id, sendCoins, allBalance, cancellationToken);
+                return FormatSendMessage(fromUser, toUser, coins);
+            }
+
+            return CommandHelpers.CommandAttributeByCommand[Command.Send]?.Help;
+        } catch (AccountInsufficientBalanceException ex) {
+            return @$"You balance({ex.Balance:F}{Constants.Currency}) is too low";
+        }
     }
+
+    [GeneratedRegex("0:[0-9a-z]{64}", RegexOptions.Compiled)]
+    private static partial Regex AddressRegex();
 }

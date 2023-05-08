@@ -37,7 +37,7 @@ public class SendCommandNotificationConsumer : IConsumer<UpdateNotification>, IM
                     Text: { } messageText,
                     MessageId: var messageId,
                     Chat.Id: var chatId,
-                    From.Id: { } userId
+                    From.Id: var userId
                 }
             } || !messageText.StartsWith('/')) {
             return;

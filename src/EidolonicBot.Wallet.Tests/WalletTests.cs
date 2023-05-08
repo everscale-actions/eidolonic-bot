@@ -82,9 +82,9 @@ public class WalletTests : IAsyncLifetime {
         await _giver.SendTransaction(_wallet.Address, 0.1m, cancellationToken: _cancellationToken);
 
         var secondBefore = await secondWallet.GetBalance(_cancellationToken) ?? 0;
-        await _wallet.SendCoins(2, 1m.NanoToCoins(), _cancellationToken);
+        await _wallet.SendCoins(2, 1m.NanoToCoins(), false, _cancellationToken);
         var walletAfterSendAndInit = await _wallet.GetBalance(_cancellationToken);
-        await _wallet.SendCoins(2, 1m.NanoToCoins(), _cancellationToken);
+        await _wallet.SendCoins(2, 1m.NanoToCoins(), false, _cancellationToken);
         var walletAfterSecondSend = await _wallet.GetBalance(_cancellationToken);
         var secondAfter = await secondWallet.GetBalance(_cancellationToken);
 
