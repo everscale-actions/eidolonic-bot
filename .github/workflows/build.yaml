@@ -1,0 +1,72 @@
+name: Build
+
+on:
+  push:
+    paths:
+      - src/**
+      - .github/workflows/build.yaml
+    branches:
+      - main
+
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+env:
+  CONTAINER_IMAGE_REGISTRY: ghcr.io
+  CONTAINER_IMAGE_NAME: everscale-actions/eidolonic-bot
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    strategy:
+      matrix:
+        arch: [ x64, arm64 ]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v3
+
+      - name: Build image
+        working-directory: src
+        env:
+          ContainerImageName: ${{ env.CONTAINER_IMAGE_NAME }}
+          ContainerImageTags: latest-${{ matrix.arch }}
+        run: |
+          dotnet publish EidolonicBot --os linux --arch ${{ matrix.arch }} /t:PublishContainer -c Release
+
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Tag and push image to ghcr.io
+        env:
+          IMAGE_NAME: ${{ env.CONTAINER_IMAGE_NAME }}
+          IMAGE_TAG: latest-${{ matrix.arch }}
+          REGISTRY: ${{ env.CONTAINER_IMAGE_REGISTRY }}
+        run: |
+          docker tag $IMAGE_NAME:$IMAGE_TAG $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+          docker push $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
+  
+  manifest:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Publish manifest
+        env:
+          REGISTRY: ${{ env.CONTAINER_IMAGE_REGISTRY }}
+          IMAGE_NAME: ${{ env.CONTAINER_IMAGE_NAME }}
+        run: |
+          docker manifest create $REGISTRY/$IMAGE_NAME:latest \
+          --amend $REGISTRY/$IMAGE_NAME:latest-x64 \
+          --amend $REGISTRY/$IMAGE_NAME:latest-arm64
+          docker manifest push $REGISTRY/$IMAGE_NAME:latest

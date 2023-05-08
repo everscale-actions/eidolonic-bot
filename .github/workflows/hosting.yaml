@@ -1,0 +1,50 @@
+name: Hosting
+
+on:
+  push:
+    paths:
+      - .github/workflows/hosting.yaml
+    branches:
+      - main
+  schedule:
+    - cron: '0 */4 * * *'
+  workflow_run:
+    workflows: [ Build ]
+    types: [ completed ]
+  workflow_dispatch:
+
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+env:
+  HOSTING_PATH: .hosting
+
+jobs:
+  run-app:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create .env file
+        working-directory: ${{ env.HOSTING_PATH }}
+        run: |
+          cat <<EOT > .env
+          Bot__Token=${{ secrets.BOT_TOKEN }}
+          Wallet__SeedPhrase=${{ secrets.WALLET_SEED_PHRASE }}
+          EverClient__Network__Endpoints__0=${{ secrets.NETWORK_ENDPOINT }}
+          Serilog__WriteTo__Elasticsearch__Args__nodeUris=${{ secrets.SEMATEXT_ELASTICSEARCH_URIS }}
+          SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+          EOT
+
+      - name: Run app
+        working-directory: ${{ env.HOSTING_PATH }}
+        run: |
+          docker compose up --pull=always
+
+      - name: Logs to artifact
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: logs
+          path: .hosting/logs/**
