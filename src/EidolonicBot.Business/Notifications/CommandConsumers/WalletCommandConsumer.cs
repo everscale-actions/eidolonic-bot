@@ -1,41 +1,31 @@
 using System.Text;
+using EidolonicBot.Notifications.CommandConsumers.Base;
+using Microsoft.Extensions.Caching.Memory;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace EidolonicBot.Notifications.CommandConsumers;
 
-public class WalletCommandConsumer : CommandHandlerBase {
-    private readonly ITelegramBotClient _botClient;
+public class WalletCommandConsumer : CommandConsumerBase {
     private readonly IEverWallet _wallet;
 
-    public WalletCommandConsumer(ITelegramBotClient botClient, IEverWallet wallet) {
-        _botClient = botClient;
+    public WalletCommandConsumer(ITelegramBotClient botClient, IEverWallet wallet, IMemoryCache memoryCache) : base(Command.Wallet, botClient,
+        memoryCache) {
         _wallet = wallet;
     }
 
     private static string FormatInfoMessage(WalletInfo info) {
         return new StringBuilder()
             .AppendLine($"`{info.Address}`")
-            .AppendLine($"Balance {info.Balance ?? 0}{Constants.Currency}")
+            .AppendLine($"Balance {info.Balance ?? 0:F}{Constants.Currency}")
             .ToString();
     }
 
-    protected override Task<bool> Check(Command command, string[]? args, Message message, CancellationToken cancellationToken) {
-        return Task.FromResult(command == Command.Wallet);
-    }
 
-    protected override async Task Consume(Command command, string[]? args, Message message, CancellationToken cancellationToken) {
+    protected override async Task<string?> Consume(string[] args, Message message, long chatId, bool isAdmin,
+        CancellationToken cancellationToken) {
         var info = await _wallet.GetInfo(cancellationToken);
 
-        var messageText = FormatInfoMessage(info);
-
-        await _botClient.SendTextMessageAsync(
-            message.Chat.Id,
-            messageText,
-            ParseMode.MarkdownV2,
-            replyMarkup: new ReplyKeyboardRemove(),
-            cancellationToken: cancellationToken);
+        return FormatInfoMessage(info);
     }
 }

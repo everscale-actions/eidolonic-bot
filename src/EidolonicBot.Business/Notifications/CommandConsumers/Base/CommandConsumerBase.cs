@@ -1,3 +1,4 @@
+using EidolonicBot.Abstract;
 using MassTransit;
 using Microsoft.Extensions.Caching.Memory;
 using Telegram.Bot;
@@ -6,7 +7,7 @@ using Telegram.Bot.Types.Enums;
 
 namespace EidolonicBot.Notifications.CommandConsumers.Base;
 
-public abstract class CommandConsumerBase : IConsumer<CommandNotification> {
+public abstract class CommandConsumerBase : IConsumer<CommandNotification>, IMediatorConsumer {
     private readonly ITelegramBotClient _botClient;
     private readonly Command _command;
     private readonly IMemoryCache _memoryCache;
@@ -34,6 +35,10 @@ public abstract class CommandConsumerBase : IConsumer<CommandNotification> {
         var replyText = await Consume(context.Message.Arguments, context.Message.Message, chatId, isAdmin,
             cancellationToken);
 
+        if (replyText is null) {
+            return;
+        }
+
         await _botClient.SendTextMessageAsync(
             message.Chat.Id,
             replyText,
@@ -54,6 +59,6 @@ public abstract class CommandConsumerBase : IConsumer<CommandNotification> {
         return cache?.Contains(userId) ?? false;
     }
 
-    protected abstract Task<string> Consume(string[] args, Message message, long chatId, bool isAdmin,
+    protected abstract Task<string?> Consume(string[] args, Message message, long chatId, bool isAdmin,
         CancellationToken cancellationToken);
 }

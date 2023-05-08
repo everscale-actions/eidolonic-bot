@@ -1,32 +1,21 @@
 using System.Text;
+using EidolonicBot.Notifications.CommandConsumers.Base;
+using Microsoft.Extensions.Caching.Memory;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace EidolonicBot.Notifications.CommandConsumers;
 
-public class HelpCommandConsumer : CommandHandlerBase {
-    private readonly ITelegramBotClient _botClient;
+public class HelpCommandConsumer : CommandConsumerBase {
+    public HelpCommandConsumer(ITelegramBotClient botClient, IMemoryCache memoryCache) : base(Command.Help, botClient, memoryCache) { }
 
-    public HelpCommandConsumer(ITelegramBotClient botClient) {
-        _botClient = botClient;
-    }
-
-    protected override Task<bool> Check(Command command, string[]? args, Message message, CancellationToken cancellationToken) {
-        return Task.FromResult(command == Command.Help);
-    }
-
-    protected override async Task Consume(Command command, string[]? args, Message message, CancellationToken cancellationToken) {
+    protected override Task<string?> Consume(string[] args, Message message, long chatId, bool isAdmin, CancellationToken cancellationToken) {
         var sb = new StringBuilder("Usage:\n");
+
         foreach (var (_, commandDescription) in
                  CommandHelpers.CommandAttributeByCommand.Where(c => c.Value is not null))
             sb.Append($"{commandDescription!.Text}\t- {commandDescription.Description}\n");
-        var text = sb.ToString().TrimEnd('\n');
 
-        await _botClient.SendTextMessageAsync(
-            message.Chat.Id,
-            text,
-            replyMarkup: new ReplyKeyboardRemove(),
-            cancellationToken: cancellationToken);
+        return Task.FromResult(sb.ToString().TrimEnd('\n'))!;
     }
 }
