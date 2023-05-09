@@ -72,7 +72,7 @@ public class EverWallet : IEverWallet {
             throw new NotInitializedException();
         }
 
-        var destStateInitBoc = await GetStateInitBoc(userId, _keyPair.Public, cancellationToken);
+        var destStateInitBoc = await GetStateInitBoc(userId, _keyPair, cancellationToken);
         var dest = await GetAddress(destStateInitBoc, cancellationToken);
 
         return await SendCoins(dest, coins, allBalance, cancellationToken);
@@ -100,7 +100,7 @@ public class EverWallet : IEverWallet {
         }
 
         _keyPair ??= await GetKeyPair(phrase ?? throw new InvalidOperationException(), cancellationToken);
-        _stateInitBoc ??= await GetStateInitBoc(userId, _keyPair.Public, cancellationToken);
+        _stateInitBoc ??= await GetStateInitBoc(userId, _keyPair, cancellationToken);
         _address ??= await GetAddress(_stateInitBoc, cancellationToken);
         return this;
     }
@@ -171,16 +171,25 @@ public class EverWallet : IEverWallet {
         return keypair ?? throw new InvalidOperationException();
     }
 
-    private async Task<string> GetStateInitBoc(long userId, string publicKey,
+    private async Task<string> GetStateInitBoc(long userId, KeyPair keyPair,
         CancellationToken cancellationToken) {
-        var stateInit = await _memoryCache.GetOrCreateAsync<string>($"StateInitBocByUserIdByPublicKey_{userId}_{publicKey}",
+        var stateInit = await _memoryCache.GetOrCreateAsync<string>($"StateInitBocByUserIdByPublicKey_{userId}_{keyPair.Public}",
             async entity => {
                 _logger.LogDebug("Getting StateInit for {UserId}", userId);
+                var userBoc = (await _everClient.Boc.EncodeBoc(new ParamsOfEncodeBoc {
+                    Builder = new[] {
+                        userId.ToBuilderOp(),
+                        keyPair.Secret.ToBuilderOp()
+                    }
+                }, cancellationToken)).Boc;
+                var userHash = (await _everClient.Boc.GetBocHash(new ParamsOfGetBocHash {
+                    Boc = userBoc
+                }, cancellationToken)).Hash;
                 var dataBoc = (await _everClient.Boc.EncodeBoc(new ParamsOfEncodeBoc {
                     Builder = new[] {
-                        $"x{publicKey}".ToBuilderOp(),
+                        $"x{keyPair.Public}".ToBuilderOp(),
                         0L.ToBuilderOp(),
-                        userId.ToBuilderOp()
+                        userHash.ToBuilderOp()
                     }
                 }, cancellationToken)).Boc;
                 var stateInitBoc = (await _everClient.Boc.EncodeBoc(new ParamsOfEncodeBoc {
