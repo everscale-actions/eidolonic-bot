@@ -19,6 +19,9 @@ public static class HostApplicationBuilderExtensions {
                     typeof(SendCommandNotificationConsumer).Assembly);
             });
 
+        builder.Services.AddSingleton<ISubscriptionService, SubscriptionService>();
+        builder.Services.AddSingleton<IHostedService>(sp => sp.GetRequiredService<ISubscriptionService>());
+
         return builder;
     }
 }

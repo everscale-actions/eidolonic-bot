@@ -1,5 +1,4 @@
 using System.Reflection;
-using EidolonicBot.Services;
 using EverscaleNet.Client.PackageManager;
 using EverscaleNet.Models;
 using Microsoft.Extensions.Caching.Memory;

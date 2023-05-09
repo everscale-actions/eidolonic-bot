@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using EidolonicBot.Exceptions;
 using EidolonicBot.Notifications.CommandConsumers.Base;
 using Microsoft.Extensions.Caching.Memory;
@@ -7,9 +6,8 @@ using Telegram.Bot.Types;
 
 namespace EidolonicBot.Notifications.CommandConsumers;
 
-public partial class SendCommandConsumer : CommandConsumerBase {
+public class SendCommandConsumer : CommandConsumerBase {
     private const string SendMessage = "{0} sent to {1} {2:F}{3}";
-    private const decimal DefaultTipCoins = 1m;
 
     private readonly IEverWallet _wallet;
 
@@ -43,17 +41,13 @@ public partial class SendCommandConsumer : CommandConsumerBase {
         bool allBalance;
         decimal sendCoins;
         switch (args) {
-            case []:
-                allBalance = false;
-                sendCoins = DefaultTipCoins;
-                break;
             case ["all", ..]:
-                allBalance = true;
                 sendCoins = 0.1m;
+                allBalance = true;
                 break;
-            case [{ } c, ..] when decimal.TryParse(c.Replace(',', '.'), out var coins):
+            case [{ } coinsStr, ..]
+                when decimal.TryParse(coinsStr.Replace(',', '.'), out sendCoins):
                 allBalance = false;
-                sendCoins = coins;
                 break;
             default:
                 return CommandHelpers.CommandAttributeByCommand[Command.Send]?.Help;
@@ -64,7 +58,7 @@ public partial class SendCommandConsumer : CommandConsumerBase {
         }
 
         try {
-            if (args is [_, { } dest] && AddressRegex().IsMatch(dest)) {
+            if (args is [.., { } dest] && Regex.TvmAddressRegex().IsMatch(dest)) {
                 var (transactionId, coins) = await _wallet.SendCoins(dest, sendCoins, allBalance, cancellationToken);
                 return FormatSendMessage(fromUser, dest, coins);
             }
@@ -79,7 +73,4 @@ public partial class SendCommandConsumer : CommandConsumerBase {
             return @$"You balance({ex.Balance:F}{Constants.Currency}) is too low";
         }
     }
-
-    [GeneratedRegex("0:[0-9a-z]{64}", RegexOptions.Compiled)]
-    private static partial Regex AddressRegex();
 }

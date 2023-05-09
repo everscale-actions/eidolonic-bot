@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.EntityFrameworkCore" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\EidolonicBot.Database.Postgres\EidolonicBot.Database.Postgres.csproj" />
+		<ProjectReference Include="..\EidolonicBot.Database.Sqlite\EidolonicBot.Database.Sqlite.csproj" />
+	</ItemGroup>
+
+</Project>

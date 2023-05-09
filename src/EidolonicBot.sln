@@ -14,6 +14,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.Constants", "E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.TelegramBot", "EidolonicBot.TelegramBot\EidolonicBot.TelegramBot.csproj", "{7D692A34-D3E9-4529-ABDE-1CDABDA8CE44}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.Database", "EidolonicBot.Database\EidolonicBot.Database.csproj", "{50C4DACD-3DDF-455D-995B-1A6664FDF758}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.Database.Sqlite", "EidolonicBot.Database.Sqlite\EidolonicBot.Database.Sqlite.csproj", "{C41A68F4-D8D2-488D-99BC-0EE687F743B7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.Database.Postgres", "EidolonicBot.Database.Postgres\EidolonicBot.Database.Postgres.csproj", "{5E9D8494-01B2-49EF-8BA3-49245F7E1EF4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.Database.Models", "EidolonicBot.Database.Models\EidolonicBot.Database.Models.csproj", "{5DD0837E-524E-47A0-A5F3-108A15CE3C82}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,5 +56,21 @@ Global
 		{7D692A34-D3E9-4529-ABDE-1CDABDA8CE44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D692A34-D3E9-4529-ABDE-1CDABDA8CE44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D692A34-D3E9-4529-ABDE-1CDABDA8CE44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{50C4DACD-3DDF-455D-995B-1A6664FDF758}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{50C4DACD-3DDF-455D-995B-1A6664FDF758}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{50C4DACD-3DDF-455D-995B-1A6664FDF758}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{50C4DACD-3DDF-455D-995B-1A6664FDF758}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C41A68F4-D8D2-488D-99BC-0EE687F743B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C41A68F4-D8D2-488D-99BC-0EE687F743B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C41A68F4-D8D2-488D-99BC-0EE687F743B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C41A68F4-D8D2-488D-99BC-0EE687F743B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E9D8494-01B2-49EF-8BA3-49245F7E1EF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E9D8494-01B2-49EF-8BA3-49245F7E1EF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E9D8494-01B2-49EF-8BA3-49245F7E1EF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E9D8494-01B2-49EF-8BA3-49245F7E1EF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DD0837E-524E-47A0-A5F3-108A15CE3C82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DD0837E-524E-47A0-A5F3-108A15CE3C82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DD0837E-524E-47A0-A5F3-108A15CE3C82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DD0837E-524E-47A0-A5F3-108A15CE3C82}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
