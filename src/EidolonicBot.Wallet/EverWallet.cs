@@ -1,5 +1,6 @@
 using System.Text.Json;
 using EidolonicBot.Exceptions;
+using EidolonicBot.Utils;
 using EverscaleNet.Abstract;
 using EverscaleNet.Client.Models;
 using EverscaleNet.Models;
@@ -172,31 +173,30 @@ public class EverWallet : IEverWallet {
 
     private async Task<string> GetStateInitBoc(long userId, string publicKey,
         CancellationToken cancellationToken) {
-        var stateInit = await _memoryCache.GetOrCreateAsync<string>($"StateInitBocByUserId_{userId}", async entity => {
-            _logger.LogDebug("Getting StateInit for {UserId}", userId);
-
-            var dataBoc = (await _everClient.Boc.EncodeBoc(new ParamsOfEncodeBoc {
-                Builder = new BuilderOp[] {
-                    new BuilderOp.BitString { Value = $"x{publicKey}" },
-                    new BuilderOp.Integer { Size = 64, Value = 0.ToJsonElement<int>() },
-                    new BuilderOp.Integer { Size = 64, Value = userId.ToJsonElement<long>() }
-                }
-            }, cancellationToken)).Boc;
-            var stateInitBoc = (await _everClient.Boc.EncodeBoc(new ParamsOfEncodeBoc {
-                Builder = new BuilderOp[] {
-                    new BuilderOp.Integer { Size = 1, Value = 0.ToJsonElement<int>() },
-                    new BuilderOp.Integer { Size = 1, Value = 0.ToJsonElement<int>() },
-                    new BuilderOp.Integer { Size = 1, Value = 1.ToJsonElement<int>() },
-                    new BuilderOp.Integer { Size = 1, Value = 1.ToJsonElement<int>() },
-                    new BuilderOp.Integer { Size = 1, Value = 0.ToJsonElement<int>() },
-                    new BuilderOp.CellBoc { Boc = WalletContractCodeBoc },
-                    new BuilderOp.CellBoc { Boc = dataBoc }
-                }
-            }, cancellationToken)).Boc;
-
-            entity.Size = 1;
-            return stateInitBoc;
-        });
+        var stateInit = await _memoryCache.GetOrCreateAsync<string>($"StateInitBocByUserIdByPublicKey_{userId}_{publicKey}",
+            async entity => {
+                _logger.LogDebug("Getting StateInit for {UserId}", userId);
+                var dataBoc = (await _everClient.Boc.EncodeBoc(new ParamsOfEncodeBoc {
+                    Builder = new[] {
+                        $"x{publicKey}".ToBuilderOp(),
+                        0L.ToBuilderOp(),
+                        userId.ToBuilderOp()
+                    }
+                }, cancellationToken)).Boc;
+                var stateInitBoc = (await _everClient.Boc.EncodeBoc(new ParamsOfEncodeBoc {
+                    Builder = new[] {
+                        false.ToBuilderOp(),
+                        false.ToBuilderOp(),
+                        true.ToBuilderOp(),
+                        true.ToBuilderOp(),
+                        false.ToBuilderOp(),
+                        WalletContractCodeBoc.ToBuilderOpCellBoc(),
+                        dataBoc.ToBuilderOpCellBoc()
+                    }
+                }, cancellationToken)).Boc;
+                entity.Size = 1;
+                return stateInitBoc;
+            });
         return stateInit ?? throw new InvalidOperationException();
     }
 
@@ -205,7 +205,6 @@ public class EverWallet : IEverWallet {
             _logger.LogDebug("Getting Address for {StateInit}", stateInitBoc);
             var resultOfGetBocHash =
                 await _everClient.Boc.GetBocHash(new ParamsOfGetBocHash { Boc = stateInitBoc }, cancellationToken);
-
             entity.Size = 1;
             return $"0:{resultOfGetBocHash.Hash}";
         });
