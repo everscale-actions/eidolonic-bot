@@ -35,6 +35,7 @@ jobs:
           EverClient__Network__Endpoints__0=${{ secrets.NETWORK_ENDPOINT }}
           Serilog__WriteTo__Elasticsearch__Args__nodeUris=${{ secrets.SEMATEXT_ELASTICSEARCH_URIS }}
           SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+          ConnectionStrings__Postgres=${{ secrets.SUPABASE_CONNECTION_STRING }}
           EOT
 
       - name: Run app

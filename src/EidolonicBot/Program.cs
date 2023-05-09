@@ -1,7 +1,3 @@
-using System.Globalization;
-using EidolonicBot;
-using EidolonicBot.Services;
-
 CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 
 var host = Host.CreateApplicationBuilder(args)
@@ -10,7 +6,10 @@ var host = Host.CreateApplicationBuilder(args)
     .AddTelegramBot<BotUpdateHandler>()
     .AddEverClient()
     .AddEverWallet()
+    .AddDatabase()
     .AddBusiness()
     .Build();
 
-host.Run();
+host
+    .MigrateDatabase()
+    .Run();
