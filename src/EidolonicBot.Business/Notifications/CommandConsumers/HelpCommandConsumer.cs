@@ -13,8 +13,9 @@ public class HelpCommandConsumer : CommandConsumerBase {
         var sb = new StringBuilder("Usage:\n");
 
         foreach (var (_, commandDescription) in
-                 CommandHelpers.CommandAttributeByCommand.Where(c => c.Value is not null))
+                 CommandHelpers.CommandAttributeByCommand.Where(c => c.Value is not null)) {
             sb.Append($"{commandDescription!.Text}\t- {commandDescription.Description}\n");
+        }
 
         return Task.FromResult(sb.ToString().TrimEnd('\n'))!;
     }
