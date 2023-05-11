@@ -28,6 +28,6 @@ public enum Command {
                "  `/subscription list`\n" +
                "  `/subscription add `address\n" +
                "  `/subscription remove `address\n" +
-               " * only chat admins can control subscriptions")]
+               " [*] only chat admins can control subscriptions")]
     Subscription
 }
