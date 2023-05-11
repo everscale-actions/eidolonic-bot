@@ -59,7 +59,7 @@ public class SubscriptionService : ISubscriptionService, IAsyncDisposable {
         await _everClient.Net.Unsubscribe(new ResultOfSubscribeCollection { Handle = _handler.Value }, cancellationToken);
     }
 
-    private void LogCallback(JsonElement e, uint responseType) {
+    private Task LogCallback(JsonElement e, uint responseType) {
         switch ((SubscriptionResponseType)responseType) {
             case SubscriptionResponseType.Ok:
                 _logger.LogInformation("{Transaction}", JsonSerializer.Serialize(e));
@@ -70,5 +70,7 @@ public class SubscriptionService : ISubscriptionService, IAsyncDisposable {
             default:
                 throw new ArgumentOutOfRangeException(nameof(responseType), responseType, null);
         }
+
+        return Task.CompletedTask;
     }
 }

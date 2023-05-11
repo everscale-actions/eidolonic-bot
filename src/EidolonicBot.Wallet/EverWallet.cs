@@ -1,6 +1,5 @@
 using System.Text.Json;
 using EidolonicBot.Exceptions;
-using EidolonicBot.Utils;
 using EverscaleNet.Abstract;
 using EverscaleNet.Client.Models;
 using EverscaleNet.Models;

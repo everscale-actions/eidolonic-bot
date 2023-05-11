@@ -2,8 +2,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="EverscaleNet" />
-		<PackageReference Include="EverscaleNet.Client" />
-		<PackageReference Include="EverscaleNet.Serialization" />
 		<PackageReference Include="EverscaleNet.Utils" />
 		<PackageReference Include="MassTransit" />
 		<PackageReference Include="MassTransit.Analyzers">
