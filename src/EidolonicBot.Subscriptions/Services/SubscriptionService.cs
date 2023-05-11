@@ -84,7 +84,9 @@ public class SubscriptionService : ISubscriptionService, IAsyncDisposable {
                 var transaction = e.ToPrototype(prototype).result.transactions;
                 _logger.LogInformation("Got transaction by subscription {@Transaction}", transaction);
                 try {
-                    await _mediator.Publish(new SubscriptionReceived(
+                    await using var scope = _scope.ServiceProvider.CreateAsyncScope();
+                    var mediator = scope.ServiceProvider.GetRequiredService<IScopedMediator>();
+                    await mediator.Publish(new SubscriptionReceived(
                         transaction.id,
                         transaction.account_addr,
                         transaction.balance_delta.NanoToCoins()

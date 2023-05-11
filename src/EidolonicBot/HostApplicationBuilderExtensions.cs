@@ -16,7 +16,7 @@ public static class HostApplicationBuilderExtensions {
                 .ReadFrom.Configuration(builder.Configuration)
                 .CreateLogger());
 
-            loggingBuilder.AddSentry(options => { options.Environment = builder.Environment.EnvironmentName; });
+            loggingBuilder.AddSentry(options => options.Environment = builder.Environment.EnvironmentName);
         });
         return builder;
     }
