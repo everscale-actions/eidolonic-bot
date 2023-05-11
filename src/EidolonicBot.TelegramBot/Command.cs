@@ -6,12 +6,12 @@ public enum Command {
     Unknown,
 
     [Command("/help",
-        Description = "Show this help",
-        IsWalletNeeded = false)]
+        Description = "Show this help")]
     Help,
 
     [Command("/wallet",
-        Description = "Wallet address and balance")]
+        Description = "Wallet address and balance",
+        IsWalletNeeded = true)]
     Wallet,
 
     [Command("/send",
@@ -19,7 +19,8 @@ public enum Command {
         Help = "Sends tokens from your wallet to user that you reply to or special address\n" +
                " Usage: `/send amount `\\[address]\n" +
                "  amount - minimum 0.1 or all to send the whole balance\n" +
-               "  address - get some coins for withdrawal")]
+               "  address - get some coins for withdrawal",
+        IsWalletNeeded = true)]
     Send,
 
     [Command("/subscription",
