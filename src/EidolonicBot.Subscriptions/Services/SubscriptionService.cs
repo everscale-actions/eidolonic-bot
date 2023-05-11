@@ -15,7 +15,7 @@ namespace EidolonicBot.Services;
 
 public class SubscriptionService : ISubscriptionService, IAsyncDisposable {
     private const string SubscriptionQuery =
-        @"subscription($addresses:StringFilter){transactions(filter:{account_addr:$addresses, balance_delta:{gt:""0""}}){id account_addr balance_delta(format:DEC)}}";
+        @"subscription($addresses:StringFilter){transactions(filter:{account_addr:$addresses, balance_delta:{ne:""0""}}){id account_addr balance_delta(format:DEC)}}";
 
     private readonly ILogger<SubscriptionService> _logger;
     private readonly IScopedMediator _mediator;
@@ -44,8 +44,7 @@ public class SubscriptionService : ISubscriptionService, IAsyncDisposable {
         Debug.Assert(_everClient != null, nameof(_everClient) + " != null");
 
         try {
-            var subscription = await _db.Subscription.ToArrayAsync(cancellationToken);
-            var addresses = subscription.Select(s => s.Address).ToArray();
+            var addresses = await _db.Subscription.Select(s => s.Address).ToArrayAsync(cancellationToken);
 
             var resultOfSubscribeCollection = await _everClient.Net.Subscribe(new ParamsOfSubscribe {
                 Subscription = SubscriptionQuery,
