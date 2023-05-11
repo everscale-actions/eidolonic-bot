@@ -27,6 +27,7 @@ public enum Command {
         Help = " Usage:\n" +
                "  `/subscription list`\n" +
                "  `/subscription add `address\n" +
-               "  `/subscription remove `address\n")]
+               "  `/subscription remove `address\n" +
+               " * only chat admins can control subscriptions")]
     Subscription
 }

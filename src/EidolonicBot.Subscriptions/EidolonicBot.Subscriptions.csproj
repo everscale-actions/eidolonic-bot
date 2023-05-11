@@ -3,24 +3,17 @@
 	<ItemGroup>
 		<PackageReference Include="EverscaleNet" />
 		<PackageReference Include="EverscaleNet.Utils" />
-		<PackageReference Include="MassTransit" />
+		<PackageReference Include="MassTransit.Abstractions" />
 		<PackageReference Include="MassTransit.Analyzers">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.Hosting" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
-		<PackageReference Include="Microsoft.Extensions.Options" />
-		<PackageReference Include="Telegram.Bot" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\EidolonicBot.Constants\EidolonicBot.Constants.csproj" />
 		<ProjectReference Include="..\EidolonicBot.Database.Models\EidolonicBot.Database.Models.csproj" />
-		<ProjectReference Include="..\EidolonicBot.Subscriptions\EidolonicBot.Subscriptions.csproj" />
-		<ProjectReference Include="..\EidolonicBot.TelegramBot\EidolonicBot.TelegramBot.csproj" />
-		<ProjectReference Include="..\EidolonicBot.Utils\EidolonicBot.Utils.csproj" />
-		<ProjectReference Include="..\EidolonicBot.Wallet\EidolonicBot.Wallet.csproj" />
 	</ItemGroup>
 
 </Project>

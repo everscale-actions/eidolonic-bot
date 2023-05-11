@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.Database.Postg
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.Database.Models", "EidolonicBot.Database.Models\EidolonicBot.Database.Models.csproj", "{5DD0837E-524E-47A0-A5F3-108A15CE3C82}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.Subscriptions", "EidolonicBot.Subscriptions\EidolonicBot.Subscriptions.csproj", "{D1BBE835-692C-4E1C-977E-79914851FC38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,5 +74,9 @@ Global
 		{5DD0837E-524E-47A0-A5F3-108A15CE3C82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5DD0837E-524E-47A0-A5F3-108A15CE3C82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5DD0837E-524E-47A0-A5F3-108A15CE3C82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1BBE835-692C-4E1C-977E-79914851FC38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1BBE835-692C-4E1C-977E-79914851FC38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1BBE835-692C-4E1C-977E-79914851FC38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1BBE835-692C-4E1C-977E-79914851FC38}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

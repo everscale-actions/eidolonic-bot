@@ -1,5 +1,5 @@
 using EidolonicBot.Abstract;
-using EidolonicBot.Notifications.UpdateConsumers;
+using EidolonicBot.Events;
 using EidolonicBot.Services;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,11 +16,10 @@ public static class HostApplicationBuilderExtensions {
             )
             .AddMediator(x => {
                 x.AddConsumers(type => type.IsAssignableTo(typeof(IMediatorConsumer)),
-                    typeof(SendCommandNotificationConsumer).Assembly);
+                    typeof(SubscriptionReceivedConsumer).Assembly);
             });
 
-        builder.Services.AddSingleton<ISubscriptionService, SubscriptionService>();
-        builder.Services.AddSingleton<IHostedService>(sp => sp.GetRequiredService<ISubscriptionService>());
+        builder.AddSubscriptions();
 
         return builder;
     }
