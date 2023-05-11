@@ -1,10 +1,4 @@
-﻿using EidolonicBot.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Telegram.Bot;
-using Telegram.Bot.Polling;
-
-namespace EidolonicBot;
+﻿namespace EidolonicBot;
 
 public static class HostApplicationBuilderExtensions {
     public static HostApplicationBuilder AddTelegramBot<T>(this HostApplicationBuilder builder) where T : class, IUpdateHandler {

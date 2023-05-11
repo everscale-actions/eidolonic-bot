@@ -1,19 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-	<ItemGroup>
-		<PackageReference Include="EverscaleNet.AppKit" />
-		<PackageReference Include="EverscaleNet.Client" />
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="EverscaleNet.AppKit" />
+    <PackageReference Include="EverscaleNet.Client" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\EidolonicBot.Wallet\EidolonicBot.Wallet.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EidolonicBot.Wallet\EidolonicBot.Wallet.csproj" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<Content Include="_contracts\**">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
+  <ItemGroup>
+    <Content Include="_contracts\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
 </Project>

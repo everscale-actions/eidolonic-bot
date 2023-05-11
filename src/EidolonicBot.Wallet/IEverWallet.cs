@@ -1,5 +1,3 @@
-using EverscaleNet.Models;
-
 namespace EidolonicBot;
 
 public interface IEverWallet {

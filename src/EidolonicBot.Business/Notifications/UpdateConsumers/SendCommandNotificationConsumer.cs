@@ -1,13 +1,4 @@
-﻿using EidolonicBot.Abstract;
-using EidolonicBot.Services;
-using MassTransit;
-using MassTransit.Mediator;
-using Microsoft.Extensions.Hosting;
-using Telegram.Bot;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
-
-namespace EidolonicBot.Notifications.UpdateConsumers;
+﻿namespace EidolonicBot.Notifications.UpdateConsumers;
 
 public class SendCommandNotificationConsumer : IConsumer<UpdateNotification>, IMediatorConsumer {
     private readonly ITelegramBotClient _botClient;

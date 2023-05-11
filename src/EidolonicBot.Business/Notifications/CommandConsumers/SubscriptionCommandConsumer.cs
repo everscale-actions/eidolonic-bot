@@ -1,11 +1,3 @@
-using EidolonicBot.Models;
-using EidolonicBot.Notifications.CommandConsumers.Base;
-using EidolonicBot.Services;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Caching.Memory;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-
 namespace EidolonicBot.Notifications.CommandConsumers;
 
 public class SubscriptionCommandConsumer : CommandConsumerBase {

@@ -1,9 +1,3 @@
-using EidolonicBot.Abstract;
-using MassTransit;
-using Microsoft.EntityFrameworkCore;
-using Telegram.Bot;
-using Telegram.Bot.Types.Enums;
-
 namespace EidolonicBot.Events;
 
 public class SubscriptionReceivedConsumer : IConsumer<SubscriptionReceived>, IMediatorConsumer {

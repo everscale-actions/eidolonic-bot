@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace EidolonicBot.Models;
 
 [PrimaryKey(nameof(ChatId), nameof(SubscriptionId))]

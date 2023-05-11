@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-	<ItemGroup>
-		<PackageReference Include="MassTransit.Abstractions" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" />
-		<PackageReference Include="Microsoft.Extensions.Http" />
-		<PackageReference Include="Telegram.Bot" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MassTransit.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="Telegram.Bot" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\EidolonicBot.Utils\EidolonicBot.Utils.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EidolonicBot.Utils\EidolonicBot.Utils.csproj" />
+  </ItemGroup>
 
 </Project>

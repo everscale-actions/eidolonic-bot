@@ -1,20 +1,13 @@
-using EidolonicBot.Abstract;
-using MassTransit;
-using Microsoft.Extensions.Caching.Memory;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-
 namespace EidolonicBot.Notifications.CommandConsumers.Base;
 
 public abstract class CommandConsumerBase : IConsumer<CommandNotification>, IMediatorConsumer {
-    private readonly ITelegramBotClient _botClient;
+    private readonly ITelegramBotClient _bot;
     private readonly Command _command;
     private readonly IMemoryCache _memoryCache;
 
-    protected CommandConsumerBase(Command command, ITelegramBotClient botClient, IMemoryCache memoryCache) {
+    protected CommandConsumerBase(Command command, ITelegramBotClient bot, IMemoryCache memoryCache) {
         _command = command;
-        _botClient = botClient;
+        _bot = bot;
         _memoryCache = memoryCache;
     }
 
@@ -39,7 +32,7 @@ public abstract class CommandConsumerBase : IConsumer<CommandNotification>, IMed
             return;
         }
 
-        await _botClient.SendTextMessageAsync(
+        await _bot.SendTextMessageAsync(
             message.Chat.Id,
             replyText,
             ParseMode.Markdown,
@@ -52,7 +45,7 @@ public abstract class CommandConsumerBase : IConsumer<CommandNotification>, IMed
         var cache = await _memoryCache.GetOrCreateAsync($"AdminIdsByChatId_{chatId}", async entry => {
             entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(1));
             entry.SetSize(1);
-            var admins = await _botClient.GetChatAdministratorsAsync(chatId, cancellationToken);
+            var admins = await _bot.GetChatAdministratorsAsync(chatId, cancellationToken);
             return admins.Select(a => a.User.Id).ToArray();
         });
 

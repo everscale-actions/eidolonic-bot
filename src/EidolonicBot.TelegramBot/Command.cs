@@ -1,5 +1,3 @@
-using EidolonicBot.Attributes;
-
 namespace EidolonicBot;
 
 public enum Command {

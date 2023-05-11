@@ -2,7 +2,6 @@ using System.Text.Json;
 using EidolonicBot.Exceptions;
 using EverscaleNet.Abstract;
 using EverscaleNet.Client.Models;
-using EverscaleNet.Models;
 using EverscaleNet.Serialization;
 using EverscaleNet.Utils;
 using Microsoft.Extensions.Caching.Memory;

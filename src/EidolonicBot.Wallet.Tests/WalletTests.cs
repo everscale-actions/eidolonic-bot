@@ -1,11 +1,3 @@
-using EidolonicBot.Exceptions;
-using EverscaleNet;
-using EverscaleNet.Utils;
-using FluentAssertions.Execution;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-
 namespace EidolonicBot;
 
 public class WalletTests : IAsyncLifetime {

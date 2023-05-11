@@ -1,5 +1,3 @@
-using EidolonicBot.Attributes;
-
 namespace EidolonicBot.Utils;
 
 public static class CommandHelpers {

@@ -1,7 +1,3 @@
-using EidolonicBot.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
 namespace EidolonicBot.ModelConfigurations;
 
 public class SubscriptionConfigurationPostgres : SubscriptionConfigurationBase {

@@ -1,6 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
-
 namespace EidolonicBot.Models;
 
 [Index(nameof(Address), IsUnique = true)]

@@ -1,9 +1,3 @@
-using System.Text;
-using EidolonicBot.Notifications.CommandConsumers.Base;
-using Microsoft.Extensions.Caching.Memory;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-
 namespace EidolonicBot.Notifications.CommandConsumers;
 
 public class WalletCommandConsumer : CommandConsumerBase {

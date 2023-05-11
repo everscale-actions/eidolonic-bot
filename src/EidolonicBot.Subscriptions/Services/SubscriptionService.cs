@@ -1,16 +1,3 @@
-using System.Diagnostics;
-using System.Text.Json;
-using EidolonicBot.Events;
-using EverscaleNet.Abstract;
-using EverscaleNet.Client.Models;
-using EverscaleNet.Models;
-using EverscaleNet.Serialization;
-using EverscaleNet.Utils;
-using MassTransit.Mediator;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-
 namespace EidolonicBot.Services;
 
 public class SubscriptionService : ISubscriptionService, IAsyncDisposable {
@@ -18,7 +5,6 @@ public class SubscriptionService : ISubscriptionService, IAsyncDisposable {
         @"subscription($addresses:StringFilter){transactions(filter:{account_addr:$addresses, balance_delta:{ne:""0""}}){id account_addr balance_delta(format:DEC)}}";
 
     private readonly ILogger<SubscriptionService> _logger;
-    private readonly IScopedMediator _mediator;
     private readonly AsyncServiceScope _scope;
     private AppDbContext? _db;
     private IEverClient? _everClient;
@@ -29,7 +15,6 @@ public class SubscriptionService : ISubscriptionService, IAsyncDisposable {
         _scope = serviceProvider.CreateAsyncScope();
         _db = _scope.ServiceProvider.GetRequiredService<AppDbContext>();
         _everClient = _scope.ServiceProvider.GetRequiredService<IEverClient>();
-        _mediator = _scope.ServiceProvider.GetRequiredService<IScopedMediator>();
     }
 
     public async ValueTask DisposeAsync() {
@@ -97,7 +82,7 @@ public class SubscriptionService : ISubscriptionService, IAsyncDisposable {
 
                 break;
             case SubscriptionResponseType.Error:
-                _logger.LogWarning("Subscription error {Error}", JsonSerializer.Serialize(e, JsonOptionsProvider.JsonSerializerOptions));
+                _logger.LogWarning("Subscription error {@Error}", e.ToObject<ClientError>());
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(responseType), responseType, null);

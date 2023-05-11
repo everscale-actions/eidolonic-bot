@@ -1,11 +1,3 @@
-using EidolonicBot.Notifications;
-using MassTransit;
-using MassTransit.Mediator;
-using Microsoft.Extensions.DependencyInjection;
-using Telegram.Bot;
-using Telegram.Bot.Polling;
-using Telegram.Bot.Types;
-
 namespace EidolonicBot.Services;
 
 public class BotUpdateHandler : IUpdateHandler {

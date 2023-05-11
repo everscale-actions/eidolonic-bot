@@ -1,5 +1,3 @@
-using Telegram.Bot.Types;
-
 namespace EidolonicBot.Notifications;
 
 // ReSharper disable once ClassNeverInstantiated.Global

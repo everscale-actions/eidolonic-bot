@@ -1,5 +1,3 @@
-using Telegram.Bot.Types;
-
 namespace EidolonicBot.Notifications;
 
 public record UpdateNotification {

@@ -1,9 +1,3 @@
-using System.Reflection;
-using EverscaleNet.Client.PackageManager;
-using EverscaleNet.Models;
-using Microsoft.Extensions.Caching.Memory;
-using Serilog;
-
 namespace EidolonicBot;
 
 public static class HostApplicationBuilderExtensions {

@@ -1,9 +1,4 @@
-using EidolonicBot.Abstract;
 using EidolonicBot.Events;
-using EidolonicBot.Services;
-using MassTransit;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace EidolonicBot;
 

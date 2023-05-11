@@ -1,46 +1,46 @@
 <Project Sdk="Microsoft.NET.Sdk.Worker">
 
-	<PropertyGroup>
-		<UserSecretsId>a2361216-afa4-40b4-b4ed-d501a64a040b</UserSecretsId>
-	</PropertyGroup>
+  <PropertyGroup>
+    <UserSecretsId>a2361216-afa4-40b4-b4ed-d501a64a040b</UserSecretsId>
+  </PropertyGroup>
 
-	<PropertyGroup>
-		<ContainerImageName>everscale-actions/eidolonic-bot</ContainerImageName>
-		<ContainerImageTags Condition="$(ContainerImageTags) == ''">latest</ContainerImageTags>
-	</PropertyGroup>
+  <PropertyGroup>
+    <ContainerImageName>everscale-actions/eidolonic-bot</ContainerImageName>
+    <ContainerImageTags Condition="$(ContainerImageTags) == ''">latest</ContainerImageTags>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<ContainerLabel Include="org.opencontainers.image.source" Value="https://github.com/$(ContainerImageName)" />
-	</ItemGroup>
+  <ItemGroup>
+    <ContainerLabel Include="org.opencontainers.image.source" Value="https://github.com/$(ContainerImageName)" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="EverscaleNet.Client" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" />
-		<PackageReference Include="Microsoft.NET.Build.Containers" />
-		<PackageReference Include="Sentry.Extensions.Logging" />
-		<PackageReference Include="Serilog.Enrichers.Environment" />
-		<PackageReference Include="Serilog.Extensions.Hosting" />
-		<PackageReference Include="Serilog.Formatting.Compact" />
-		<PackageReference Include="Serilog.Settings.Configuration" />
-		<PackageReference Include="Serilog.Sinks.Console" />
-		<PackageReference Include="Serilog.Sinks.File" />
-		<PackageReference Include="Serilog.Sinks.Elasticsearch" />
-	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="EverscaleNet.Client" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Microsoft.NET.Build.Containers" />
+    <PackageReference Include="Sentry.Extensions.Logging" />
+    <PackageReference Include="Serilog.Enrichers.Environment" />
+    <PackageReference Include="Serilog.Extensions.Hosting" />
+    <PackageReference Include="Serilog.Formatting.Compact" />
+    <PackageReference Include="Serilog.Settings.Configuration" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="Serilog.Sinks.Elasticsearch" />
+  </ItemGroup>
 
-	<ItemGroup>
-		<Content Update="appsettings.Development.json">
-			<DependentUpon>appsettings.json</DependentUpon>
-		</Content>
-	</ItemGroup>
+  <ItemGroup>
+    <Content Update="appsettings.Development.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+    </Content>
+  </ItemGroup>
 
-	<ItemGroup>
-		<ProjectReference Include="..\EidolonicBot.Business\EidolonicBot.Business.csproj" />
-		<ProjectReference Include="..\EidolonicBot.Database\EidolonicBot.Database.csproj" />
-		<ProjectReference Include="..\EidolonicBot.TelegramBot\EidolonicBot.TelegramBot.csproj" />
-	</ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EidolonicBot.Business\EidolonicBot.Business.csproj" />
+    <ProjectReference Include="..\EidolonicBot.Database\EidolonicBot.Database.csproj" />
+    <ProjectReference Include="..\EidolonicBot.TelegramBot\EidolonicBot.TelegramBot.csproj" />
+  </ItemGroup>
 </Project>

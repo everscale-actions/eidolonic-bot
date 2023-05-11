@@ -1,6 +1,3 @@
-using EidolonicBot.Models;
-using Microsoft.EntityFrameworkCore;
-
 namespace EidolonicBot;
 
 public abstract class AppDbContext : DbContext {

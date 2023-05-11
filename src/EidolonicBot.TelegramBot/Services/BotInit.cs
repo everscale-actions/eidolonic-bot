@@ -1,8 +1,3 @@
-using EidolonicBot.Utils;
-using Microsoft.Extensions.Hosting;
-using Telegram.Bot;
-using Telegram.Bot.Types;
-
 namespace EidolonicBot.Services;
 
 public class BotInit : IHostedService {

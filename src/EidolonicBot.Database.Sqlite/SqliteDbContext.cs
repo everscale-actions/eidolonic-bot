@@ -1,5 +1,3 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace EidolonicBot;
 
 public class SqliteDbContext : AppDbContext {

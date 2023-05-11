@@ -1,5 +1,3 @@
-using Telegram.Bot;
-
 namespace EidolonicBot.Services;
 
 public class StaticService : IStaticService {
