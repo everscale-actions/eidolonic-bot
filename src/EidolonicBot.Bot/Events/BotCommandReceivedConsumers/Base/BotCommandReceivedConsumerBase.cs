@@ -35,7 +35,7 @@ public abstract class BotCommandReceivedConsumerBase : IConsumer<BotCommandRecei
         await _bot.SendTextMessageAsync(
             message.Chat.Id,
             replyText,
-            ParseMode.Markdown,
+            parseMode: ParseMode.Markdown,
             replyToMessageId: message.MessageId,
             cancellationToken: cancellationToken
         );

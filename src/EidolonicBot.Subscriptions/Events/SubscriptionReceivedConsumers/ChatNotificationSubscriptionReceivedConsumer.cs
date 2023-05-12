@@ -30,6 +30,6 @@ public class SubscriptionReceivedConsumer : IConsumer<SubscriptionReceived>, IMe
             $"Balance change:` {@event.BalanceChange}`";
 
         await Task.WhenAll(chatIds.Select(chatId =>
-            _bot.SendTextMessageAsync(chatId, message, ParseMode.Markdown, cancellationToken: cancellationToken)));
+            _bot.SendTextMessageAsync(chatId, message, parseMode: ParseMode.Markdown, cancellationToken: cancellationToken)));
     }
 }
