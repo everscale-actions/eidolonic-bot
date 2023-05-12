@@ -1,4 +1,8 @@
-namespace EidolonicBot.Events;
+using MassTransit;
+using Telegram.Bot;
+using Telegram.Bot.Types.Enums;
+
+namespace EidolonicBot.Events.SubscriptionReceivedConsumers;
 
 public class SubscriptionReceivedConsumer : IConsumer<SubscriptionReceived>, IMediatorConsumer {
     private readonly ITelegramBotClient _bot;
@@ -18,6 +22,8 @@ public class SubscriptionReceivedConsumer : IConsumer<SubscriptionReceived>, IMe
             .SelectMany(chatId => chatId)
             .ToArrayAsync(cancellationToken);
 
+        
+        
         var message =
             $"Transaction:` {@event.TransactionId}`\n" +
             $"Account:` {@event.AccountAddr}`\n" +

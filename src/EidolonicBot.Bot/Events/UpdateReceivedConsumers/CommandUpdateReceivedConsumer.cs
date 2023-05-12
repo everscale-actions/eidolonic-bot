@@ -1,25 +1,23 @@
-﻿namespace EidolonicBot.Notifications.UpdateConsumers;
+﻿namespace EidolonicBot.Events.UpdateReceivedConsumers;
 
-public class SendCommandNotificationConsumer : IConsumer<UpdateNotification>, IMediatorConsumer {
+public class CommandUpdateReceivedConsumer : IConsumer<UpdateReceived>, IMediatorConsumer {
     private readonly ITelegramBotClient _botClient;
     private readonly IHostEnvironment _hostEnvironment;
-    private readonly ILogger<SendCommandNotificationConsumer> _logger;
+    private readonly ILogger<CommandUpdateReceivedConsumer> _logger;
     private readonly IScopedMediator _mediator;
-    private readonly IStaticService _staticService;
-    private readonly IEverWallet _wallet;
+    private readonly IMemoryCache _cache;
 
-    public SendCommandNotificationConsumer(IScopedMediator mediator, IStaticService staticService,
-        ILogger<SendCommandNotificationConsumer> logger, IHostEnvironment hostEnvironment,
-        ITelegramBotClient botClient, IEverWallet wallet) {
+    public CommandUpdateReceivedConsumer(IScopedMediator mediator,
+        ILogger<CommandUpdateReceivedConsumer> logger, IHostEnvironment hostEnvironment,
+        ITelegramBotClient botClient, IMemoryCache cache) {
         _mediator = mediator;
-        _staticService = staticService;
         _logger = logger;
         _hostEnvironment = hostEnvironment;
         _botClient = botClient;
-        _wallet = wallet;
+        _cache = cache;
     }
 
-    public async Task Consume(ConsumeContext<UpdateNotification> context) {
+    public async Task Consume(ConsumeContext<UpdateReceived> context) {
         var update = context.Message.Update;
         var cancellationToken = context.CancellationToken;
 
@@ -40,7 +38,7 @@ public class SendCommandNotificationConsumer : IConsumer<UpdateNotification>, IM
             case 1 when update.Message.Chat.Type is not ChatType.Private && _hostEnvironment.IsDevelopment():
                 return;
             case 2: {
-                var botUsername = await _staticService.GetBotUsername(cancellationToken);
+                var botUsername = await GetBotUsername(cancellationToken);
                 if (commandAndUserName[1] != botUsername) {
                     _logger.LogDebug("Command ignored die to wrong bot username Expected: {ExpectedUserName} Actual: {ActualUserName}",
                         botUsername, commandAndUserName[1]);
@@ -70,14 +68,18 @@ public class SendCommandNotificationConsumer : IConsumer<UpdateNotification>, IM
             }
         }
 
-        if (command.IsWalletNeeded()) {
-            await _wallet.Init(userId, cancellationToken);
-        }
+        await _mediator.Publish(new BotCommandReceived(
+            Command: command,
+            Arguments: args,
+            Message: update.Message
+        ), cancellationToken);
+    }
 
-        await _mediator.Send<CommandNotification>(new {
-            Command = command,
-            Arguments = args,
-            update.Message
-        }, cancellationToken);
+    private async Task<string?> GetBotUsername(CancellationToken cancellationToken) {
+        return await _cache.GetOrCreateAsync("BotUsername", async entry => {
+            entry.Size = 1;
+            entry.Priority = CacheItemPriority.NeverRemove;
+            return (await _botClient.GetMeAsync(cancellationToken: cancellationToken)).Username;
+        });
     }
 }

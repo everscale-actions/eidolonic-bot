@@ -90,7 +90,8 @@ public class WalletTests : IAsyncLifetime {
         var wallet = new EverWallet(_everClient,
             _sp.GetRequiredService<IOptions<EverWalletOptions>>(),
             _sp.GetRequiredService<IMemoryCache>(),
-            _sp.GetRequiredService<ILogger<EverWallet>>());
+            _sp.GetRequiredService<ILogger<EverWallet>>()
+        );
         return await wallet.Init(secondUserId, _cancellationToken);
     }
 }

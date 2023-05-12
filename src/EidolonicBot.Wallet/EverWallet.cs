@@ -96,7 +96,6 @@ public class EverWallet : IEverWallet {
         if (phrase is null or "YOUR_SEED_PHRASE_HERE") {
             throw new NullReferenceException("Wallet:SeedPhrase should be provided");
         }
-
         _keyPair ??= await GetKeyPair(phrase ?? throw new InvalidOperationException(), cancellationToken);
         _stateInitBoc ??= await GetStateInitBoc(userId, _keyPair, cancellationToken);
         _address ??= await GetAddress(_stateInitBoc, cancellationToken);

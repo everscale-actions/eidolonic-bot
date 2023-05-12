@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="EverscaleNet.Client" />
+    <PackageReference Include="MassTransit" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -39,8 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EidolonicBot.Business\EidolonicBot.Business.csproj" />
     <ProjectReference Include="..\EidolonicBot.Database\EidolonicBot.Database.csproj" />
-    <ProjectReference Include="..\EidolonicBot.TelegramBot\EidolonicBot.TelegramBot.csproj" />
+    <ProjectReference Include="..\EidolonicBot.Bot\EidolonicBot.Bot.csproj" />
   </ItemGroup>
 </Project>

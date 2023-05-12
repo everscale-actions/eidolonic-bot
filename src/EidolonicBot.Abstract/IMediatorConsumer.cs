@@ -1,3 +1,3 @@
-namespace EidolonicBot.Abstract;
+namespace EidolonicBot;
 
 public interface IMediatorConsumer { }

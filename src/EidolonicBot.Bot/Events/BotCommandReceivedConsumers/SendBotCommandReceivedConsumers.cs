@@ -1,17 +1,16 @@
-namespace EidolonicBot.Notifications.CommandConsumers;
+namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 
-public class SendCommandConsumer : CommandConsumerBase {
+public class SendBotCommandReceivedConsumers : BotCommandReceivedConsumerBase {
     private const string SendMessage = "{0} sent to {1} {2:F}{3}";
-    private readonly ITelegramBotClient _bot;
-    private readonly ILogger<SendCommandConsumer> _logger;
+    private readonly ILogger<SendBotCommandReceivedConsumers> _logger;
 
     private readonly IEverWallet _wallet;
 
-    public SendCommandConsumer(ITelegramBotClient bot, IEverWallet wallet, IMemoryCache memoryCache, ILogger<SendCommandConsumer> logger) : base(
+    public SendBotCommandReceivedConsumers(ITelegramBotClient bot, IEverWallet wallet, IMemoryCache memoryCache,
+        ILogger<SendBotCommandReceivedConsumers> logger) : base(
         Command.Send, bot, memoryCache) {
         _wallet = wallet;
         _logger = logger;
-        _bot = bot;
     }
 
     private static string FormatSendMessage(User fromUser, User toUser, decimal coins) {
@@ -55,13 +54,6 @@ public class SendCommandConsumer : CommandConsumerBase {
             return $"You should send at least {0.1:F}{Constants.Currency}";
         }
 
-        var rnd = new Random().Next(1, Enum.GetValues<Emoji>().Length);
-        var dice = await _bot.SendDiceAsync(chatId,
-            (Emoji)rnd,
-            true,
-            replyToMessageId: message.MessageId, cancellationToken: cancellationToken);
-        _logger.LogInformation("Dice {@Dice}", dice);
-
         try {
             if (args is [.., { } dest] && Regex.TvmAddressRegex().IsMatch(dest)) {
                 var (transactionId, coins) = await _wallet.SendCoins(dest, sendCoins, allBalance, cancellationToken);
@@ -81,7 +73,6 @@ public class SendCommandConsumer : CommandConsumerBase {
             return "Something went wrong";
         } finally {
             await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
-            await _bot.DeleteMessageAsync(chatId, dice.MessageId, cancellationToken);
         }
     }
 }

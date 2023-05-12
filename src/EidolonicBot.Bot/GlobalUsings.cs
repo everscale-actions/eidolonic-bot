@@ -1,11 +1,11 @@
 // Global using directives
 
 global using System.Text;
-global using EidolonicBot.Abstract;
+global using EidolonicBot.Attributes;
+global using EidolonicBot.Events;
+global using EidolonicBot.Events.BotCommandReceivedConsumers.Base;
 global using EidolonicBot.Exceptions;
 global using EidolonicBot.Models;
-global using EidolonicBot.Notifications;
-global using EidolonicBot.Notifications.CommandConsumers.Base;
 global using EidolonicBot.Services;
 global using EidolonicBot.Utils;
 global using MassTransit;

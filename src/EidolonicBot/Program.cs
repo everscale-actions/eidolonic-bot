@@ -3,11 +3,12 @@ CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
 var host = Host.CreateApplicationBuilder(args)
     .AddLogging()
     .AddMemoryCache()
-    .AddTelegramBot<BotUpdateHandler>()
+    .AddTelegramBot()
     .AddEverClient()
     .AddEverWallet()
     .AddDatabase()
-    .AddBusiness()
+    .AddMassTransit()
+    .AddSubscriptions()
     .Build();
 
 host

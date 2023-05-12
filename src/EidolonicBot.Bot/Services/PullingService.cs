@@ -1,6 +1,3 @@
-using Microsoft.Extensions.Logging;
-using Telegram.Bot.Types.Enums;
-
 namespace EidolonicBot.Services;
 
 public class PullingService : BackgroundService {

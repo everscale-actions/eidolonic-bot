@@ -1,17 +1,17 @@
-namespace EidolonicBot.Notifications.CommandConsumers.Base;
+namespace EidolonicBot.Events.BotCommandReceivedConsumers.Base;
 
-public abstract class CommandConsumerBase : IConsumer<CommandNotification>, IMediatorConsumer {
+public abstract class BotCommandReceivedConsumerBase : IConsumer<BotCommandReceived>, IMediatorConsumer {
     private readonly ITelegramBotClient _bot;
     private readonly Command _command;
     private readonly IMemoryCache _memoryCache;
 
-    protected CommandConsumerBase(Command command, ITelegramBotClient bot, IMemoryCache memoryCache) {
+    protected BotCommandReceivedConsumerBase(Command command, ITelegramBotClient bot, IMemoryCache memoryCache) {
         _command = command;
         _bot = bot;
         _memoryCache = memoryCache;
     }
 
-    public async Task Consume(ConsumeContext<CommandNotification> context) {
+    public async Task Consume(ConsumeContext<BotCommandReceived> context) {
         if (context.Message.Command != _command) {
             return;
         }

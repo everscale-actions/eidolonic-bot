@@ -16,9 +16,9 @@ public class BotUpdateHandler : IUpdateHandler {
         await using var scope = _serviceProvider.CreateAsyncScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IScopedMediator>();
         try {
-            await mediator.Send<UpdateNotification>(new { Update = update }, cancellationToken);
+            await mediator.Publish(new UpdateReceived(Update: update), cancellationToken);
         } catch (Exception ex) {
-            _logger.LogError(ex, "UpdateNotification failed: {@Update}", update);
+            _logger.LogError(ex, "UpdateReceived failed: {@Update}", update);
         }
     }
 

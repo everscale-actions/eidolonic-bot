@@ -1,10 +1,10 @@
-namespace EidolonicBot.Notifications.CommandConsumers;
+namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 
-public class SubscriptionCommandConsumer : CommandConsumerBase {
+public class SubscriptionBotCommandReceivedConsumers : BotCommandReceivedConsumerBase {
     private readonly AppDbContext _db;
     private readonly ISubscriptionService _subscriptionService;
 
-    public SubscriptionCommandConsumer(ITelegramBotClient botClient, IMemoryCache memoryCache, AppDbContext db,
+    public SubscriptionBotCommandReceivedConsumers(ITelegramBotClient botClient, IMemoryCache memoryCache, AppDbContext db,
         ISubscriptionService subscriptionService) : base(
         Command.Subscription, botClient,
         memoryCache) {
@@ -33,7 +33,7 @@ public class SubscriptionCommandConsumer : CommandConsumerBase {
                    " `/subscription add `address";
         }
 
-        return string.Join('\n', subscriptionStrings.Select(s => s));
+        return string.Join('\n', subscriptionStrings.Select<string, string>(s => s));
     }
 
     private async Task<string> Subscribe(string address, long chatId, CancellationToken cancellationToken) {

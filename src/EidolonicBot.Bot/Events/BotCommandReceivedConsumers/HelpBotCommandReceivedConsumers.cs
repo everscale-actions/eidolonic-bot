@@ -1,7 +1,7 @@
-namespace EidolonicBot.Notifications.CommandConsumers;
+namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 
-public class HelpCommandConsumer : CommandConsumerBase {
-    public HelpCommandConsumer(ITelegramBotClient botClient, IMemoryCache memoryCache) : base(Command.Help, botClient, memoryCache) { }
+public class HelpBotCommandReceivedConsumers : BotCommandReceivedConsumerBase {
+    public HelpBotCommandReceivedConsumers(ITelegramBotClient botClient, IMemoryCache memoryCache) : base(Command.Help, botClient, memoryCache) { }
 
     protected override Task<string?> Consume(string[] args, Message message, long chatId, bool isAdmin, CancellationToken cancellationToken) {
         var sb = new StringBuilder("Usage:\n");
