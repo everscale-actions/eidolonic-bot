@@ -38,8 +38,9 @@ public class SubscriptionService : ISubscriptionService, IAsyncDisposable {
             _handler = resultOfSubscribeCollection.Handle;
         } catch (Exception e) {
             if (!cancellationToken.IsCancellationRequested) {
-                _logger.LogError(e, "Subscription service error. Restarting...");
+                _logger.LogError(e, "Subscription service error. Restarting in 10 seconds..");
                 await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
+                await StartAsync(cancellationToken);
             }
         }
     }
@@ -52,8 +53,9 @@ public class SubscriptionService : ISubscriptionService, IAsyncDisposable {
     public async Task StopAsync(CancellationToken cancellationToken) {
         _logger.LogInformation("Stopping subscription service");
 
-        Debug.Assert(_everClient != null, nameof(_everClient) + " != null");
-        Debug.Assert(_handler != null, nameof(_handler) + " != null");
+        if (_everClient is null || _handler is null) {
+            return;
+        }
 
         await _everClient.Net.Unsubscribe(new ResultOfSubscribeCollection { Handle = _handler.Value }, cancellationToken);
     }
