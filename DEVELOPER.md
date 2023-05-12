@@ -5,7 +5,7 @@
 ### Add migration
 
 ```shell
-migration="NewMigration"
+migration="AddThreadIdToSubscription"
 
 cd src
 dotnet ef migrations add $migration -s EidolonicBot -p EidolonicBot.Database.Sqlite -- --provider Sqlite

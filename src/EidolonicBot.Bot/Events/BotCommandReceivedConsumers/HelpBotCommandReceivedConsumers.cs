@@ -3,7 +3,8 @@ namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 public class HelpBotCommandReceivedConsumers : BotCommandReceivedConsumerBase {
     public HelpBotCommandReceivedConsumers(ITelegramBotClient botClient, IMemoryCache memoryCache) : base(Command.Help, botClient, memoryCache) { }
 
-    protected override Task<string?> Consume(string[] args, Message message, long chatId, bool isAdmin, CancellationToken cancellationToken) {
+    protected override Task<string?> Consume(string[] args, Message message, long chatId, int messageThreadId, bool isAdmin,
+        CancellationToken cancellationToken) {
         var sb = new StringBuilder("Usage:\n");
 
         foreach (var (_, commandDescription) in

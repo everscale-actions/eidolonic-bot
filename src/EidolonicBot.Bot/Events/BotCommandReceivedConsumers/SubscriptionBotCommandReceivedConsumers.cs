@@ -12,19 +12,20 @@ public class SubscriptionBotCommandReceivedConsumers : BotCommandReceivedConsume
         _subscriptionService = subscriptionService;
     }
 
-    protected override async Task<string?> Consume(string[] args, Message message, long chatId, bool isAdmin,
+    protected override async Task<string?> Consume(string[] args, Message message, long chatId, int messageThreadId, bool isAdmin,
         CancellationToken cancellationToken) {
         return args switch {
-            ["add", { } address] when isAdmin && Regex.TvmAddressRegex().IsMatch(address) => await Subscribe(address, chatId, cancellationToken),
-            ["remove", { } address] when isAdmin && Regex.TvmAddressRegex().IsMatch(address) => await Unsubscribe(address, chatId,
+            ["add", { } address] when isAdmin && Regex.TvmAddressRegex().IsMatch(address) => await Subscribe(address, chatId, messageThreadId,
                 cancellationToken),
-            ["list"] => await GetSubscriptionList(chatId, cancellationToken),
+            ["remove", { } address] when isAdmin && Regex.TvmAddressRegex().IsMatch(address) => await Unsubscribe(address, chatId,
+                messageThreadId, cancellationToken),
+            ["list"] => await GetSubscriptionList(chatId, messageThreadId, cancellationToken),
             _ => CommandHelpers.CommandAttributeByCommand[Command.Subscription]?.Help
         };
     }
 
-    private async Task<string?> GetSubscriptionList(long chatId, CancellationToken cancellationToken) {
-        var subscriptionStrings = await _db.SubscriptionByChat.Where(s => s.ChatId == chatId)
+    private async Task<string?> GetSubscriptionList(long chatId, int messageThreadId, CancellationToken cancellationToken) {
+        var subscriptionStrings = await _db.SubscriptionByChat.Where(s => s.ChatId == chatId && s.MessageThreadId == messageThreadId)
             .Select(s => $"`{s.Subscription.Address}`")
             .ToArrayAsync(cancellationToken);
 
@@ -36,14 +37,20 @@ public class SubscriptionBotCommandReceivedConsumers : BotCommandReceivedConsume
         return string.Join('\n', subscriptionStrings.Select<string, string>(s => s));
     }
 
-    private async Task<string> Subscribe(string address, long chatId, CancellationToken cancellationToken) {
+    private async Task<string> Subscribe(string address, long chatId, int messageThreadId, CancellationToken cancellationToken) {
         var subscription = await _db.Subscription.FirstOrDefaultAsync(s => s.Address == address, cancellationToken);
         subscription ??= (await _db.Subscription.AddAsync(new Subscription { Address = address }, cancellationToken)).Entity;
 
-        var subscriptionByChat = await _db.SubscriptionByChat.FindAsync(new object?[] { chatId, subscription.Id, cancellationToken },
+        var subscriptionByChat = await _db.SubscriptionByChat.FindAsync(
+            new object?[] { chatId, messageThreadId, subscription.Id, cancellationToken },
             cancellationToken);
         if (subscriptionByChat is null) {
-            await _db.SubscriptionByChat.AddAsync(new SubscriptionByChat { SubscriptionId = subscription.Id, ChatId = chatId },
+            await _db.SubscriptionByChat.AddAsync(
+                new SubscriptionByChat {
+                    SubscriptionId = subscription.Id,
+                    ChatId = chatId,
+                    MessageThreadId = messageThreadId
+                },
                 cancellationToken);
         }
 
@@ -56,13 +63,14 @@ public class SubscriptionBotCommandReceivedConsumers : BotCommandReceivedConsume
             : $"`{address}` is already added earlier";
     }
 
-    private async Task<string> Unsubscribe(string address, long chatId, CancellationToken cancellationToken) {
+    private async Task<string> Unsubscribe(string address, long chatId, int messageThreadId, CancellationToken cancellationToken) {
         var subscription = await _db.Subscription.FirstOrDefaultAsync(s => s.Address == address, cancellationToken);
         if (subscription is null) {
             return "Subscription not found";
         }
 
-        var subscriptionByChat = await _db.SubscriptionByChat.FindAsync(new object?[] { chatId, subscription.Id, cancellationToken },
+        var subscriptionByChat = await _db.SubscriptionByChat.FindAsync(
+            new object?[] { chatId, messageThreadId, subscription.Id, cancellationToken },
             cancellationToken);
         if (subscriptionByChat is null) {
             return "Subscription not found";

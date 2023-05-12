@@ -29,7 +29,7 @@ public class SendBotCommandReceivedConsumers : BotCommandReceivedConsumerBase {
             Constants.Currency);
     }
 
-    protected override async Task<string?> Consume(string[] args, Message message, long chatId, bool isAdmin,
+    protected override async Task<string?> Consume(string[] args, Message message, long chatId, int messageThreadId, bool isAdmin,
         CancellationToken cancellationToken) {
         if (message is not { From: { } fromUser }) {
             return null;
@@ -56,12 +56,12 @@ public class SendBotCommandReceivedConsumers : BotCommandReceivedConsumerBase {
 
         try {
             if (args is [.., { } dest] && Regex.TvmAddressRegex().IsMatch(dest)) {
-                var (transactionId, coins) = await _wallet.SendCoins(dest, sendCoins, allBalance, cancellationToken);
+                var (_, coins) = await _wallet.SendCoins(dest, sendCoins, allBalance, cancellationToken);
                 return FormatSendMessage(fromUser, dest, coins);
             }
 
             if (message is { ReplyToMessage.From: { } toUser }) {
-                var (transactionId, coins) = await _wallet.SendCoins(toUser.Id, sendCoins, allBalance, cancellationToken);
+                var (_, coins) = await _wallet.SendCoins(toUser.Id, sendCoins, allBalance, cancellationToken);
                 return FormatSendMessage(fromUser, toUser, coins);
             }
 

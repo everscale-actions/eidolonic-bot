@@ -47,10 +47,13 @@ namespace EidolonicBot.Migrations
                     b.Property<long>("ChatId")
                         .HasColumnType("bigint");
 
+                    b.Property<int>("MessageThreadId")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("SubscriptionId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("ChatId", "SubscriptionId");
+                    b.HasKey("ChatId", "MessageThreadId", "SubscriptionId");
 
                     b.HasIndex("SubscriptionId");
 

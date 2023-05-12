@@ -19,13 +19,14 @@ public abstract class BotCommandReceivedConsumerBase : IConsumer<BotCommandRecei
         var message = context.Message.Message;
         var cancellationToken = context.CancellationToken;
 
-        if (message is not { Chat.Id: var chatId, From.Id: var fromId }) {
+        if (message is not { Chat.Id: var chatId, MessageThreadId: var messageThreadId, From.Id: var fromId }) {
             return;
         }
 
         var isAdmin = chatId == fromId || await IsChatAdmin(chatId, fromId, cancellationToken);
 
-        var replyText = await Consume(context.Message.Arguments, context.Message.Message, chatId, isAdmin,
+        // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
+        var replyText = await Consume(context.Message.Arguments, context.Message.Message, chatId, messageThreadId ?? 0, isAdmin,
             cancellationToken);
 
         if (replyText is null) {
@@ -52,6 +53,6 @@ public abstract class BotCommandReceivedConsumerBase : IConsumer<BotCommandRecei
         return cache?.Contains(userId) ?? false;
     }
 
-    protected abstract Task<string?> Consume(string[] args, Message message, long chatId, bool isAdmin,
+    protected abstract Task<string?> Consume(string[] args, Message message, long chatId, int messageThreadId, bool isAdmin,
         CancellationToken cancellationToken);
 }

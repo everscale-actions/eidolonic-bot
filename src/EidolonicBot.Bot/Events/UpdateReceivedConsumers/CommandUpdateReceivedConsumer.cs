@@ -25,8 +25,7 @@ public class CommandUpdateReceivedConsumer : IConsumer<UpdateReceived>, IMediato
                 Message : {
                     Text: { } messageText,
                     MessageId: var messageId,
-                    Chat.Id: var chatId,
-                    From.Id: var userId
+                    Chat.Id: var chatId
                 }
             } || !messageText.StartsWith('/')) {
             return;
