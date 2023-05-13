@@ -1,10 +1,10 @@
 namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 
-public class SubscriptionBotCommandReceivedConsumers : BotCommandReceivedConsumerBase {
+public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
     private readonly AppDbContext _db;
     private readonly ISubscriptionService _subscriptionService;
 
-    public SubscriptionBotCommandReceivedConsumers(ITelegramBotClient botClient, IMemoryCache memoryCache, AppDbContext db,
+    public SubscriptionBotCommandReceivedConsumer(ITelegramBotClient botClient, IMemoryCache memoryCache, AppDbContext db,
         ISubscriptionService subscriptionService) : base(
         Command.Subscription, botClient,
         memoryCache) {

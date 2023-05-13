@@ -2,7 +2,7 @@ namespace EidolonicBot.Services;
 
 public class SubscriptionService : ISubscriptionService, IAsyncDisposable {
     private const string SubscriptionQuery =
-        @"subscription($addresses:StringFilter){transactions(filter:{account_addr:$addresses, balance_delta:{ne:""0""}}){id account_addr balance_delta(format:DEC)}}";
+        @"subscription($addresses:StringFilter){transactions(filter:{account_addr:$addresses,balance_delta:{ne:""0""}}){id account_addr balance_delta(format:DEC)out_messages{dst}in_message{src}}}";
 
     private readonly ILogger<SubscriptionService> _logger;
     private readonly AsyncServiceScope _scope;
@@ -60,12 +60,23 @@ public class SubscriptionService : ISubscriptionService, IAsyncDisposable {
         await _everClient.Net.Unsubscribe(new ResultOfSubscribeCollection { Handle = _handler.Value }, cancellationToken);
     }
 
+
     private async Task SubscriptionCallback(JsonElement e, uint responseType, CancellationToken cancellationToken) {
         switch ((SubscriptionResponseType)responseType) {
             case SubscriptionResponseType.Ok:
                 var prototype = new {
                     result = new {
-                        transactions = new { id = string.Empty, account_addr = string.Empty, balance_delta = string.Empty }
+                        transactions = new {
+                            id = string.Empty,
+                            account_addr = string.Empty,
+                            balance_delta = string.Empty,
+                            out_messages = ArrayExtensions.Empty(new {
+                                dst = string.Empty
+                            }),
+                            in_message = new {
+                                src = string.Empty
+                            }
+                        }
                     }
                 };
                 var transaction = e.ToPrototype(prototype).result.transactions;
@@ -73,10 +84,17 @@ public class SubscriptionService : ISubscriptionService, IAsyncDisposable {
                 try {
                     await using var scope = _scope.ServiceProvider.CreateAsyncScope();
                     var mediator = scope.ServiceProvider.GetRequiredService<IScopedMediator>();
+
+                    var balanceDeltaCoins = transaction.balance_delta.NanoToCoins();
+                    var counterparty = balanceDeltaCoins > 0 
+                        ? transaction.in_message.src 
+                        : transaction.out_messages[0].dst;
+
                     await mediator.Publish(new SubscriptionReceived(
-                        transaction.id,
-                        transaction.account_addr,
-                        transaction.balance_delta.NanoToCoins()
+                        TransactionId: transaction.id,
+                        AccountAddr: transaction.account_addr,
+                        BalanceDelta: balanceDeltaCoins,
+                        Сounterparty: counterparty
                     ), cancellationToken);
                 } catch (Exception exception) {
                     _logger.LogError(exception, "Failed to publish SubscriptionReceived event");

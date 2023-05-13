@@ -1,3 +1,3 @@
 namespace EidolonicBot.Events;
 
-public record SubscriptionReceived(string TransactionId, string AccountAddr, decimal BalanceChange);
+public record SubscriptionReceived(string TransactionId, string AccountAddr, decimal BalanceDelta, string Сounterparty);

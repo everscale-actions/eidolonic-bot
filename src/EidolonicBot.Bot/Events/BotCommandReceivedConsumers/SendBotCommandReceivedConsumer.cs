@@ -1,13 +1,13 @@
 namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 
-public class SendBotCommandReceivedConsumers : BotCommandReceivedConsumerBase {
+public class SendBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
     private const string SendMessage = "{0} sent to {1} {2:F}{3}";
-    private readonly ILogger<SendBotCommandReceivedConsumers> _logger;
+    private readonly ILogger<SendBotCommandReceivedConsumer> _logger;
 
     private readonly IEverWallet _wallet;
 
-    public SendBotCommandReceivedConsumers(ITelegramBotClient bot, IEverWallet wallet, IMemoryCache memoryCache,
-        ILogger<SendBotCommandReceivedConsumers> logger) : base(
+    public SendBotCommandReceivedConsumer(ITelegramBotClient bot, IEverWallet wallet, IMemoryCache memoryCache,
+        ILogger<SendBotCommandReceivedConsumer> logger) : base(
         Command.Send, bot, memoryCache) {
         _wallet = wallet;
         _logger = logger;
