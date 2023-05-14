@@ -7,6 +7,7 @@ public interface IEverWallet {
         CancellationToken cancellationToken);
 
     Task<(string transactionId, decimal totalOutputCoins)> SendCoins(string address, decimal coins, bool allBalance,
+        string? memo,
         CancellationToken cancellationToken);
 
     Task<EverWallet> Init(long userId, CancellationToken cancellationToken);

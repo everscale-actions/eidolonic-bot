@@ -17,8 +17,15 @@ public class EverWallet : IEverWallet {
     private const string WalletContractAbiJson =
         "{\"ABI version\":2,\"version\":\"2.3\",\"header\":[\"pubkey\",\"time\",\"expire\"],\"functions\":[{\"name\":\"sendTransaction\",\"inputs\":[{\"name\":\"dest\",\"type\":\"address\"},{\"name\":\"value\",\"type\":\"uint128\"},{\"name\":\"bounce\",\"type\":\"bool\"},{\"name\":\"flags\",\"type\":\"uint8\"},{\"name\":\"payload\",\"type\":\"cell\"}],\"outputs\":[]},{\"name\":\"sendTransactionRaw\",\"inputs\":[{\"name\":\"flags\",\"type\":\"uint8\"},{\"name\":\"message\",\"type\":\"cell\"}],\"outputs\":[]}],\"data\":[],\"events\":[],\"fields\":[{\"name\":\"_pubkey\",\"type\":\"uint256\"},{\"name\":\"_timestamp\",\"type\":\"uint64\"}]}";
 
-    private static readonly Abi Abi = new Abi.Contract {
+    private const string TransferAbiJson =
+        "{\"ABI version\":2,\"functions\":[{\"name\":\"transfer\",\"id\":\"0x00000000\",\"inputs\":[{\"name\":\"comment\",\"type\":\"bytes\"}],\"outputs\":[]}],\"events\":[],\"data\":[]}";
+
+    private static readonly Abi WalletAbi = new Abi.Contract {
         Value = JsonSerializer.Deserialize<AbiContract>(WalletContractAbiJson, JsonOptionsProvider.JsonSerializerOptions)
+    };
+
+    private static readonly Abi TransferAbi = new Abi.Contract {
+        Value = JsonSerializer.Deserialize<AbiContract>(TransferAbiJson, JsonOptionsProvider.JsonSerializerOptions)
     };
 
     private readonly IEverClient _everClient;
@@ -73,10 +80,11 @@ public class EverWallet : IEverWallet {
         var destStateInitBoc = await GetStateInitBoc(userId, _keyPair, cancellationToken);
         var dest = await GetAddress(destStateInitBoc, cancellationToken);
 
-        return await SendCoins(dest, coins, allBalance, cancellationToken);
+        return await SendCoins(dest, coins, allBalance, null, cancellationToken);
     }
 
     public async Task<(string transactionId, decimal totalOutputCoins)> SendCoins(string address, decimal coins, bool allBalance,
+        string? memo,
         CancellationToken cancellationToken) {
         var balance = await GetBalance(cancellationToken) ?? throw new AccountInsufficientBalanceException(0);
         if (balance - coins < 0.1m) {
@@ -84,11 +92,26 @@ public class EverWallet : IEverWallet {
         }
 
         try {
-            return await SendTransaction(address, coins.CoinsToNano(), false, allBalance, cancellationToken);
+            var payload = memo is null ? null : await GetPayloadBodyByMemo(memo);
+            return await SendTransaction(address, coins.CoinsToNano(), false, allBalance, payload, cancellationToken);
         } catch (EverClientException exception) when (exception.Code == (uint)TvmErrorCode.LowBalance) {
             var balanceEx = await GetBalance(cancellationToken) ?? throw new AccountInsufficientBalanceException(0);
             throw new AccountInsufficientBalanceException(balanceEx);
         }
+    }
+
+    private async Task<string> GetPayloadBodyByMemo(string memo) {
+        var result = await _everClient.Abi.EncodeMessageBody(new ParamsOfEncodeMessageBody() {
+            Abi = TransferAbi,
+            CallSet = new CallSet() {
+                FunctionName = "transfer",
+                Input = new { comment = memo.ToHexString() }.ToJsonElement()
+            },
+            IsInternal = true,
+            Signer = new Signer.None()
+        });
+
+        return result.Body;
     }
 
     public async Task<EverWallet> Init(long userId, CancellationToken cancellationToken) {
@@ -96,6 +119,7 @@ public class EverWallet : IEverWallet {
         if (phrase is null or "YOUR_SEED_PHRASE_HERE") {
             throw new NullReferenceException("Wallet:SeedPhrase should be provided");
         }
+
         _keyPair ??= await GetKeyPair(phrase ?? throw new InvalidOperationException(), cancellationToken);
         _stateInitBoc ??= await GetStateInitBoc(userId, _keyPair, cancellationToken);
         _address ??= await GetAddress(_stateInitBoc, cancellationToken);
@@ -107,6 +131,7 @@ public class EverWallet : IEverWallet {
 
     private async Task<(string transactionId, decimal totalOutputCoins)> SendTransaction(string dest, decimal nanoCoins, bool bounce,
         bool allBalance,
+        string? payload,
         CancellationToken cancellationToken) {
         if (_keyPair is null || _stateInitBoc is null || _address is null) {
             throw new NotInitializedException();
@@ -120,13 +145,13 @@ public class EverWallet : IEverWallet {
                 value,
                 bounce,
                 flags = allBalance ? 130 : 1,
-                payload = "te6ccgEBAQEAAgAAAA=="
+                payload = payload ?? "te6ccgEBAQEAAgAAAA=="
             }.ToJsonElement()
         };
 
         var bodyBoc = (await _everClient.Abi.EncodeMessageBody(new ParamsOfEncodeMessageBody {
             Address = _address,
-            Abi = Abi,
+            Abi = WalletAbi,
             CallSet = callSet,
             Signer = new Signer.Keys { KeysAccessor = _keyPair }
         }, cancellationToken)).Body;

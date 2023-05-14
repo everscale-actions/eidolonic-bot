@@ -55,17 +55,25 @@ public class SendBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
         }
 
         try {
-            if (args is [.., { } dest] && Regex.TvmAddressRegex().IsMatch(dest)) {
-                var (_, coins) = await _wallet.SendCoins(dest, sendCoins, allBalance, cancellationToken);
-                return FormatSendMessage(fromUser, dest, coins);
+            decimal coins;
+            switch (args) {
+                case [.., { } destWithMemo, { } memo]
+                    when Regex.TvmAddressRegex().IsMatch(destWithMemo) && !string.IsNullOrWhiteSpace(memo): {
+                    (_, coins) = await _wallet.SendCoins(destWithMemo, sendCoins, allBalance, memo, cancellationToken);
+                    return FormatSendMessage(fromUser, destWithMemo, coins);
+                }
+                case [.., { } dest]
+                    when Regex.TvmAddressRegex().IsMatch(dest): {
+                    (_, coins) = await _wallet.SendCoins(dest, sendCoins, allBalance, null, cancellationToken);
+                    return FormatSendMessage(fromUser, dest, coins);
+                }
+                case [_]
+                    when message is { ReplyToMessage.From: { } toUser }:
+                    (_, coins) = await _wallet.SendCoins(toUser.Id, sendCoins, allBalance, cancellationToken);
+                    return FormatSendMessage(fromUser, toUser, coins);
+                default:
+                    return CommandHelpers.CommandAttributeByCommand[Command.Send]?.Help;
             }
-
-            if (message is { ReplyToMessage.From: { } toUser }) {
-                var (_, coins) = await _wallet.SendCoins(toUser.Id, sendCoins, allBalance, cancellationToken);
-                return FormatSendMessage(fromUser, toUser, coins);
-            }
-
-            return CommandHelpers.CommandAttributeByCommand[Command.Send]?.Help;
         } catch (AccountInsufficientBalanceException ex) {
             return @$"You balance({ex.Balance:F}{Constants.Currency}) is too low";
         } catch (Exception e) {

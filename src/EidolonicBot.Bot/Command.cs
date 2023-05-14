@@ -15,9 +15,10 @@ public enum Command {
     [Command("/send",
         Description = "Sends tokens from to another user",
         Help = "Sends tokens from your wallet to user that you reply to or special address\n" +
-               " Usage: `/send amount `\\[address]\n" +
+               " Usage: `/send amount `\\[address] \\[memo]\n" +
                "  amount - minimum 0.1 or all to send the whole balance\n" +
-               "  address - get some coins for withdrawal",
+               "  address - get some coins for withdrawal\n" +
+               "  memo - to withdraw funds to exchanges",
         IsWalletNeeded = true)]
     Send,
 
