@@ -12,7 +12,8 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
         _subscriptionService = subscriptionService;
     }
 
-    protected override async Task<string?> Consume(string[] args, Message message, long chatId, int messageThreadId, bool isAdmin,
+    protected override async Task<string?> ConsumeAndGetReply(string[] args, Message message, long chatId,
+        int messageThreadId, bool isAdmin,
         CancellationToken cancellationToken) {
         return args switch {
             ["add", { } address] when isAdmin && Regex.TvmAddressRegex().IsMatch(address) => await Subscribe(address, chatId, messageThreadId,
@@ -20,7 +21,7 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
             ["remove", { } address] when isAdmin && Regex.TvmAddressRegex().IsMatch(address) => await Unsubscribe(address, chatId,
                 messageThreadId, cancellationToken),
             ["list"] => await GetSubscriptionList(chatId, messageThreadId, cancellationToken),
-            _ => CommandHelpers.CommandAttributeByCommand[Command.Subscription]?.Help
+            _ => CommandHelpers.HelpByCommand[Command.Subscription]
         };
     }
 

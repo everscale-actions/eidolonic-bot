@@ -13,21 +13,24 @@ public enum Command {
     Wallet,
 
     [Command("/send",
-        Description = "Sends tokens from to another user",
-        Help = "Sends tokens from your wallet to user that you reply to or special address\n" +
-               " Usage: `/send amount `\\[address] \\[memo]\n" +
-               "  amount - minimum 0.1 or all to send the whole balance\n" +
-               "  address - get some coins for withdrawal\n" +
-               "  memo - to withdraw funds to exchanges",
+        Description = "Sends tokens to another telegram user that you reply to",
         IsWalletNeeded = true)]
+    [CommandArg("amount", "minimum 0.1 or all to send the whole balance")]
     Send,
 
+    [Command("/withdrawal",
+        Description = "Withdraw tokens to address",
+        IsWalletNeeded = true)]
+    [CommandArg("amount", "minimum 0.1 or all to send the whole balance")]
+    [CommandArg("address", "you outer address or address of the recipient", dependsOn: "amount")]
+    [CommandArg("memo", "(optional) e.g. `user-id` for exchanges", dependsOn: "address")]
+    Withdraw,
+
     [Command("/subscription",
-        Description = "Subscribe to transaction of address",
-        Help = " Usage:\n" +
-               "  `/subscription list`\n" +
-               "  `/subscription add `address\n" +
-               "  `/subscription remove `address\n" +
-               " [*] only chat admins can control subscriptions")]
+        Description = "Get or control list of subscriptions")]
+    [CommandArg("list", "show subscriptions for this chat")]
+    [CommandArg("add", "subscribe to transactions")]
+    [CommandArg("remove", "unsubscribe from transactions")]
+    [CommandArg("address", "account address", dependsOn: new[] { "add", "remove" })]
     Subscription
 }

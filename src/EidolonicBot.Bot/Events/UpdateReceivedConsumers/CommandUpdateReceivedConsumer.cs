@@ -53,8 +53,8 @@ public class CommandUpdateReceivedConsumer : IConsumer<UpdateReceived>, IMediato
             : Command.Unknown;
         var args = commandAndArgs.Length >= 2 ? commandAndArgs[1..] : Array.Empty<string>();
 
-        if (args.Length == 0 || (args.Length == 1 && args[0].Equals("help", StringComparison.OrdinalIgnoreCase))) {
-            var help = CommandHelpers.CommandAttributeByCommand[command]?.Help;
+        if (args.Length == 1 && args[0].Equals("help", StringComparison.InvariantCultureIgnoreCase)) {
+            var help = CommandHelpers.HelpByCommand[command];
             if (help is not null) {
                 await _botClient.SendTextMessageAsync(
                     chatId,

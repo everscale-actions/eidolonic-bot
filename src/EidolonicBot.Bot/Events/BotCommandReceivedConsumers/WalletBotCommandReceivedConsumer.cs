@@ -16,7 +16,8 @@ public class WalletBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
     }
 
 
-    protected override async Task<string?> Consume(string[] args, Message message, long chatId, int messageThreadId, bool isAdmin,
+    protected override async Task<string?> ConsumeAndGetReply(string[] args, Message message, long chatId,
+        int messageThreadId, bool isAdmin,
         CancellationToken cancellationToken) {
         var info = await _wallet.GetInfo(cancellationToken);
 

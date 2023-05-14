@@ -1,22 +1,22 @@
 namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 
-public class SendBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
-    private const string SendMessage = "{0} sent to {1} {2:F}{3}";
-    private readonly ILogger<SendBotCommandReceivedConsumer> _logger;
+public class WithdrawBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
+    private const string WithdrawalMessage = "{0} withdrawal to {1} {2:F}{3}";
+    private readonly ILogger<WithdrawBotCommandReceivedConsumer> _logger;
 
     private readonly IEverWallet _wallet;
 
-    public SendBotCommandReceivedConsumer(ITelegramBotClient bot, IEverWallet wallet, IMemoryCache memoryCache,
-        ILogger<SendBotCommandReceivedConsumer> logger) : base(
-        Command.Send, bot, memoryCache) {
+    public WithdrawBotCommandReceivedConsumer(ITelegramBotClient bot, IEverWallet wallet, IMemoryCache memoryCache,
+        ILogger<WithdrawBotCommandReceivedConsumer> logger) : base(
+        Command.Withdraw, bot, memoryCache) {
         _wallet = wallet;
         _logger = logger;
     }
 
-    private static string FormatSendMessage(User fromUser, User toUser, decimal coins) {
-        return string.Format(SendMessage,
+    private static string FormatSendMessage(User fromUser, string dest, decimal coins) {
+        return string.Format(WithdrawalMessage,
             fromUser.ToMentionString(),
-            toUser.ToMentionString(),
+            $"`{dest}`",
             coins,
             Constants.Currency);
     }
@@ -25,12 +25,7 @@ public class SendBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
         int messageThreadId, bool isAdmin,
         CancellationToken cancellationToken) {
         if (message is not { From: { } fromUser }) {
-            _logger.LogError("There is no From User in telegram message {@Message}", message);
-            return "Ops, something went wrong..";
-        }
-
-        if (message is not { ReplyToMessage.From: { } toUser }) {
-            return "Reply to some message of user to send tokens";
+            return null;
         }
 
         bool allBalance;
@@ -45,16 +40,22 @@ public class SendBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
                 allBalance = false;
                 break;
             default:
-                return CommandHelpers.HelpByCommand[Command.Send];
+                return CommandHelpers.HelpByCommand[Command.Withdraw];
         }
 
         if (sendCoins < 0.1m) {
             return $"You should send at least {0.1:F}{Constants.Currency}";
         }
 
+        if (args is not [_, { } dest, ..] || !Regex.TvmAddressRegex().IsMatch(dest)) {
+            return "Provide valid destination address";
+        }
+
+        var memo = args is [_, _, { } memoStr] && !string.IsNullOrWhiteSpace(memoStr) ? memoStr : null;
+
         try {
-            var (_, coins) = await _wallet.SendCoins(toUser.Id, sendCoins, allBalance, cancellationToken);
-            return FormatSendMessage(fromUser, toUser, coins);
+            var (_, coins) = await _wallet.SendCoins(dest, sendCoins, allBalance, memo, cancellationToken);
+            return FormatSendMessage(fromUser, dest, coins);
         } catch (AccountInsufficientBalanceException ex) {
             return @$"You balance({ex.Balance:F}{Constants.Currency}) is too low";
         } catch (Exception e) {
