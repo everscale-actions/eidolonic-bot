@@ -3,7 +3,8 @@ namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 public class WalletBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
     private readonly IEverWallet _wallet;
 
-    public WalletBotCommandReceivedConsumer(ITelegramBotClient botClient, IEverWallet wallet, IMemoryCache memoryCache) : base(Command.Wallet, botClient,
+    public WalletBotCommandReceivedConsumer(ITelegramBotClient botClient, IEverWallet wallet, IMemoryCache memoryCache) : base(Command.Wallet,
+        botClient,
         memoryCache) {
         _wallet = wallet;
     }

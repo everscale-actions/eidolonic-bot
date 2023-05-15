@@ -16,7 +16,7 @@ public static class EnumHelper {
         var attribute = memInfo[0].GetCustomAttribute(typeof(T), false);
         return (T?)attribute;
     }
-    
+
     public static T[] GetAttributesOfType<T>(this Enum enumVal) where T : Attribute {
         var type = enumVal.GetType();
         var memInfo = type.GetMember(enumVal.ToString());

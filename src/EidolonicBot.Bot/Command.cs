@@ -26,8 +26,8 @@ public enum Command {
         IsWalletNeeded = true,
         IsBotInitCommand = true)]
     [CommandArg("amount", "minimum 0.1 or all to send the whole balance")]
-    [CommandArg("address", "you outer address or address of the recipient", dependsOn: "amount")]
-    [CommandArg("memo", "(optional) e.g. `user-id` for exchanges", dependsOn: "address")]
+    [CommandArg("address", "you outer address or address of the recipient", "amount")]
+    [CommandArg("memo", "(optional) e.g. `user-id` for exchanges", "address")]
     Withdraw,
 
     [Command("/subscription",
@@ -36,6 +36,6 @@ public enum Command {
     [CommandArg("list", "show subscriptions for this chat")]
     [CommandArg("add", "subscribe to transactions")]
     [CommandArg("remove", "unsubscribe from transactions")]
-    [CommandArg("address", "account address", dependsOn: new[] { "add", "remove" })]
+    [CommandArg("address", "account address", "add", "remove")]
     Subscription
 }

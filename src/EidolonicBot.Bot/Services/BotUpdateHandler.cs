@@ -16,7 +16,7 @@ internal class BotUpdateHandler : IUpdateHandler {
         await using var scope = _serviceProvider.CreateAsyncScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IScopedMediator>();
         try {
-            await mediator.Publish(new UpdateReceived(Update: update), cancellationToken);
+            await mediator.Publish(new UpdateReceived(update), cancellationToken);
         } catch (Exception ex) {
             _logger.LogError(ex, "UpdateReceived failed: {@Update}", update);
         }

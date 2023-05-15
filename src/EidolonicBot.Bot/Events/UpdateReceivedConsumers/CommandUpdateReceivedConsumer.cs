@@ -2,10 +2,10 @@
 
 public class CommandUpdateReceivedConsumer : IConsumer<UpdateReceived>, IMediatorConsumer {
     private readonly ITelegramBotClient _botClient;
+    private readonly IMemoryCache _cache;
     private readonly IHostEnvironment _hostEnvironment;
     private readonly ILogger<CommandUpdateReceivedConsumer> _logger;
     private readonly IScopedMediator _mediator;
-    private readonly IMemoryCache _cache;
 
     public CommandUpdateReceivedConsumer(IScopedMediator mediator,
         ILogger<CommandUpdateReceivedConsumer> logger, IHostEnvironment hostEnvironment,
@@ -68,9 +68,9 @@ public class CommandUpdateReceivedConsumer : IConsumer<UpdateReceived>, IMediato
         }
 
         await _mediator.Publish(new BotCommandReceived(
-            Command: command,
-            Arguments: args,
-            Message: update.Message
+            command,
+            args,
+            update.Message
         ), cancellationToken);
     }
 
@@ -78,7 +78,7 @@ public class CommandUpdateReceivedConsumer : IConsumer<UpdateReceived>, IMediato
         return await _cache.GetOrCreateAsync("BotUsername", async entry => {
             entry.Size = 1;
             entry.Priority = CacheItemPriority.NeverRemove;
-            return (await _botClient.GetMeAsync(cancellationToken: cancellationToken)).Username;
+            return (await _botClient.GetMeAsync(cancellationToken)).Username;
         });
     }
 }

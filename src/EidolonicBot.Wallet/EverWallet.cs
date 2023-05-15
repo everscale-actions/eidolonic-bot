@@ -100,20 +100,6 @@ internal class EverWallet : IEverWallet {
         }
     }
 
-    private async Task<string> GetPayloadBodyByMemo(string memo) {
-        var result = await _everClient.Abi.EncodeMessageBody(new ParamsOfEncodeMessageBody() {
-            Abi = TransferAbi,
-            CallSet = new CallSet() {
-                FunctionName = "transfer",
-                Input = new { comment = memo.ToHexString() }.ToJsonElement()
-            },
-            IsInternal = true,
-            Signer = new Signer.None()
-        });
-
-        return result.Body;
-    }
-
     public async Task<IEverWallet> Init(long userId, CancellationToken cancellationToken) {
         var phrase = _walletOptions.Value.SeedPhrase;
         if (phrase is null or "YOUR_SEED_PHRASE_HERE") {
@@ -128,6 +114,20 @@ internal class EverWallet : IEverWallet {
 
 
     public string Address => _address ?? throw new NotInitializedException();
+
+    private async Task<string> GetPayloadBodyByMemo(string memo) {
+        var result = await _everClient.Abi.EncodeMessageBody(new ParamsOfEncodeMessageBody {
+            Abi = TransferAbi,
+            CallSet = new CallSet {
+                FunctionName = "transfer",
+                Input = new { comment = memo.ToHexString() }.ToJsonElement()
+            },
+            IsInternal = true,
+            Signer = new Signer.None()
+        });
+
+        return result.Body;
+    }
 
     private async Task<(string transactionId, decimal totalOutputCoins)> SendTransaction(string dest, decimal nanoCoins, bool bounce,
         bool allBalance,

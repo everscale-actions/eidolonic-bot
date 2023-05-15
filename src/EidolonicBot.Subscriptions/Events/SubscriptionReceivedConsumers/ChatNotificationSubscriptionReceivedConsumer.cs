@@ -7,9 +7,9 @@ using Telegram.Bot.Types.Enums;
 namespace EidolonicBot.Events.SubscriptionReceivedConsumers;
 
 public class SubscriptionReceivedConsumer : IConsumer<SubscriptionReceived>, IMediatorConsumer {
+    private readonly BlockchainOptions _blockchainOptions;
     private readonly ITelegramBotClient _bot;
     private readonly AppDbContext _db;
-    private readonly BlockchainOptions _blockchainOptions;
 
     public SubscriptionReceivedConsumer(AppDbContext db, ITelegramBotClient bot, IOptions<BlockchainOptions> blockchainOptionsAccessor) {
         _db = db;
@@ -24,7 +24,7 @@ public class SubscriptionReceivedConsumer : IConsumer<SubscriptionReceived>, IMe
         var chatAndThreadIds = await _db.Subscription
             .Where(s => s.Address == transaction.AccountAddr)
             .SelectMany(s => s.SubscriptionByChat.Select(sbc => new { sbc.ChatId, sbc.MessageThreadId }))
-            .ToArrayAsync(cancellationToken: cancellationToken);
+            .ToArrayAsync(cancellationToken);
 
         var links = _blockchainOptions.Explorers
             .Select(e => $"[{e.Name}]({string.Format(e.TransactionLinkTemplate, transaction.TransactionId)})");
@@ -41,7 +41,7 @@ public class SubscriptionReceivedConsumer : IConsumer<SubscriptionReceived>, IMe
             _bot.SendTextMessageAsync(chat.ChatId,
                 message,
                 chat.MessageThreadId,
-                parseMode: ParseMode.Markdown,
+                ParseMode.Markdown,
                 disableWebPagePreview: true,
                 cancellationToken: cancellationToken)));
     }

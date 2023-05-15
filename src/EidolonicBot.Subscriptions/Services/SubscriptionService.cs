@@ -93,11 +93,11 @@ internal class SubscriptionService : ISubscriptionService, IAsyncDisposable {
                         : transaction.out_messages[0].dst;
 
                     await mediator.Publish(new SubscriptionReceived(
-                        TransactionId: transaction.id,
-                        AccountAddr: transaction.account_addr,
-                        BalanceDelta: balanceDeltaCoins,
-                        Сounterparty: counterparty,
-                        Balance: transaction.account.balance.NanoToCoins()
+                        transaction.id,
+                        transaction.account_addr,
+                        balanceDeltaCoins,
+                        counterparty,
+                        transaction.account.balance.NanoToCoins()
                     ), cancellationToken);
                 } catch (Exception exception) {
                     _logger.LogError(exception, "Failed to publish SubscriptionReceived event");
