@@ -34,8 +34,9 @@ public enum Command {
         Description = "Get or control list of subscriptions",
         IsBotInitCommand = true)]
     [CommandArg("list", "show subscriptions for this chat")]
-    [CommandArg("add", "subscribe to transactions")]
+    [CommandArg("add", "subscribe for transactions")]
+    [CommandArg("edit", "edit subscription parameters")]
     [CommandArg("remove", "unsubscribe from transactions")]
-    [CommandArg("address", "account address", "add", "remove")]
+    [CommandArg("address", "account address", "add", "remove", "edit")]
     Subscription
 }

@@ -23,7 +23,9 @@ public class SubscriptionReceivedConsumer : IConsumer<SubscriptionReceived>, IMe
 
         var chatAndThreadIds = await _db.Subscription
             .Where(s => s.Address == transaction.AccountAddr)
-            .SelectMany(s => s.SubscriptionByChat.Select(sbc => new { sbc.ChatId, sbc.MessageThreadId }))
+            .SelectMany(s => s.SubscriptionByChat
+                .Where(sbc => sbc.MinDelta <= Math.Abs(transaction.BalanceDelta))
+                .Select(sbc => new { sbc.ChatId, sbc.MessageThreadId, sbc.MinDelta }))
             .ToArrayAsync(cancellationToken);
 
         var links = _blockchainOptions.Explorers
