@@ -6,5 +6,9 @@
         <RootNamespace>EidolonicBot</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="$(AssemblyName).Tests" />
+    </ItemGroup>
+
     <Import Project="Tests.props" Condition="$(MSBuildProjectFile.EndsWith('Tests.csproj'))" />
 </Project>

@@ -86,7 +86,7 @@ public class WalletTests : IAsyncLifetime {
         (walletAfterSendAndInit - walletAfterSecondSend).Should().BeLessThan(0.1m - walletAfterSendAndInit!.Value);
     }
 
-    private async Task<EverWallet> CreateAnotherEverWallet(int secondUserId) {
+    private async Task<IEverWallet> CreateAnotherEverWallet(int secondUserId) {
         var wallet = new EverWallet(_everClient,
             _sp.GetRequiredService<IOptions<EverWalletOptions>>(),
             _sp.GetRequiredService<IMemoryCache>(),

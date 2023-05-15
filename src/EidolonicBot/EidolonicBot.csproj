@@ -40,7 +40,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EidolonicBot.Database\EidolonicBot.Database.csproj" />
     <ProjectReference Include="..\EidolonicBot.Bot\EidolonicBot.Bot.csproj" />
+    <ProjectReference Include="..\EidolonicBot.Database\EidolonicBot.Database.csproj" />
   </ItemGroup>
+
 </Project>

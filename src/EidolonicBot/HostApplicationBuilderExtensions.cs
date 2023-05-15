@@ -30,12 +30,6 @@ public static class HostApplicationBuilderExtensions {
         return builder;
     }
 
-    public static HostApplicationBuilder AddEverWallet(this HostApplicationBuilder builder) {
-        builder.Services.AddScoped<IEverWallet, EverWallet>()
-            .Configure<EverWalletOptions>(builder.Configuration.GetSection("Wallet"));
-        return builder;
-    }
-
     public static HostApplicationBuilder AddMassTransit(this HostApplicationBuilder builder) {
         builder.Services
             .AddMassTransit(x =>

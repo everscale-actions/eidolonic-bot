@@ -10,7 +10,7 @@ public interface IEverWallet {
         string? memo,
         CancellationToken cancellationToken);
 
-    Task<EverWallet> Init(long userId, CancellationToken cancellationToken);
+    Task<IEverWallet> Init(long userId, CancellationToken cancellationToken);
     Task<decimal?> GetBalance(CancellationToken cancellationToken);
     Task<AccountType?> GetAccountType(CancellationToken cancellationToken);
 }

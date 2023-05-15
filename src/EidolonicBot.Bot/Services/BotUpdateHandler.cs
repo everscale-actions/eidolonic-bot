@@ -1,6 +1,6 @@
 namespace EidolonicBot.Services;
 
-public class BotUpdateHandler : IUpdateHandler {
+internal class BotUpdateHandler : IUpdateHandler {
     private readonly ILogger<BotUpdateHandler> _logger;
     private readonly IServiceProvider _serviceProvider;
 

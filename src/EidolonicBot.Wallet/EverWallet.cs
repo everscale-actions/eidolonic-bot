@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 
 namespace EidolonicBot;
 
-public class EverWallet : IEverWallet {
+internal class EverWallet : IEverWallet {
     private const string WalletContractCodeBoc =
         "te6cckEBBgEA/AABFP8A9KQT9LzyyAsBAgEgAgMABNIwAubycdcBAcAA8nqDCNcY7UTQgwfXAdcLP8j4KM8WI88WyfkAA3HXAQHDAJqDB9cBURO68uBk3oBA1wGAINcBgCDXAVQWdfkQ8qj4I7vyeWa++COBBwiggQPoqFIgvLHydAIgghBM7mRsuuMPAcjL/8s/ye1UBAUAmDAC10zQ+kCDBtcBcdcBeNcB10z4AHCAEASqAhSxyMsFUAXPFlAD+gLLaSLQIc8xIddJoIQJuZgzcAHLAFjPFpcwcQHLABLM4skB+wAAPoIQFp4+EbqOEfgAApMg10qXeNcB1AL7AOjRkzLyPOI+zYS/";
 
@@ -114,7 +114,7 @@ public class EverWallet : IEverWallet {
         return result.Body;
     }
 
-    public async Task<EverWallet> Init(long userId, CancellationToken cancellationToken) {
+    public async Task<IEverWallet> Init(long userId, CancellationToken cancellationToken) {
         var phrase = _walletOptions.Value.SeedPhrase;
         if (phrase is null or "YOUR_SEED_PHRASE_HERE") {
             throw new NullReferenceException("Wallet:SeedPhrase should be provided");

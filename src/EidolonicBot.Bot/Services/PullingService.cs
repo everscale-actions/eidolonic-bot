@@ -1,6 +1,6 @@
 namespace EidolonicBot.Services;
 
-public class PullingService : BackgroundService {
+internal class PullingService : BackgroundService {
     private readonly ITelegramBotClient _client;
     private readonly ILogger<PullingService> _logger;
     private readonly ReceiverOptions _receiverOptions;

@@ -1,6 +1,6 @@
 namespace EidolonicBot.Services;
 
-public class BotInit : IHostedService {
+internal class BotInit : IHostedService {
     private readonly ITelegramBotClient _botClient;
 
     public BotInit(ITelegramBotClient botClient) {
