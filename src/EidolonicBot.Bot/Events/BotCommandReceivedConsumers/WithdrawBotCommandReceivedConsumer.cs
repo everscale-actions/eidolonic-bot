@@ -2,21 +2,23 @@ namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 
 public class WithdrawBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
     private const string WithdrawalMessage = "{0} withdrawal to {1} {2:F}{3}";
+    private readonly ILinkFormatter _linkFormatter;
     private readonly ILogger<WithdrawBotCommandReceivedConsumer> _logger;
 
     private readonly IEverWallet _wallet;
 
     public WithdrawBotCommandReceivedConsumer(ITelegramBotClient bot, IEverWallet wallet, IMemoryCache memoryCache,
-        ILogger<WithdrawBotCommandReceivedConsumer> logger) : base(
+        ILogger<WithdrawBotCommandReceivedConsumer> logger, ILinkFormatter linkFormatter) : base(
         Command.Withdraw, bot, memoryCache) {
         _wallet = wallet;
         _logger = logger;
+        _linkFormatter = linkFormatter;
     }
 
-    private static string FormatSendMessage(User fromUser, string dest, decimal coins) {
+    private string FormatSendMessage(User fromUser, string dest, decimal coins) {
         return string.Format(WithdrawalMessage,
             fromUser.ToMentionString(),
-            $"`{dest}`",
+            $"{_linkFormatter.GetAddressLink(dest)}",
             coins,
             Constants.Currency);
     }

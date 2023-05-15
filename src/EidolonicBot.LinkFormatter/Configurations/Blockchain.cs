@@ -1,5 +1,6 @@
 namespace EidolonicBot.Configurations;
 
-public class BlockchainOptions {
+public record BlockchainOptions {
+    public string DefaultExplorer { get; init; } = null!;
     public ExplorerOptions[] Explorers { get; init; } = null!;
 }

@@ -23,6 +23,7 @@ public static class CommandHelpers {
             var usages = argAttrs
                 .Where(arg => arg.DependsOn.Length == 0)
                 .Select(arg => $"{text} {GetSubArgs(argAttrs, arg.Name)}");
+
             var args = argAttrs
                 .Select(a => $"   {a.Name} - {a.Description}");
             var help = description + '\n' +

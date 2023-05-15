@@ -1,3 +1,3 @@
 namespace EidolonicBot.Commands;
 
-public record ReloadSubscriptionService { }
+public record ReloadSubscriptionService;

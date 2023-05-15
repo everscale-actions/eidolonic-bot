@@ -72,9 +72,7 @@ internal class SubscriptionService : ISubscriptionService, IAsyncDisposable {
                             account_addr = string.Empty,
                             account = new { balance = string.Empty },
                             balance_delta = string.Empty,
-                            out_messages = ArrayExtensions.Empty(new {
-                                dst = string.Empty
-                            }),
+                            out_messages = ArrayExtensions.EmptyNullable(new { dst = string.Empty }),
                             in_message = new {
                                 src = string.Empty
                             }
@@ -88,15 +86,15 @@ internal class SubscriptionService : ISubscriptionService, IAsyncDisposable {
                     var mediator = scope.ServiceProvider.GetRequiredService<IScopedMediator>();
 
                     var balanceDeltaCoins = transaction.balance_delta.NanoToCoins();
-                    var counterparty = balanceDeltaCoins > 0
-                        ? transaction.in_message.src
-                        : transaction.out_messages[0].dst;
+                    var from = string.IsNullOrEmpty(transaction.in_message.src) ? null : transaction.in_message.src;
+                    var to = transaction.out_messages?.Select(m => m.dst).ToArray() ?? Array.Empty<string>();
 
                     await mediator.Publish(new SubscriptionReceived(
                         transaction.id,
                         transaction.account_addr,
                         balanceDeltaCoins,
-                        counterparty,
+                        from,
+                        to,
                         transaction.account.balance.NanoToCoins()
                     ), cancellationToken);
                 } catch (Exception exception) {

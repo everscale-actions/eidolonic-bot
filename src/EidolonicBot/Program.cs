@@ -9,6 +9,7 @@ var host = Host.CreateApplicationBuilder(args)
     .AddDatabase()
     .AddMassTransit()
     .AddSubscriptions()
+    .AddLinkFormatter()
     .Build();
 
 host

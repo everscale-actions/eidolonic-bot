@@ -1,34 +1,39 @@
 namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 
 public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
+    private readonly string[] _adminActions = { "add", "edit", "remove" };
+
     private readonly AppDbContext _db;
+    private readonly ILinkFormatter _linkFormatter;
     private readonly IScopedMediator _mediator;
 
     public SubscriptionBotCommandReceivedConsumer(ITelegramBotClient botClient, IMemoryCache memoryCache, AppDbContext db,
-        IScopedMediator mediator) : base(
+        IScopedMediator mediator, ILinkFormatter linkFormatter) : base(
         Command.Subscription, botClient,
         memoryCache) {
         _db = db;
         _mediator = mediator;
+        _linkFormatter = linkFormatter;
     }
 
     protected override async Task<string?> ConsumeAndGetReply(string[] args, Message message, long chatId,
         int messageThreadId, bool isAdmin,
         CancellationToken cancellationToken) {
         return args switch {
-            ["add", { } address, ..]
-                when isAdmin && Regex.TvmAddressRegex().IsMatch(address) =>
+            [{ } action, ..]
+                when _adminActions.Contains(action) && !isAdmin => "Only chat admin can control subscriptions",
+
+            ["add", { } address, ..] when Regex.TvmAddressRegex().IsMatch(address) =>
                 await Subscribe(address, chatId, messageThreadId, GetMinDeltaByArgs(args), cancellationToken),
 
-            ["edit", { } address, ..]
-                when isAdmin && Regex.TvmAddressRegex().IsMatch(address) =>
+            ["edit", { } address, ..] when isAdmin && Regex.TvmAddressRegex().IsMatch(address) =>
                 await EditSubscription(address, chatId, messageThreadId, GetMinDeltaByArgs(args), cancellationToken),
 
-            ["remove", { } address]
-                when isAdmin && Regex.TvmAddressRegex().IsMatch(address) =>
+            ["remove", { } address] when isAdmin && Regex.TvmAddressRegex().IsMatch(address) =>
                 await Unsubscribe(address, chatId, messageThreadId, cancellationToken),
 
-            ["list"] => await GetSubscriptionList(chatId, messageThreadId, cancellationToken),
+            ["list", ..] => await GetSubscriptionList(chatId, messageThreadId, args is [_, "full", ..] or [_, "true", ..], cancellationToken),
+
             _ => CommandHelpers.HelpByCommand[Command.Subscription]
         };
     }
@@ -55,22 +60,26 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
         var savedEntries = await _db.SaveChangesAsync(cancellationToken);
 
         return savedEntries > 0
-            ? $"`subscription for {address}` was updated"
-            : $"`subscription for {address}` is up to date";
+            ? $"`subscription for {_linkFormatter.GetAddressLink(address)}` was updated"
+            : $"`subscription for {_linkFormatter.GetAddressLink(address)}` is up to date";
     }
 
-    private async Task<string?> GetSubscriptionList(long chatId, int messageThreadId, CancellationToken cancellationToken) {
-        var subscriptionStrings = await _db.SubscriptionByChat.Where(s => s.ChatId == chatId && s.MessageThreadId == messageThreadId)
-            .Select(s => $"`{s.Subscription.Address} ``| {s.MinDelta}{Constants.Currency}`")
-            .ToArrayAsync(cancellationToken);
+    private async Task<string?> GetSubscriptionList(long chatId, int messageThreadId, bool full, CancellationToken cancellationToken) {
+        var subscriptionStrings = (await _db.SubscriptionByChat.Where(s => s.ChatId == chatId && s.MessageThreadId == messageThreadId)
+                .Select(s => new { s.Subscription.Address, s.MinDelta })
+                .ToArrayAsync(cancellationToken))
+            .Select(s => full
+                ? $"`{s.Address}`` | ``{s.MinDelta}{Constants.Currency}`"
+                : $"{_linkFormatter.GetAddressLink(s.Address)} | {s.MinDelta}{Constants.Currency}")
+            .ToArray();
 
         if (subscriptionStrings.Length == 0) {
             return "Get your first subscription with\n" +
                    " `/subscription add `address";
         }
 
-        return $"`Address | MinDelta`\n" +
-               $"{string.Join('\n', subscriptionStrings.Select<string, string>(s => s))}";
+        return $"Address | MinDelta\n" +
+               $"{string.Join('\n', subscriptionStrings)}";
     }
 
     private async Task<string> Subscribe(string address, long chatId, int messageThreadId, decimal minDelta,
@@ -97,8 +106,8 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
         await _mediator.Send(new ReloadSubscriptionService(), cancellationToken);
 
         return savedEntries > 0
-            ? $"`{address}` added to subscriptions"
-            : $"`{address}` is already added earlier";
+            ? $"{_linkFormatter.GetAddressLink(address)} added to subscriptions"
+            : $"{_linkFormatter.GetAddressLink(address)} is already added earlier";
     }
 
     private async Task<string> Unsubscribe(string address, long chatId, int messageThreadId, CancellationToken cancellationToken) {
@@ -123,6 +132,6 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
 
         await _mediator.Send(new ReloadSubscriptionService(), cancellationToken);
 
-        return $"`{address}` removed from subscriptions";
+        return $"{_linkFormatter.GetAddressLink(address)} removed from subscriptions";
     }
 }

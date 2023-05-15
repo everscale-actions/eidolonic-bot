@@ -1,7 +1,8 @@
 namespace EidolonicBot;
 
 public static class ArrayExtensions {
-    public static T[] Empty<T>(T prototype) {
-        return Array.Empty<T>();
+    // ReSharper disable once ReturnTypeCanBeNotNullable
+    public static T[]? EmptyNullable<T>(T prototype) {
+        return null;
     }
 }
