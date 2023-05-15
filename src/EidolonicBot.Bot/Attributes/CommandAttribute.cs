@@ -10,4 +10,5 @@ public class CommandAttribute : Attribute {
     public string? Description { get; init; }
     public bool IsWalletNeeded { get; init; }
     public bool IsBotInitCommand { get; init; }
+    public bool IsInlineCommand { get; init; }
 }

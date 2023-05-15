@@ -10,19 +10,21 @@ public enum Command {
 
     [Command("/wallet",
         Description = "Wallet address and balance",
+        IsInlineCommand = true,
         IsWalletNeeded = true,
         IsBotInitCommand = true)]
     Wallet,
 
     [Command("/send",
         Description = "Sends tokens to another telegram user that you reply to",
-        IsWalletNeeded = true,
-        IsBotInitCommand = true)]
+        IsInlineCommand = true,
+        IsWalletNeeded = true)]
     [CommandArg("amount", "minimum 0.1 or all to send the whole balance")]
     Send,
 
     [Command("/withdrawal",
         Description = "Withdraw tokens to address",
+        IsInlineCommand = true,
         IsWalletNeeded = true,
         IsBotInitCommand = true)]
     [CommandArg("amount", "minimum 0.1 or all to send the whole balance")]
@@ -31,10 +33,15 @@ public enum Command {
     Withdraw,
 
     [Command("/subscription",
-        Description = "Get or control list of subscriptions")]
+        Description = "Get or control list of subscriptions",
+        IsInlineCommand = true)]
     [CommandArg("list", "show subscriptions for this chat")]
     [CommandArg("add", "subscribe to transactions")]
     [CommandArg("remove", "unsubscribe from transactions")]
     [CommandArg("address", "account address", dependsOn: new[] { "add", "remove" })]
-    Subscription
+    Subscription,
+
+    [Command("/start",
+        Description = "Start bot")]
+    Start
 }
