@@ -2,7 +2,7 @@ namespace EidolonicBot.Services;
 
 internal class SubscriptionService : ISubscriptionService, IAsyncDisposable {
     private const string SubscriptionQuery =
-        @"subscription($addresses:StringFilter){transactions(filter:{account_addr:$addresses,balance_delta:{ne:""0""}}){id account_addr balance_delta(format:DEC)out_messages{dst}in_message{src}}}";
+        @"subscription($addresses:StringFilter){transactions(filter:{account_addr:$addresses,balance_delta:{ne:""0""}}){id account_addr account{balance(format:DEC)} balance_delta(format:DEC) out_messages{dst} in_message{src}}}";
 
     private readonly ILogger<SubscriptionService> _logger;
     private readonly AsyncServiceScope _scope;
@@ -70,6 +70,7 @@ internal class SubscriptionService : ISubscriptionService, IAsyncDisposable {
                         transactions = new {
                             id = string.Empty,
                             account_addr = string.Empty,
+                            account = new { balance = string.Empty },
                             balance_delta = string.Empty,
                             out_messages = ArrayExtensions.Empty(new {
                                 dst = string.Empty
@@ -87,15 +88,16 @@ internal class SubscriptionService : ISubscriptionService, IAsyncDisposable {
                     var mediator = scope.ServiceProvider.GetRequiredService<IScopedMediator>();
 
                     var balanceDeltaCoins = transaction.balance_delta.NanoToCoins();
-                    var counterparty = balanceDeltaCoins > 0 
-                        ? transaction.in_message.src 
+                    var counterparty = balanceDeltaCoins > 0
+                        ? transaction.in_message.src
                         : transaction.out_messages[0].dst;
 
                     await mediator.Publish(new SubscriptionReceived(
                         TransactionId: transaction.id,
                         AccountAddr: transaction.account_addr,
                         BalanceDelta: balanceDeltaCoins,
-                        Сounterparty: counterparty
+                        Сounterparty: counterparty,
+                        Balance: transaction.account.balance.NanoToCoins()
                     ), cancellationToken);
                 } catch (Exception exception) {
                     _logger.LogError(exception, "Failed to publish SubscriptionReceived event");

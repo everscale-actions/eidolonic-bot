@@ -33,6 +33,7 @@ public class SubscriptionReceivedConsumer : IConsumer<SubscriptionReceived>, IMe
             $"❕Subscription alert ❕\n" +
             $"address:` {transaction.AccountAddr}`\n" +
             $"{(transaction.BalanceDelta > 0 ? "from" : "to")}:` {transaction.Сounterparty}`\n" +
+            $"balance: ` {transaction.Balance}{Constants.Currency}`\n" +
             $"delta: ` {transaction.BalanceDelta}{Constants.Currency}`\n" +
             string.Join(" | ", links);
 
