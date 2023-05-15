@@ -22,7 +22,7 @@ public static class CommandHelpers {
 
             var usages = argAttrs
                 .Where(arg => arg.DependsOn.Length == 0)
-                .Select(arg => $"{text} {GetSubArgs(arg.Name, argAttrs)}");
+                .Select(arg => $"{text} {GetSubArgs(argAttrs, arg.Name)}");
             var args = argAttrs
                 .Select(a => $"   {a.Name} - {a.Description}");
             var help = description + '\n' +
@@ -33,11 +33,8 @@ public static class CommandHelpers {
         });
 
     // ReSharper disable once ParameterTypeCanBeEnumerable.Local
-    private static string GetSubArgs(string name, CommandArgAttribute[] args, string? str = null) {
-        str ??= name;
-        var arg = args.SingleOrDefault(a => a.DependsOn.Contains(name))?.Name;
-        return arg is null
-            ? str
-            : GetSubArgs(arg, args, $"{str} {arg}");
+    private static string GetSubArgs(CommandArgAttribute[] args, string str) {
+        var arg = args.SingleOrDefault(a => a.DependsOn.Contains(str))?.Name;
+        return arg is null ? str : GetSubArgs(args, $"{str} {arg}");
     }
 }
