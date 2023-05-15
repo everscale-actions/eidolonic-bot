@@ -47,6 +47,9 @@ namespace EidolonicBot.Migrations
                     b.Property<Guid>("SubscriptionId")
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal>("MinDelta")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("ChatId", "MessageThreadId", "SubscriptionId");
 
                     b.HasIndex("SubscriptionId");
