@@ -2,14 +2,14 @@ namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 
 public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
     private readonly AppDbContext _db;
-    private readonly ISubscriptionService _subscriptionService;
+    private readonly IScopedMediator _mediator;
 
     public SubscriptionBotCommandReceivedConsumer(ITelegramBotClient botClient, IMemoryCache memoryCache, AppDbContext db,
-        ISubscriptionService subscriptionService) : base(
+        IScopedMediator mediator) : base(
         Command.Subscription, botClient,
         memoryCache) {
         _db = db;
-        _subscriptionService = subscriptionService;
+        _mediator = mediator;
     }
 
     protected override async Task<string?> ConsumeAndGetReply(string[] args, Message message, long chatId,
@@ -57,7 +57,7 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
 
         var savedEntries = await _db.SaveChangesAsync(cancellationToken);
 
-        await _subscriptionService.Restart(cancellationToken);
+        await _mediator.Send(new ReloadSubscriptionService(), cancellationToken);
 
         return savedEntries > 0
             ? $"`{address}` added to subscriptions"
@@ -84,7 +84,7 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
 
         await _db.SaveChangesAsync(cancellationToken);
 
-        await _subscriptionService.Restart(cancellationToken);
+        await _mediator.Send(new ReloadSubscriptionService(), cancellationToken);
 
         return $"`{address}` removed from subscriptions";
     }

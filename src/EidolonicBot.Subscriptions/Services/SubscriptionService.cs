@@ -1,6 +1,6 @@
 namespace EidolonicBot.Services;
 
-public class SubscriptionService : ISubscriptionService, IAsyncDisposable {
+internal class SubscriptionService : ISubscriptionService, IAsyncDisposable {
     private const string SubscriptionQuery =
         @"subscription($addresses:StringFilter){transactions(filter:{account_addr:$addresses,balance_delta:{ne:""0""}}){id account_addr balance_delta(format:DEC)out_messages{dst}in_message{src}}}";
 
@@ -45,7 +45,8 @@ public class SubscriptionService : ISubscriptionService, IAsyncDisposable {
         }
     }
 
-    public async Task Restart(CancellationToken cancellationToken) {
+    public async Task Reload(CancellationToken cancellationToken) {
+        //todo: make sure all transactions was caught
         await StopAsync(cancellationToken);
         await StartAsync(cancellationToken);
     }

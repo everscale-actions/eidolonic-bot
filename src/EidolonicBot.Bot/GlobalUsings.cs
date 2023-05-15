@@ -2,6 +2,7 @@
 
 global using System.Text;
 global using EidolonicBot.Attributes;
+global using EidolonicBot.Commands;
 global using EidolonicBot.Events;
 global using EidolonicBot.Events.BotCommandReceivedConsumers.Base;
 global using EidolonicBot.Exceptions;
