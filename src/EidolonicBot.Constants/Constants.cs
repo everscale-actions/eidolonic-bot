@@ -2,5 +2,5 @@
 
 public static class Constants {
     public const string Currency = "Ē";
-    public static readonly Guid ApplicationId = Guid.NewGuid();
+    public static readonly DateTimeOffset ApplicationStartDate = DateTimeOffset.UtcNow;
 }

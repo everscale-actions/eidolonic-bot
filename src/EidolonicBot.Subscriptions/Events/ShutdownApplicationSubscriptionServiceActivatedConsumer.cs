@@ -14,7 +14,7 @@ public class ShutdownApplicationSubscriptionServiceActivatedConsumer : IConsumer
     }
 
     public Task Consume(ConsumeContext<SubscriptionServiceActivated> context) {
-        if (Constants.ApplicationId == context.Message.ApplicationId) {
+        if (Constants.ApplicationStartDate >= context.Message.ApplicationStartDate) {
             return Task.CompletedTask;
         }
 

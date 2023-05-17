@@ -88,7 +88,7 @@ internal class SubscriptionService : IHostedService, ISubscriptionService, IAsyn
         _handler = resultOfSubscribeCollection.Handle;
 
         // notify another instances of application 
-        await _publishEndpoint.Publish(new SubscriptionServiceActivated(Constants.ApplicationId),
+        await _publishEndpoint.Publish(new SubscriptionServiceActivated(Constants.ApplicationStartDate),
             cancellationToken);
     }
 

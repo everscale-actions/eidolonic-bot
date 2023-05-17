@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.Abstract", "Ei
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{ADC7F2C5-1A58-4207-8800-A2810DB4577F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.LinkFormatter", "EidolonicBot.LinkFormatter\EidolonicBot.LinkFormatter.csproj", "{57BD8DFF-473E-4690-8756-2B806D9375FD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -82,6 +84,10 @@ Global
 		{C3A04514-DA77-4DB0-BAB8-7F6A6BFB4636}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C3A04514-DA77-4DB0-BAB8-7F6A6BFB4636}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C3A04514-DA77-4DB0-BAB8-7F6A6BFB4636}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57BD8DFF-473E-4690-8756-2B806D9375FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57BD8DFF-473E-4690-8756-2B806D9375FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57BD8DFF-473E-4690-8756-2B806D9375FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57BD8DFF-473E-4690-8756-2B806D9375FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C3A04514-DA77-4DB0-BAB8-7F6A6BFB4636} = {5B641880-6038-4AB4-9F48-CD443828EF91}
