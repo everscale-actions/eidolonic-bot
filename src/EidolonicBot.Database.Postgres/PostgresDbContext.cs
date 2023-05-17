@@ -7,5 +7,7 @@ public class PostgresDbContext : AppDbContext {
         modelBuilder.HasCollation("case_insensitive", "en-u-ks-primary", "icu", false);
 
         modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
+
+        base.OnModelCreating(modelBuilder);
     }
 }
