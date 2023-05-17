@@ -1,7 +1,7 @@
 namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 
 public class WithdrawBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
-    private const string WithdrawalMessage = "{0} withdrawal to {1} {2:F}{3}";
+    private const string WithdrawalMessage = "{0} withdrew to {1} {2:F}{3}";
     private readonly ILinkFormatter _linkFormatter;
     private readonly ILogger<WithdrawBotCommandReceivedConsumer> _logger;
 

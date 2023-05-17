@@ -21,7 +21,7 @@ public enum Command {
     [CommandArg("amount", "minimum 0.1 or all to send the whole balance")]
     Send,
 
-    [Command("/withdrawal",
+    [Command("/withdraw",
         Description = "Withdraw tokens to address",
         IsWalletNeeded = true,
         IsBotInitCommand = true)]
