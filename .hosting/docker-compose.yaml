@@ -4,4 +4,6 @@ services:
   app:
     image: ghcr.io/everscale-actions/eidolonic-bot:latest
     env_file: .env
+    volumes:
+      - ./logs/:/app/logs/
     restart: on-failure

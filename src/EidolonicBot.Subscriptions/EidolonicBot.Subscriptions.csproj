@@ -10,6 +10,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Polly" />
     <PackageReference Include="Telegram.Bot" />
   </ItemGroup>
 
