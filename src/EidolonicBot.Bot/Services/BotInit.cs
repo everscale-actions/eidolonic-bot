@@ -2,12 +2,15 @@ namespace EidolonicBot.Services;
 
 internal class BotInit : IHostedService {
     private readonly ITelegramBotClient _botClient;
+    private readonly ILogger<BotInit> _logger;
 
-    public BotInit(ITelegramBotClient botClient) {
+    public BotInit(ITelegramBotClient botClient, ILogger<BotInit> logger) {
         _botClient = botClient;
+        _logger = logger;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken) {
+        _logger.LogInformation("Initialize bot (commands, etc)");
         await InitCommands(cancellationToken);
     }
 

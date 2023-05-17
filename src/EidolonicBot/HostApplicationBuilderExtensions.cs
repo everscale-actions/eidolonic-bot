@@ -1,3 +1,4 @@
+using EidolonicBot.Events;
 using EidolonicBot.Events.SubscriptionReceivedConsumers;
 
 namespace EidolonicBot;
@@ -32,9 +33,20 @@ public static class HostApplicationBuilderExtensions {
 
     public static HostApplicationBuilder AddMassTransit(this HostApplicationBuilder builder) {
         builder.Services
-            .AddMassTransit(x =>
-                x.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context))
-            )
+            .AddMassTransit(x => {
+                x.AddConsumers(type => !type.IsAssignableTo(typeof(IMediatorConsumer)),
+                    typeof(ShutdownApplicationSubscriptionServiceActivatedConsumer).Assembly);
+
+                var amqpUri = builder.Configuration["AMQP_URI"];
+                if (amqpUri is not null) {
+                    x.UsingRabbitMq((context, cfg) => {
+                        cfg.Host(amqpUri);
+                        cfg.ConfigureEndpoints(context);
+                    });
+                } else {
+                    x.UsingInMemory((context, configurator) => configurator.ConfigureEndpoints(context));
+                }
+            })
             .AddMediator(x => {
                 x.AddConsumers(type => type.IsAssignableTo(typeof(IMediatorConsumer)),
                     typeof(ChatNotificationSubscriptionReceivedConsumer).Assembly,

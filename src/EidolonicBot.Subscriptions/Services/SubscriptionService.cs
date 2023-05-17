@@ -1,10 +1,14 @@
+using MassTransit;
+using Polly;
+
 namespace EidolonicBot.Services;
 
-internal class SubscriptionService : ISubscriptionService, IAsyncDisposable {
+internal class SubscriptionService : IHostedService, ISubscriptionService, IAsyncDisposable {
     private const string SubscriptionQuery =
         @"subscription($addresses:StringFilter){transactions(filter:{account_addr:$addresses,balance_delta:{ne:""0""}}){id account_addr account{balance(format:DEC)} balance_delta(format:DEC) out_messages{dst} in_message{src}}}";
 
     private readonly ILogger<SubscriptionService> _logger;
+    private readonly IPublishEndpoint _publishEndpoint;
     private readonly AsyncServiceScope _scope;
     private AppDbContext? _db;
     private IEverClient? _everClient;
@@ -15,6 +19,7 @@ internal class SubscriptionService : ISubscriptionService, IAsyncDisposable {
         _scope = serviceProvider.CreateAsyncScope();
         _db = _scope.ServiceProvider.GetRequiredService<AppDbContext>();
         _everClient = _scope.ServiceProvider.GetRequiredService<IEverClient>();
+        _publishEndpoint = _scope.ServiceProvider.GetRequiredService<IBus>();
     }
 
     public async ValueTask DisposeAsync() {
@@ -25,17 +30,8 @@ internal class SubscriptionService : ISubscriptionService, IAsyncDisposable {
     public async Task StartAsync(CancellationToken cancellationToken) {
         _logger.LogInformation("Starting subscription service");
 
-        Debug.Assert(_db != null, nameof(_db) + " != null");
-        Debug.Assert(_everClient != null, nameof(_everClient) + " != null");
-
         try {
-            var addresses = await _db.Subscription.Select(s => s.Address).ToArrayAsync(cancellationToken);
-
-            var resultOfSubscribeCollection = await _everClient.Net.Subscribe(new ParamsOfSubscribe {
-                Subscription = SubscriptionQuery,
-                Variables = new { addresses = new { @in = addresses } }.ToJsonElement()
-            }, SubscriptionCallback, cancellationToken);
-            _handler = resultOfSubscribeCollection.Handle;
+            await StartSubscription(cancellationToken);
         } catch (Exception e) {
             if (!cancellationToken.IsCancellationRequested) {
                 _logger.LogError(e, "Subscription service error. Restarting in 10 seconds..");
@@ -45,12 +41,6 @@ internal class SubscriptionService : ISubscriptionService, IAsyncDisposable {
         }
     }
 
-    public async Task Reload(CancellationToken cancellationToken) {
-        //todo: make sure all transactions was caught
-        await StopAsync(cancellationToken);
-        await StartAsync(cancellationToken);
-    }
-
     public async Task StopAsync(CancellationToken cancellationToken) {
         _logger.LogInformation("Stopping subscription service");
 
@@ -58,7 +48,48 @@ internal class SubscriptionService : ISubscriptionService, IAsyncDisposable {
             return;
         }
 
-        await _everClient.Net.Unsubscribe(new ResultOfSubscribeCollection { Handle = _handler.Value }, cancellationToken);
+        await _everClient.Net.Unsubscribe(new ResultOfSubscribeCollection { Handle = _handler.Value },
+            cancellationToken);
+    }
+
+    public async Task Reload(CancellationToken cancellationToken) {
+        Debug.Assert(_handler != null, nameof(_handler) + " != null");
+        Debug.Assert(_everClient != null, nameof(_everClient) + " != null");
+
+        uint? oldHandler = null;
+        if (_handler is not null) {
+            oldHandler = _handler.Value;
+            await Policy
+                .Handle<Exception>()
+                .WaitAndRetryAsync(10, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)))
+                .ExecuteAsync(StartSubscription, cancellationToken);
+        }
+
+        if (oldHandler is not null) {
+            await Policy
+                .Handle<EverClientException>()
+                .WaitAndRetryAsync(10, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)))
+                .ExecuteAsync(ct => _everClient.Net.Unsubscribe(
+                    new ResultOfSubscribeCollection { Handle = oldHandler.Value },
+                    ct), cancellationToken);
+        }
+    }
+
+    private async Task StartSubscription(CancellationToken cancellationToken) {
+        Debug.Assert(_db != null, nameof(_db) + " != null");
+        Debug.Assert(_everClient != null, nameof(_everClient) + " != null");
+
+        var addresses = await _db.Subscription.Select(s => s.Address).ToArrayAsync(cancellationToken);
+        _handler = null;
+        var resultOfSubscribeCollection = await _everClient.Net.Subscribe(new ParamsOfSubscribe {
+            Subscription = SubscriptionQuery,
+            Variables = new { addresses = new { @in = addresses } }.ToJsonElement()
+        }, SubscriptionCallback, cancellationToken);
+        _handler = resultOfSubscribeCollection.Handle;
+
+        // notify another instances of application 
+        await _publishEndpoint.Publish(new SubscriptionServiceActivated(Constants.ApplicationId),
+            cancellationToken);
     }
 
 

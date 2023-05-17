@@ -13,10 +13,6 @@ on:
     types: [ completed ]
   workflow_dispatch:
 
-concurrency:
-  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
-  cancel-in-progress: true
-
 env:
   HOSTING_PATH: .hosting
 
@@ -36,6 +32,7 @@ jobs:
           Serilog__WriteTo__Elasticsearch__Args__nodeUris=${{ secrets.SEMATEXT_ELASTICSEARCH_URIS }}
           SENTRY_DSN=${{ secrets.SENTRY_DSN }}
           ConnectionStrings__Postgres=${{ secrets.SUPABASE_CONNECTION_STRING }}
+          AMQP_URI=${{ secrets.AMQP_URI }}
           EOT
 
       - name: Run app
