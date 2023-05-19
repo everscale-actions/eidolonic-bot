@@ -10,9 +10,14 @@ public class WalletBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
     }
 
     private static string FormatInfoMessage(WalletInfo info) {
-        return
-            $"`{info.Address}`\n" +
-            $"Balance {info.Balance ?? 0:F}{Constants.Currency}".ToEscapedMarkdownV2();
+        var tokens = info.TokenBalances is not null
+            ? string.Join('\n', info.TokenBalances
+                .Select(t => $"   {t.Balance}{t.Symbol}"))
+            : null;
+
+        return $"`{info.Address}`\n" +
+               $"Balance {info.Balance ?? 0:F}{Constants.Currency}\n" +
+               tokens;
     }
 
 

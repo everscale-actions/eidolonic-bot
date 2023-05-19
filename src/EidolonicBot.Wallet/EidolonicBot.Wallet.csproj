@@ -5,8 +5,13 @@
     <PackageReference Include="EverscaleNet.Utils" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Options" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EidolonicBot.GraphQL\EidolonicBot.GraphQL.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,3 +1,5 @@
+using EidolonicBot.Models;
+
 namespace EidolonicBot;
 
 public interface IEverWallet {
@@ -13,4 +15,5 @@ public interface IEverWallet {
     Task<IEverWallet> Init(long userId, CancellationToken cancellationToken);
     Task<decimal?> GetBalance(CancellationToken cancellationToken);
     Task<AccountType?> GetAccountType(CancellationToken cancellationToken);
+    Task<TokenBalance[]?> GetTokenBalances(CancellationToken cancellationToken);
 }

@@ -22,7 +22,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" />
     <PackageReference Include="Microsoft.NET.Build.Containers" />
     <PackageReference Include="Sentry.Extensions.Logging" />
     <PackageReference Include="Serilog.Enrichers.Environment" />
@@ -43,6 +42,7 @@
   <ItemGroup>
     <ProjectReference Include="..\EidolonicBot.Bot\EidolonicBot.Bot.csproj" />
     <ProjectReference Include="..\EidolonicBot.Database\EidolonicBot.Database.csproj" />
+    <ProjectReference Include="..\EidolonicBot.GraphQL\EidolonicBot.GraphQL.csproj" />
   </ItemGroup>
 
 </Project>

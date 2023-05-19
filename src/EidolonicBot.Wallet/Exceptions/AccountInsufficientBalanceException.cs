@@ -1,8 +1,9 @@
 namespace EidolonicBot.Exceptions;
 
-public class AccountInsufficientBalanceException : Exception {
+public sealed class AccountInsufficientBalanceException : Exception {
     public AccountInsufficientBalanceException(decimal balance) {
         Balance = balance;
+        Data.Add("Balance", balance);
     }
 
     public decimal Balance { get; }

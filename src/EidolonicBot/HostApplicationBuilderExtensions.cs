@@ -1,4 +1,3 @@
-using EidolonicBot.Events.SubscriptionReceivedConsumers;
 using EidolonicBot.Events.SubscriptionServiceActivatedConsumers;
 using EidolonicBot.Serilog;
 
@@ -39,7 +38,6 @@ public static class HostApplicationBuilderExtensions {
             .AddMassTransit(x => {
                 x.AddConsumers(type => !type.IsAssignableTo(typeof(IMediatorConsumer)),
                     typeof(ShutdownApplicationSubscriptionServiceActivatedConsumer).Assembly);
-
                 var amqpUri = builder.Configuration["AMQP_URI"];
                 if (amqpUri is not null) {
                     x.UsingRabbitMq((context, cfg) => {
@@ -47,7 +45,7 @@ public static class HostApplicationBuilderExtensions {
                         cfg.ConfigureEndpoints(context);
                     });
                 } else {
-                    x.UsingInMemory((context, configurator) => configurator.ConfigureEndpoints(context));
+                    x.UsingInMemory((context, cfg) => cfg.ConfigureEndpoints(context));
                 }
             })
             .AddMediator(x => {

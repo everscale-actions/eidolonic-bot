@@ -3,6 +3,8 @@
 global using System.Globalization;
 global using System.Reflection;
 global using EidolonicBot;
+global using EidolonicBot.Events;
+global using EidolonicBot.Events.SubscriptionReceivedConsumers;
 global using EidolonicBot.Events.UpdateReceivedConsumers;
 global using EidolonicBot.Filters;
 global using EverscaleNet.Client.PackageManager;

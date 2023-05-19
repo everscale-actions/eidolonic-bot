@@ -1,5 +1,7 @@
 using System.Text.Json;
 using EidolonicBot.Exceptions;
+using EidolonicBot.GraphQL;
+using EidolonicBot.Models;
 using EverscaleNet.Abstract;
 using EverscaleNet.Client.Models;
 using EverscaleNet.Serialization;
@@ -35,6 +37,7 @@ internal class EverWallet : IEverWallet {
         JsonSerializer.Deserialize<AbiParam[]>(DataAbiParamsJson, JsonOptionsProvider.JsonSerializerOptions)!;
 
     private readonly IEverClient _everClient;
+    private readonly GraphQLClient _graphQL;
     private readonly ILogger<EverWallet> _logger;
     private readonly IMemoryCache _memoryCache;
     private readonly IOptions<EverWalletOptions> _walletOptions;
@@ -44,36 +47,74 @@ internal class EverWallet : IEverWallet {
     private string? _stateInitBoc;
 
 
-    public EverWallet(IEverClient everClient, IOptions<EverWalletOptions> walletOptions, IMemoryCache memoryCache, ILogger<EverWallet> logger) {
+    public EverWallet(IEverClient everClient, IOptions<EverWalletOptions> walletOptions, IMemoryCache memoryCache, ILogger<EverWallet> logger,
+        GraphQLClient graphQL) {
         _everClient = everClient;
         _walletOptions = walletOptions;
         _memoryCache = memoryCache;
         _logger = logger;
+        _graphQL = graphQL;
     }
 
     public async Task<decimal?> GetBalance(CancellationToken cancellationToken) {
-        var result = await _everClient.Net.QueryCollection(new ParamsOfQueryCollection {
-            Collection = "accounts",
-            Filter = new { id = new { eq = Address } }.ToJsonElement(),
-            Result = "balance(format: DEC)",
-            Limit = 1
-        }, cancellationToken);
+        if (_address is null) {
+            throw new NotInitializedException();
+        }
 
-        return result.Result.Length == 1
-            ? result.Result[0].Get<string>("balance").NanoToCoins()
+        var variables = new { address = _address };
+        var result = await _graphQL.Query(variables,
+            static (i, o) =>
+                o.Blockchain(query =>
+                    query.Account(i.address, accountQuery =>
+                        accountQuery.Info(account => new {
+                            Balance = account.Balance(BigIntFormat.Dec)
+                        }))),
+            cancellationToken);
+
+        return result.Data is { Balance: { } balance }
+            ? balance.NanoToCoins()
             : null;
     }
 
     public async Task<AccountType?> GetAccountType(CancellationToken cancellationToken) {
-        var result = await _everClient.Net.QueryCollection(new ParamsOfQueryCollection {
-            Collection = "accounts",
-            Filter = new { id = new { eq = Address } }.ToJsonElement(),
-            Result = "acc_type",
-            Limit = 1
-        }, cancellationToken);
+        if (_address is null) {
+            throw new NotInitializedException();
+        }
 
-        return result.Result.Length == 1
-            ? result.Result[0].Get<AccountType>("acc_type")
+        var variables = new { address = _address };
+        var result = await _graphQL.Query(variables,
+            static (i, o) =>
+                o.Blockchain(query =>
+                    query.Account(i.address, accountQuery =>
+                        accountQuery.Info(account => new {
+                            account.Acc_type
+                        }))),
+            cancellationToken);
+
+        return result.Data is { Acc_type: { } accType }
+            ? (AccountType)accType
+            : null;
+    }
+
+    public async Task<TokenBalance[]?> GetTokenBalances(CancellationToken cancellationToken) {
+        if (_address is null) {
+            throw new NotInitializedException();
+        }
+
+        var variables = new { address = _address };
+        var result = await _graphQL.Query(variables, static (i, o) =>
+            o.Blockchain(query =>
+                query.Account(i.address, accountQuery =>
+                    accountQuery.Info(account =>
+                        account.TokenHolder(holder =>
+                            holder.Wallets(null, null, null, null, null, connection =>
+                                connection.Nodes(wallet => new {
+                                    balance = wallet.Balance,
+                                    symbol = wallet.Token(token => token.Symbol)
+                                })))))), cancellationToken);
+
+        return result.Data is [] tokens
+            ? tokens.Select(t => new TokenBalance(t.balance!.NanoToCoins(), t.symbol!)).ToArray()
             : null;
     }
 

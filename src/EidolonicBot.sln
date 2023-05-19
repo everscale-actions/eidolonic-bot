@@ -30,6 +30,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{AD
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.LinkFormatter", "EidolonicBot.LinkFormatter\EidolonicBot.LinkFormatter.csproj", "{57BD8DFF-473E-4690-8756-2B806D9375FD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EidolonicBot.GraphQL", "EidolonicBot.GraphQL\EidolonicBot.GraphQL.csproj", "{CAD0F3CF-1861-49C2-95FF-5FCB72CC6C0C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +90,10 @@ Global
 		{57BD8DFF-473E-4690-8756-2B806D9375FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{57BD8DFF-473E-4690-8756-2B806D9375FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{57BD8DFF-473E-4690-8756-2B806D9375FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CAD0F3CF-1861-49C2-95FF-5FCB72CC6C0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CAD0F3CF-1861-49C2-95FF-5FCB72CC6C0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAD0F3CF-1861-49C2-95FF-5FCB72CC6C0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CAD0F3CF-1861-49C2-95FF-5FCB72CC6C0C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C3A04514-DA77-4DB0-BAB8-7F6A6BFB4636} = {5B641880-6038-4AB4-9F48-CD443828EF91}
