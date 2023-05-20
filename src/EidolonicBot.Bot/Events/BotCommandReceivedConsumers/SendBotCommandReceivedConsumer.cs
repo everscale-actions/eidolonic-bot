@@ -29,18 +29,22 @@ public class SendBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
             return "Ops, something went wrong..";
         }
 
-        if (message is not { ReplyToMessage.From: { } toUser }) {
+        if (message is not { ReplyToMessage: { From: { } toUser, Type: var replyMessageType } }) {
+            return "Reply to some message of user to send tokens";
+        }
+
+        if (replyMessageType is MessageType.ForumTopicCreated) {
             return "Reply to some message of user to send tokens";
         }
 
         bool allBalance;
         decimal sendCoins;
         switch (args) {
-            case ["all", ..]:
+            case ["all"]:
                 sendCoins = 0.1m;
                 allBalance = true;
                 break;
-            case [{ } coinsStr, ..]
+            case [{ } coinsStr]
                 when decimal.TryParse(coinsStr.Replace(',', '.'), out sendCoins):
                 allBalance = false;
                 break;
