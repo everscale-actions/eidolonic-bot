@@ -1,5 +1,6 @@
 using EidolonicBot.Events;
 using EidolonicBot.Events.SubscriptionReceivedConsumers;
+using EidolonicBot.Serilog;
 
 namespace EidolonicBot;
 
@@ -10,6 +11,7 @@ public static class HostApplicationBuilderExtensions {
             loggingBuilder.ClearProviders();
             loggingBuilder.AddSerilog(new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
+                .Destructure.With<IncludePublicNotNullFieldsPolicy>()
                 .CreateLogger());
             loggingBuilder.AddSentry(options => options.Environment = builder.Environment.EnvironmentName);
         });
