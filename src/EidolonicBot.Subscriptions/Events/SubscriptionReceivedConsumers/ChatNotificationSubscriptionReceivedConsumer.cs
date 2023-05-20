@@ -36,15 +36,15 @@ public class ChatNotificationSubscriptionReceivedConsumer : IConsumer<Subscripti
             $"address: {_linkFormatter.GetAddressLink(transaction.AccountAddr)}\n" +
             from +
             to +
-            $"balance: {transaction.Balance}{Constants.Currency}\n" +
-            $"delta: {transaction.BalanceDelta}{Constants.Currency}\n" +
-            string.Join(" | ", links);
+            $"balance: {transaction.Balance}{Constants.Currency}\n".ToEscapedMarkdownV2() +
+            $"delta: {transaction.BalanceDelta}{Constants.Currency}\n".ToEscapedMarkdownV2() +
+            string.Join(" \\| ", links);
 
         await Task.WhenAll(chatAndThreadIds.Select(chat =>
             _bot.SendTextMessageAsync(chat.ChatId,
                 message,
                 chat.MessageThreadId,
-                ParseMode.Markdown,
+                ParseMode.MarkdownV2,
                 disableWebPagePreview: true,
                 cancellationToken: cancellationToken)));
     }

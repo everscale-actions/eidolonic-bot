@@ -17,12 +17,12 @@ internal class LinkFormatter : ILinkFormatter {
             address = string.Format((IFormatProvider?)ShortStringFormatProvider.Instance, "{0:6..4}", address);
         }
 
-        return string.Format($"[{address}]({link})");
+        return string.Format($"[{address.ToEscapedMarkdownV2()}]({link})");
     }
 
     public string[] GetTransactionLinks(string transactionId) {
         return _blockchainOptions.Explorers
-            .Select(e => $"[{e.Name}]({string.Format(e.TransactionLinkTemplate, transactionId)})")
+            .Select(e => $"[{e.Name.ToEscapedMarkdownV2()}]({string.Format(e.TransactionLinkTemplate, transactionId)})")
             .ToArray();
     }
 }

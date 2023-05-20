@@ -1,7 +1,9 @@
 namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 
 public class WithdrawBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
-    private const string WithdrawalMessage = "{0} withdrew to {1} {2:F}{3}";
+    private const decimal MinimalCoins = 0.1m;
+
+    private const string WithdrawalMessage = "{0} withdrew to {1} {2}{3}";
     private readonly ILinkFormatter _linkFormatter;
     private readonly ILogger<WithdrawBotCommandReceivedConsumer> _logger;
 
@@ -17,9 +19,9 @@ public class WithdrawBotCommandReceivedConsumer : BotCommandReceivedConsumerBase
 
     private string FormatSendMessage(User fromUser, string dest, decimal coins) {
         return string.Format(WithdrawalMessage,
-            fromUser.ToMentionString(),
+            fromUser.ToMentionMarkdownV2(),
             $"{_linkFormatter.GetAddressLink(dest)}",
-            coins,
+            coins.ToString("F").ToEscapedMarkdownV2(),
             Constants.Currency);
     }
 
@@ -34,7 +36,7 @@ public class WithdrawBotCommandReceivedConsumer : BotCommandReceivedConsumerBase
         decimal sendCoins;
         switch (args) {
             case ["all", ..]:
-                sendCoins = 0.1m;
+                sendCoins = MinimalCoins;
                 allBalance = true;
                 break;
             case [{ } coinsStr, ..]
@@ -45,8 +47,8 @@ public class WithdrawBotCommandReceivedConsumer : BotCommandReceivedConsumerBase
                 return CommandHelpers.HelpByCommand[Command.Withdraw];
         }
 
-        if (sendCoins < 0.1m) {
-            return $"You should send at least {0.1:F}{Constants.Currency}";
+        if (sendCoins < MinimalCoins) {
+            return $"You should send at least {MinimalCoins}{Constants.Currency}";
         }
 
         if (args is not [_, { } dest, ..] || !Regex.TvmAddressRegex().IsMatch(dest)) {

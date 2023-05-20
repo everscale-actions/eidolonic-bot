@@ -30,7 +30,7 @@ public static class CommandHelpers {
                        "Usages:\n" +
                        string.Join('\n', usages) + "\n\n" +
                        string.Join('\n', args);
-            return help;
+            return help.ToEscapedMarkdownV2();
         });
 
     // ReSharper disable once ParameterTypeCanBeEnumerable.Local

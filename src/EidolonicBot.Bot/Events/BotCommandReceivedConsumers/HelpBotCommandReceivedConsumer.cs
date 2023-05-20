@@ -1,3 +1,5 @@
+using Telegram.Bot.Extensions.Markup;
+
 namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 
 public class HelpBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
@@ -7,13 +9,12 @@ public class HelpBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
     protected override Task<string?> ConsumeAndGetReply(string[] args, Message message, long chatId, int messageThreadId,
         bool isAdmin,
         CancellationToken cancellationToken) {
-        var sb = new StringBuilder("Usage:\n");
+        var text = "Usage:\n" +
+                   string.Join('\n', CommandHelpers.CommandAttributeByCommand
+                       .Where(c => c.Value is not null)
+                       .Select(c => c.Value!)
+                       .Select(a => $"{a.Text} - {a.Description}"));
 
-        foreach (var (_, commandDescription) in
-                 CommandHelpers.CommandAttributeByCommand.Where(c => c.Value is not null)) {
-            sb.Append($"{commandDescription!.Text}\t- {commandDescription.Description}\n");
-        }
-
-        return Task.FromResult(sb.ToString().TrimEnd('\n'))!;
+        return Task.FromResult((string?)Tools.EscapeMarkdown(text, ParseMode.MarkdownV2));
     }
 }

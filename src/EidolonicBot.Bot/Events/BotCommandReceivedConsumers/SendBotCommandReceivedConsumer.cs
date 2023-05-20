@@ -1,7 +1,9 @@
 namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 
 public class SendBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
-    private const string SendMessage = "{0} sent to {1} {2:F}{3}";
+    private const decimal MinimalCoins = 0.1m;
+
+    private const string SendMessage = "{0} sent to {1} {2}{3}";
     private readonly ILogger<SendBotCommandReceivedConsumer> _logger;
 
     private readonly IEverWallet _wallet;
@@ -15,9 +17,9 @@ public class SendBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
 
     private static string FormatSendMessage(User fromUser, User toUser, decimal coins) {
         return string.Format(SendMessage,
-            fromUser.ToMentionString(),
-            toUser.ToMentionString(),
-            coins,
+            fromUser.ToMentionMarkdownV2(),
+            toUser.ToMentionMarkdownV2(),
+            coins.ToString("F").ToEscapedMarkdownV2(),
             Constants.Currency);
     }
 
@@ -41,7 +43,7 @@ public class SendBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
         decimal sendCoins;
         switch (args) {
             case ["all"]:
-                sendCoins = 0.1m;
+                sendCoins = MinimalCoins;
                 allBalance = true;
                 break;
             case [{ } coinsStr]
@@ -52,8 +54,8 @@ public class SendBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
                 return CommandHelpers.HelpByCommand[Command.Send];
         }
 
-        if (sendCoins < 0.1m) {
-            return $"You should send at least {0.1:F}{Constants.Currency}";
+        if (sendCoins < MinimalCoins) {
+            return $"You should send at least {MinimalCoins}{Constants.Currency}";
         }
 
         try {

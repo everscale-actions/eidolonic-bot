@@ -21,7 +21,7 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
         CancellationToken cancellationToken) {
         return args switch {
             [{ } action, ..]
-                when _adminActions.Contains(action) && !isAdmin => "Only chat admin can control subscriptions",
+                when _adminActions.Contains(action) && !isAdmin => "Only chat admin can control subscriptions".ToEscapedMarkdownV2(),
 
             ["add", { } address, ..] when Regex.TvmAddressRegex().IsMatch(address) =>
                 await Subscribe(address, chatId, messageThreadId, GetMinDeltaByArgs(args), cancellationToken),
@@ -51,7 +51,7 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
             cancellationToken);
 
         if (subscriptionByChat is null) {
-            return "Subscription wasn't found. Add new one first.";
+            return "Subscription wasn't found\\. Add new one first";
         }
 
         subscriptionByChat.MinDelta = minDelta;
@@ -60,17 +60,20 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
         var savedEntries = await _db.SaveChangesAsync(cancellationToken);
 
         return savedEntries > 0
-            ? $"`subscription for {_linkFormatter.GetAddressLink(address)}` was updated"
-            : $"`subscription for {_linkFormatter.GetAddressLink(address)}` is up to date";
+            ? $"subscription for {_linkFormatter.GetAddressLink(address)} was updated"
+            : $"subscription for {_linkFormatter.GetAddressLink(address)} is up to date";
     }
 
     private async Task<string?> GetSubscriptionList(long chatId, int messageThreadId, bool full, CancellationToken cancellationToken) {
         var subscriptionStrings = (await _db.SubscriptionByChat.Where(s => s.ChatId == chatId && s.MessageThreadId == messageThreadId)
-                .Select(s => new { s.Subscription.Address, s.MinDelta })
+                .Select(s => new {
+                    s.Subscription.Address,
+                    MinDeltaStr = s.MinDelta.ToString(CultureInfo.CurrentCulture).ToEscapedMarkdownV2()
+                })
                 .ToArrayAsync(cancellationToken))
             .Select(s => full
-                ? $"`{s.Address}`` | ``{s.MinDelta}{Constants.Currency}`"
-                : $"{_linkFormatter.GetAddressLink(s.Address)} | {s.MinDelta}{Constants.Currency}")
+                ? $"`{s.Address}`` | ``{s.MinDeltaStr}{Constants.Currency}`"
+                : $"{_linkFormatter.GetAddressLink(s.Address)} \\| {s.MinDeltaStr}{Constants.Currency}")
             .ToArray();
 
         if (subscriptionStrings.Length == 0) {
@@ -78,7 +81,7 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
                    " `/subscription add `address";
         }
 
-        return $"Address | MinDelta\n" +
+        return "Address \\| MinDelta\n" +
                $"{string.Join('\n', subscriptionStrings)}";
     }
 

@@ -59,7 +59,7 @@ public class CommandUpdateReceivedConsumer : IConsumer<UpdateReceived>, IMediato
                 await _botClient.SendTextMessageAsync(
                     chatId,
                     help,
-                    parseMode: ParseMode.Markdown,
+                    parseMode: ParseMode.MarkdownV2,
                     replyToMessageId: messageId,
                     replyMarkup: new ReplyKeyboardRemove(),
                     cancellationToken: context.CancellationToken);

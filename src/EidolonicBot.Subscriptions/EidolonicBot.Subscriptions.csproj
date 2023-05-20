@@ -12,6 +12,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="Polly" />
     <PackageReference Include="Telegram.Bot" />
+    <PackageReference Include="Telegram.Bot.Extensions.Markup" />
   </ItemGroup>
 
   <ItemGroup>
