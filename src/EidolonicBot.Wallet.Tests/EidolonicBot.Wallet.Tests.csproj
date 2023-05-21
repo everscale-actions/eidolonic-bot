@@ -3,7 +3,10 @@
   <ItemGroup>
     <PackageReference Include="EverscaleNet.AppKit" />
     <PackageReference Include="EverscaleNet.Client" />
+    <PackageReference Include="EverscaleNet.TestSuite" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="Xunit.DependencyInjection" />
+    <PackageReference Include="Xunit.DependencyInjection.Logging" />
   </ItemGroup>
 
   <ItemGroup>
