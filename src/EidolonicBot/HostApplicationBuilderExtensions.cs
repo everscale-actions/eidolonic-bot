@@ -12,6 +12,7 @@ public static class HostApplicationBuilderExtensions {
             loggingBuilder.AddSerilog(new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
                 .Destructure.With<IncludePublicNotNullFieldsPolicy>()
+                .Destructure.With<SerializeJsonElementPolicy>()
                 .CreateLogger());
             loggingBuilder.AddSentry(options => options.Environment = builder.Environment.EnvironmentName);
         });

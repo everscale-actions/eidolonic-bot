@@ -8,6 +8,11 @@ internal class IncludePublicNotNullFieldsPolicy : IDestructuringPolicy {
         object value,
         ILogEventPropertyValueFactory propertyValueFactory,
         out LogEventPropertyValue result) {
+        if (!value.GetType().IsClass) {
+            result = null!;
+            return false;
+        }
+
         var fieldsWithValues = value.GetType()
             .GetProperties(BindingFlags.Instance | BindingFlags.Public)
             .Where(p => p.CanRead)
