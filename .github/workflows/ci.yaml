@@ -1,4 +1,4 @@
-name: Build
+name: 'CI'
 
 on:
   push:
@@ -33,6 +33,19 @@ jobs:
           key: nuget-${{ hashFiles('src/Directory.Packages.props') }}
           restore-keys: |
             nuget-
+
+      - name: Run tests
+        timeout-minutes: 10
+        working-directory: src
+        run: |
+          dotnet test -c Release --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=results" -m
+
+      - name: Upload test results trx files
+        uses: actions/upload-artifact@v3
+        if: success() || failure()
+        with:
+          name: test-results
+          path: '**/*.trx'
 
       - name: Build image
         working-directory: src
