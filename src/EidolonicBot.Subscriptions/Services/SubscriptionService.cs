@@ -95,7 +95,7 @@ internal class SubscriptionService : IHostedService, ISubscriptionService, IAsyn
 
     private async Task SubscriptionCallback(JsonElement e, uint responseType, CancellationToken cancellationToken) {
         switch ((SubscriptionResponseType)responseType) {
-            case SubscriptionResponseType.Ok:
+            case SubscriptionResponseType.Ok: {
                 var prototype = new {
                     result = new {
                         transactions = new {
@@ -111,6 +111,7 @@ internal class SubscriptionService : IHostedService, ISubscriptionService, IAsyn
                     }
                 };
                 var transaction = e.ToPrototype(prototype).result.transactions;
+                using var subscriptionScope = _logger.BeginScope(transaction);
                 _logger.LogInformation("Got transaction by subscription {@Transaction}", transaction);
                 try {
                     await using var scope = _scope.ServiceProvider.CreateAsyncScope();
@@ -133,6 +134,7 @@ internal class SubscriptionService : IHostedService, ISubscriptionService, IAsyn
                 }
 
                 break;
+            }
             case SubscriptionResponseType.Error:
                 _logger.LogWarning("Subscription error {@Error}", e.ToObject<ClientError>());
                 break;

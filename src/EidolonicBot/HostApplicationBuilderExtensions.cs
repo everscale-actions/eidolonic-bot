@@ -1,5 +1,5 @@
-using EidolonicBot.Events;
 using EidolonicBot.Events.SubscriptionReceivedConsumers;
+using EidolonicBot.Events.SubscriptionServiceActivatedConsumers;
 using EidolonicBot.Serilog;
 
 namespace EidolonicBot;

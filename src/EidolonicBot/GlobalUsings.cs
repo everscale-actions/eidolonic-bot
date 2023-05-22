@@ -5,7 +5,6 @@ global using System.Reflection;
 global using EidolonicBot;
 global using EidolonicBot.Events.UpdateReceivedConsumers;
 global using EidolonicBot.Filters;
-global using EidolonicBot.Services;
 global using EverscaleNet.Client.PackageManager;
 global using EverscaleNet.Models;
 global using MassTransit;

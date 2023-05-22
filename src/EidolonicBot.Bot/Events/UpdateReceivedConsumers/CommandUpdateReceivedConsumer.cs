@@ -53,6 +53,11 @@ public class CommandUpdateReceivedConsumer : IConsumer<UpdateReceived>, IMediato
             : Command.Unknown;
         var args = commandAndArgs.Length >= 2 ? commandAndArgs[1..] : Array.Empty<string>();
 
+        using var commandScope = _logger.BeginScope(new Dictionary<string, string> {
+            { "Command", command.ToString() },
+            { "Arg", string.Join(' ', args) }
+        });
+
         if (args.Length == 1 && args[0].Equals("help", StringComparison.InvariantCultureIgnoreCase)) {
             var help = CommandHelpers.HelpByCommand[command];
             if (help is not null) {

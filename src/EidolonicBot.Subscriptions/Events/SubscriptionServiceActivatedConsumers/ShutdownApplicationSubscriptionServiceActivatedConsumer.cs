@@ -1,6 +1,6 @@
 using MassTransit;
 
-namespace EidolonicBot.Events;
+namespace EidolonicBot.Events.SubscriptionServiceActivatedConsumers;
 
 public class ShutdownApplicationSubscriptionServiceActivatedConsumer : IConsumer<SubscriptionServiceActivated> {
     private readonly IHostApplicationLifetime _applicationLifetime;

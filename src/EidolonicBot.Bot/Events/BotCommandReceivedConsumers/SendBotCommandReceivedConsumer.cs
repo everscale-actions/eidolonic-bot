@@ -58,6 +58,13 @@ public class SendBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
             return $"You should send at least {MinimalCoins}{Constants.Currency}";
         }
 
+        using var _ = _logger.BeginScope(new Dictionary<string, object> {
+            { "FromUser", fromUser },
+            { "ToUser", toUser },
+            { "SendCoins", sendCoins },
+            { "AllBalance", allBalance }
+        });
+
         try {
             var (_, coins) = await _wallet.SendCoins(toUser.Id, sendCoins, allBalance, cancellationToken);
             return FormatSendMessage(fromUser, toUser, coins);
@@ -66,8 +73,6 @@ public class SendBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
         } catch (Exception e) {
             _logger.LogError(e, "Something went wrong");
             return "Something went wrong";
-        } finally {
-            await Task.Delay(TimeSpan.FromSeconds(10), cancellationToken);
         }
     }
 }

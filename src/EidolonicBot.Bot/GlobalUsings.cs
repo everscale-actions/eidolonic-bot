@@ -1,7 +1,6 @@
 // Global using directives
 
 global using System.Globalization;
-global using System.Text;
 global using EidolonicBot.Attributes;
 global using EidolonicBot.Commands;
 global using EidolonicBot.Events;
