@@ -38,7 +38,7 @@ jobs:
       - name: Run app
         working-directory: ${{ env.HOSTING_PATH }}
         run: |
-          docker compose up --pull=always
+          TAG=${{ github.sha }} docker compose up --pull=always
 
       - name: Logs to artifact
         if: always()

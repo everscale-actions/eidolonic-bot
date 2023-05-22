@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - src/**
-      - .github/workflows/build.yaml
+      - .github/workflows/ci.yaml
     branches:
       - main
 
@@ -51,7 +51,7 @@ jobs:
         working-directory: src
         env:
           ContainerImageName: ${{ env.CONTAINER_IMAGE_NAME }}
-          ContainerImageTags: latest-${{ matrix.arch }}
+          ContainerImageTags: ${{ github.sha }}-${{ matrix.arch }}
         run: |
           dotnet publish EidolonicBot --os linux --arch ${{ matrix.arch }} /t:PublishContainer -c Release
 
@@ -64,7 +64,7 @@ jobs:
       - name: Tag and push image to ghcr.io
         env:
           IMAGE_NAME: ${{ env.CONTAINER_IMAGE_NAME }}
-          IMAGE_TAG: latest-${{ matrix.arch }}
+          IMAGE_TAG: ${{ github.sha }}-${{ matrix.arch }}
           REGISTRY: ${{ env.CONTAINER_IMAGE_REGISTRY }}
         run: |
           docker tag $IMAGE_NAME:$IMAGE_TAG $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
@@ -86,7 +86,12 @@ jobs:
           REGISTRY: ${{ env.CONTAINER_IMAGE_REGISTRY }}
           IMAGE_NAME: ${{ env.CONTAINER_IMAGE_NAME }}
         run: |
+          docker manifest create $REGISTRY/$IMAGE_NAME:${{ github.sha }} \
+            --amend $REGISTRY/$IMAGE_NAME:${{ github.sha }}-x64 \
+            --amend $REGISTRY/$IMAGE_NAME:${{ github.sha }}-arm64
+          docker manifest push $REGISTRY/$IMAGE_NAME:${{ github.sha }}          
+          
           docker manifest create $REGISTRY/$IMAGE_NAME:latest \
-          --amend $REGISTRY/$IMAGE_NAME:latest-x64 \
-          --amend $REGISTRY/$IMAGE_NAME:latest-arm64
+            --amend $REGISTRY/$IMAGE_NAME:${{ github.sha }}-x64 \
+            --amend $REGISTRY/$IMAGE_NAME:${{ github.sha }}-arm64
           docker manifest push $REGISTRY/$IMAGE_NAME:latest
