@@ -15,10 +15,13 @@ internal class EverWallet : IEverWallet {
         "te6cckEBBgEA/AABFP8A9KQT9LzyyAsBAgEgAgMABNIwAubycdcBAcAA8nqDCNcY7UTQgwfXAdcLP8j4KM8WI88WyfkAA3HXAQHDAJqDB9cBURO68uBk3oBA1wGAINcBgCDXAVQWdfkQ8qj4I7vyeWa++COBBwiggQPoqFIgvLHydAIgghBM7mRsuuMPAcjL/8s/ye1UBAUAmDAC10zQ+kCDBtcBcdcBeNcB10z4AHCAEASqAhSxyMsFUAXPFlAD+gLLaSLQIc8xIddJoIQJuZgzcAHLAFjPFpcwcQHLABLM4skB+wAAPoIQFp4+EbqOEfgAApMg10qXeNcB1AL7AOjRkzLyPOI+zYS/";
 
     private const string WalletContractAbiJson =
-        "{\"ABI version\":2,\"version\":\"2.3\",\"header\":[\"pubkey\",\"time\",\"expire\"],\"functions\":[{\"name\":\"sendTransaction\",\"inputs\":[{\"name\":\"dest\",\"type\":\"address\"},{\"name\":\"value\",\"type\":\"uint128\"},{\"name\":\"bounce\",\"type\":\"bool\"},{\"name\":\"flags\",\"type\":\"uint8\"},{\"name\":\"payload\",\"type\":\"cell\"}],\"outputs\":[]},{\"name\":\"sendTransactionRaw\",\"inputs\":[{\"name\":\"flags\",\"type\":\"uint8\"},{\"name\":\"message\",\"type\":\"cell\"}],\"outputs\":[]}],\"data\":[],\"events\":[],\"fields\":[{\"name\":\"_pubkey\",\"type\":\"uint256\"},{\"name\":\"_timestamp\",\"type\":\"uint64\"}]}";
+        """{"ABI version":2,"version":"2.3","header":["pubkey","time","expire"],"functions":[{"name":"sendTransaction","inputs":[{"name":"dest","type":"address"},{"name":"value","type":"uint128"},{"name":"bounce","type":"bool"},{"name":"flags","type":"uint8"},{"name":"payload","type":"cell"}],"outputs":[]},{"name":"sendTransactionRaw","inputs":[{"name":"flags","type":"uint8"},{"name":"message","type":"cell"}],"outputs":[]}],"data":[],"events":[],"fields":[{"name":"_pubkey","type":"uint256"},{"name":"_timestamp","type":"uint64"}]}""";
 
     private const string TransferAbiJson =
-        "{\"ABI version\":2,\"functions\":[{\"name\":\"transfer\",\"id\":\"0x00000000\",\"inputs\":[{\"name\":\"comment\",\"type\":\"bytes\"}],\"outputs\":[]}],\"events\":[],\"data\":[]}";
+        """{"ABI version":2,"functions":[{"name":"transfer","id":"0x00000000","inputs":[{"name":"comment","type":"bytes"}],"outputs":[]}],"events":[],"data":[]}""";
+
+    private const string DataAbiParamsJson =
+        """[{"name":"pubkey","type":"uint256"},{"name":"timestamp","type":"uint64"},{"name":"userHash","type":"uint256"}]""";
 
     private static readonly Abi WalletAbi = new Abi.Contract {
         Value = JsonSerializer.Deserialize<AbiContract>(WalletContractAbiJson, JsonOptionsProvider.JsonSerializerOptions)
@@ -27,6 +30,9 @@ internal class EverWallet : IEverWallet {
     private static readonly Abi TransferAbi = new Abi.Contract {
         Value = JsonSerializer.Deserialize<AbiContract>(TransferAbiJson, JsonOptionsProvider.JsonSerializerOptions)
     };
+
+    private static readonly AbiParam[] DataAbiParams =
+        JsonSerializer.Deserialize<AbiParam[]>(DataAbiParamsJson, JsonOptionsProvider.JsonSerializerOptions)!;
 
     private readonly IEverClient _everClient;
     private readonly ILogger<EverWallet> _logger;
@@ -207,24 +213,18 @@ internal class EverWallet : IEverWallet {
                 var userHash = (await _everClient.Boc.GetBocHash(new ParamsOfGetBocHash {
                     Boc = userBoc
                 }, cancellationToken)).Hash;
-                var dataBoc = (await _everClient.Boc.EncodeBoc(new ParamsOfEncodeBoc {
-                    Builder = new[] {
-                        $"x{keyPair.Public}".ToBuilderOp(),
-                        0L.ToBuilderOp(),
-                        userHash.ToBuilderOp()
-                    }
+                var dataBoc = (await _everClient.Abi.EncodeBoc(new ParamsOfAbiEncodeBoc {
+                    @params = DataAbiParams,
+                    Data = new {
+                        pubkey = $"0x{keyPair.Public}",
+                        timestamp = 0L,
+                        userHash = $"0x{userHash}"
+                    }.ToJsonElement()
                 }, cancellationToken)).Boc;
-                var stateInitBoc = (await _everClient.Boc.EncodeBoc(new ParamsOfEncodeBoc {
-                    Builder = new[] {
-                        false.ToBuilderOp(),
-                        false.ToBuilderOp(),
-                        true.ToBuilderOp(),
-                        true.ToBuilderOp(),
-                        false.ToBuilderOp(),
-                        WalletContractCodeBoc.ToBuilderOpCellBoc(),
-                        dataBoc.ToBuilderOpCellBoc()
-                    }
-                }, cancellationToken)).Boc;
+                var stateInitBoc = (await _everClient.Boc.EncodeTvc(new ParamsOfEncodeTvc {
+                    Code = WalletContractCodeBoc,
+                    Data = dataBoc
+                }, cancellationToken)).Tvc;
                 entity.Size = 1;
                 return stateInitBoc;
             });
