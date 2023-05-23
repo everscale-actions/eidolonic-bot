@@ -25,6 +25,8 @@ internal class EverWallet : IEverWallet {
     private const string DataAbiParamsJson =
         """[{"name":"pubkey","type":"uint256"},{"name":"timestamp","type":"uint64"},{"name":"userHash","type":"uint256"}]""";
 
+    private const string EmptyPayloadBoc = "te6ccgEBAQEAAgAAAA==";
+
     private static readonly Abi WalletAbi = new Abi.Contract {
         Value = JsonSerializer.Deserialize<AbiContract>(WalletContractAbiJson, JsonOptionsProvider.JsonSerializerOptions)
     };
@@ -45,7 +47,6 @@ internal class EverWallet : IEverWallet {
     private string? _address;
     private KeyPair? _keyPair;
     private string? _stateInitBoc;
-
 
     public EverWallet(IEverClient everClient, IOptions<EverWalletOptions> walletOptions, IMemoryCache memoryCache, ILogger<EverWallet> logger,
         GraphQLClient graphQL) {
@@ -118,17 +119,6 @@ internal class EverWallet : IEverWallet {
             : null;
     }
 
-    public async Task<(string transactionId, decimal totalOutputCoins)> SendCoins(long userId, decimal coins, bool allBalance,
-        CancellationToken cancellationToken) {
-        if (_keyPair is null) {
-            throw new NotInitializedException();
-        }
-
-        var destStateInitBoc = await GetStateInitBoc(userId, _keyPair, cancellationToken);
-        var dest = await GetAddress(destStateInitBoc, cancellationToken);
-
-        return await SendCoins(dest, coins, allBalance, null, cancellationToken);
-    }
 
     public async Task<(string transactionId, decimal totalOutputCoins)> SendCoins(string address, decimal coins, bool allBalance,
         string? memo,
@@ -192,7 +182,7 @@ internal class EverWallet : IEverWallet {
                 value,
                 bounce,
                 flags = allBalance ? 130 : 1,
-                payload = payload ?? "te6ccgEBAQEAAgAAAA=="
+                payload = payload ?? EmptyPayloadBoc
             }.ToJsonElement()
         };
 

@@ -10,20 +10,17 @@ public enum Command {
 
     [Command("/wallet",
         Description = "Wallet address and balance",
-        IsWalletNeeded = true,
         IsBotInitCommand = true)]
     Wallet,
 
     [Command("/send",
         Description = "Sends tokens to another telegram user that you reply to",
-        IsWalletNeeded = true,
         IsBotInitCommand = true)]
     [CommandArg("amount", "minimum 0.1 or all to send the whole balance")]
     Send,
 
     [Command("/withdraw",
         Description = "Withdraw tokens to address",
-        IsWalletNeeded = true,
         IsBotInitCommand = true)]
     [CommandArg("amount", "minimum 0.1 or all to send the whole balance")]
     [CommandArg("address", "you outer address or address of the recipient", "amount")]

@@ -4,15 +4,14 @@ public class SendBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
     private const decimal MinimalCoins = 0.1m;
 
     private const string SendMessage = "{0} sent to {1} {2}{3}";
+    private readonly IEverWalletFactory _everWalletFactory;
     private readonly ILogger<SendBotCommandReceivedConsumer> _logger;
 
-    private readonly IEverWallet _wallet;
-
-    public SendBotCommandReceivedConsumer(ITelegramBotClient bot, IEverWallet wallet, IMemoryCache memoryCache,
-        ILogger<SendBotCommandReceivedConsumer> logger) : base(
+    public SendBotCommandReceivedConsumer(ITelegramBotClient bot, IMemoryCache memoryCache,
+        ILogger<SendBotCommandReceivedConsumer> logger, IEverWalletFactory everWalletFactory) : base(
         Command.Send, bot, memoryCache) {
-        _wallet = wallet;
         _logger = logger;
+        _everWalletFactory = everWalletFactory;
     }
 
     private static string FormatSendMessage(User fromUser, User toUser, decimal coins) {
@@ -65,8 +64,11 @@ public class SendBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
             { "AllBalance", allBalance }
         });
 
+        var fromWallet = await _everWalletFactory.CreateWallet(fromUser.Id, cancellationToken);
+        var toWallet = await _everWalletFactory.CreateWallet(toUser.Id, cancellationToken);
+
         try {
-            var (_, coins) = await _wallet.SendCoins(toUser.Id, sendCoins, allBalance, cancellationToken);
+            var (_, coins) = await fromWallet.SendCoins(toWallet.Address, sendCoins, allBalance, cancellationToken: cancellationToken);
             return FormatSendMessage(fromUser, toUser, coins);
         } catch (AccountInsufficientBalanceException ex) {
             return @$"You balance({ex.Balance:F}{Constants.Currency}) is too low";

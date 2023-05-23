@@ -1,3 +1,5 @@
+using EidolonicBot.Models;
+
 namespace EidolonicBot.Utils;
 
 public static class WalletExtensions {

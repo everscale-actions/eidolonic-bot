@@ -52,8 +52,6 @@ public static class HostApplicationBuilderExtensions {
                 x.AddConsumers(type => type.IsAssignableTo(typeof(IMediatorConsumer)),
                     typeof(ChatNotificationSubscriptionReceivedConsumer).Assembly,
                     typeof(CommandUpdateReceivedConsumer).Assembly);
-                x.ConfigureMediator((context, cfg) =>
-                    cfg.UsePublishFilter(typeof(InitUserWalletOnBotCommandReceivedFilter<>), context));
             });
         return builder;
     }

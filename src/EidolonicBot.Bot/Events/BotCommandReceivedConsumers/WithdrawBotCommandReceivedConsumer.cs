@@ -6,15 +6,14 @@ public class WithdrawBotCommandReceivedConsumer : BotCommandReceivedConsumerBase
     private const string WithdrawalMessage = "{0} withdrew to {1} {2}{3}";
     private readonly ILinkFormatter _linkFormatter;
     private readonly ILogger<WithdrawBotCommandReceivedConsumer> _logger;
+    private readonly IEverWalletFactory _walletFactory;
 
-    private readonly IEverWallet _wallet;
-
-    public WithdrawBotCommandReceivedConsumer(ITelegramBotClient bot, IEverWallet wallet, IMemoryCache memoryCache,
-        ILogger<WithdrawBotCommandReceivedConsumer> logger, ILinkFormatter linkFormatter) : base(
+    public WithdrawBotCommandReceivedConsumer(ITelegramBotClient bot, IMemoryCache memoryCache,
+        ILogger<WithdrawBotCommandReceivedConsumer> logger, ILinkFormatter linkFormatter, IEverWalletFactory walletFactory) : base(
         Command.Withdraw, bot, memoryCache) {
-        _wallet = wallet;
         _logger = logger;
         _linkFormatter = linkFormatter;
+        _walletFactory = walletFactory;
     }
 
     private string FormatSendMessage(User fromUser, string dest, decimal coins) {
@@ -64,8 +63,10 @@ public class WithdrawBotCommandReceivedConsumer : BotCommandReceivedConsumerBase
 
         var memo = args is [_, _, { } memoStr] && !string.IsNullOrWhiteSpace(memoStr) ? memoStr : null;
 
+        var wallet = await _walletFactory.CreateWallet(fromUser.Id, cancellationToken);
+
         try {
-            var (_, coins) = await _wallet.SendCoins(dest, sendCoins, allBalance, memo, cancellationToken);
+            var (_, coins) = await wallet.SendCoins(dest, sendCoins, allBalance, memo, cancellationToken);
             return FormatSendMessage(fromUser, dest, coins);
         } catch (AccountInsufficientBalanceException ex) {
             return @$"You balance({ex.Balance:F}{Constants.Currency}) is too low";

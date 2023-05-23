@@ -1,4 +1,7 @@
-using EidolonicBot.Helper;
+using EidolonicBot.Contracts;
+using EidolonicBot.GraphQL;
+using EidolonicBot.Models;
+using EidolonicBot.Services;
 
 namespace EidolonicBot;
 
@@ -20,18 +23,30 @@ public class Startup {
                     options.Network.Endpoints = new[] { endpoint };
                 });
 
+                services.AddHttpClient("GraphQLClient")
+                    .AddTypedClient<GraphQLClient>((client, sp) => {
+                        var endpoint = sp.GetRequiredService<NodeSeDockerContainer>().Endpoint;
+                        client.BaseAddress = new Uri(endpoint);
+                        return new GraphQLClient(client);
+                    });
+
                 services.AddSingleton<IEverGiver, EverGiverV3>();
 
-                services.AddSingleton<SecretPhrase>()
-                    .AddHostedService<SecretPhraseInitService>();
+                services.AddSingleton<Secret>()
+                    .AddHostedService<SecretInitService>();
 
                 services
-                    .AddTransient<IEverWallet, EverWallet>()
+                    .AddTransient<EverWallet>()
                     .AddSingleton<IConfigureOptions<EverWalletOptions>>(provider => {
-                        var secretPhraseService = provider.GetRequiredService<SecretPhrase>();
+                        var secretPhraseService = provider.GetRequiredService<Secret>();
                         return new ConfigureNamedOptions<EverWalletOptions>(null, options =>
                             options.SeedPhrase = secretPhraseService.Phrase);
-                    });
+                    })
+                    .AddSingleton<IEverWalletFactory, EverWalletFactory>();
+
+                services
+                    .AddTransient<ITokenRoot, TokenRoot>()
+                    .AddHostedService<TokenRootInitService>();
 
                 services.AddTransient(_ => new CancellationTokenSource(TimeSpan.FromSeconds(10)));
             });

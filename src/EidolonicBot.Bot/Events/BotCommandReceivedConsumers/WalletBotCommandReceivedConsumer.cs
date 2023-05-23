@@ -1,12 +1,13 @@
 namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 
 public class WalletBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
-    private readonly IEverWallet _wallet;
+    private readonly IEverWalletFactory _walletFactory;
 
-    public WalletBotCommandReceivedConsumer(ITelegramBotClient botClient, IEverWallet wallet, IMemoryCache memoryCache) : base(Command.Wallet,
+    public WalletBotCommandReceivedConsumer(ITelegramBotClient botClient, IMemoryCache memoryCache, IEverWalletFactory walletFactory) : base(
+        Command.Wallet,
         botClient,
         memoryCache) {
-        _wallet = wallet;
+        _walletFactory = walletFactory;
     }
 
     private static string FormatInfoMessage(WalletInfo info) {
@@ -24,7 +25,12 @@ public class WalletBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
     protected override async Task<string?> ConsumeAndGetReply(string[] args, Message message, long chatId,
         int messageThreadId, bool isAdmin,
         CancellationToken cancellationToken) {
-        var info = await _wallet.GetInfo(cancellationToken);
+        if (message is not { From.Id : var userId }) {
+            return "User not found";
+        }
+
+        var wallet = await _walletFactory.CreateWallet(userId, cancellationToken);
+        var info = await wallet.GetInfo(cancellationToken);
 
         return FormatInfoMessage(info);
     }

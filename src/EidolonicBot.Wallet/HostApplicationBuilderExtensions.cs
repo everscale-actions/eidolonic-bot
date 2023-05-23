@@ -5,8 +5,9 @@ namespace EidolonicBot;
 
 public static class HostApplicationBuilderExtensions {
     public static HostApplicationBuilder AddEverWallet(this HostApplicationBuilder builder) {
-        builder.Services.AddScoped<IEverWallet, EverWallet>()
-            .Configure<EverWalletOptions>(builder.Configuration.GetSection("Wallet"));
+        builder.Services.AddTransient<EverWallet>()
+            .Configure<EverWalletOptions>(builder.Configuration.GetSection("Wallet"))
+            .AddSingleton<IEverWalletFactory, EverWalletFactory>();
         return builder;
     }
 }
