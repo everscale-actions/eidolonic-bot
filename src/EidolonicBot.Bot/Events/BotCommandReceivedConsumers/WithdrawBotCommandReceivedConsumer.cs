@@ -63,7 +63,7 @@ public class WithdrawBotCommandReceivedConsumer : BotCommandReceivedConsumerBase
 
         var memo = args is [_, _, { } memoStr] && !string.IsNullOrWhiteSpace(memoStr) ? memoStr : null;
 
-        var wallet = await _walletFactory.CreateWallet(fromUser.Id, cancellationToken);
+        var wallet = await _walletFactory.GetWallet(fromUser.Id, cancellationToken);
 
         try {
             var (_, coins) = await wallet.SendCoins(dest, sendCoins, allBalance, memo, cancellationToken);

@@ -1,8 +1,9 @@
 using EidolonicBot.Models;
+using EverscaleNet;
 
 namespace EidolonicBot;
 
-public interface IEverWallet {
+public interface IEverWallet : IInternalSender {
     string Address { get; }
 
     Task<(string transactionId, decimal totalOutputCoins)> SendCoins(string address, decimal coins, bool allBalance,

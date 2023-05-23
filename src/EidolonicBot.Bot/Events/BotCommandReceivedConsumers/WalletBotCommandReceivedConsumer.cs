@@ -17,7 +17,7 @@ public class WalletBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
             : null;
 
         return $"`{info.Address}`\n" +
-               $"Balance {info.Balance ?? 0:F}{Constants.Currency}\n" +
+               $"Balance {info.Balance ?? 0:F}{Constants.Currency}\n".ToEscapedMarkdownV2() +
                tokens;
     }
 
@@ -29,7 +29,7 @@ public class WalletBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
             return "User not found";
         }
 
-        var wallet = await _walletFactory.CreateWallet(userId, cancellationToken);
+        var wallet = await _walletFactory.GetWallet(userId, cancellationToken);
         var info = await wallet.GetInfo(cancellationToken);
 
         return FormatInfoMessage(info);

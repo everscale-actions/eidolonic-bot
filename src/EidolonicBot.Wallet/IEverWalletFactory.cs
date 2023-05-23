@@ -1,5 +1,5 @@
 namespace EidolonicBot;
 
 public interface IEverWalletFactory {
-    Task<IEverWallet> CreateWallet(long userId, CancellationToken cancellationToken);
+    Task<IEverWallet> GetWallet(long userId, CancellationToken cancellationToken);
 }

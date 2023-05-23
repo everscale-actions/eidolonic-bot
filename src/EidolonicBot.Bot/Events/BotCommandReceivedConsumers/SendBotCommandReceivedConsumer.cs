@@ -64,8 +64,8 @@ public class SendBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
             { "AllBalance", allBalance }
         });
 
-        var fromWallet = await _everWalletFactory.CreateWallet(fromUser.Id, cancellationToken);
-        var toWallet = await _everWalletFactory.CreateWallet(toUser.Id, cancellationToken);
+        var fromWallet = await _everWalletFactory.GetWallet(fromUser.Id, cancellationToken);
+        var toWallet = await _everWalletFactory.GetWallet(toUser.Id, cancellationToken);
 
         try {
             var (_, coins) = await fromWallet.SendCoins(toWallet.Address, sendCoins, allBalance, cancellationToken: cancellationToken);

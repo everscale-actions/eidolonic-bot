@@ -1,18 +1,23 @@
-using EidolonicBot.Contracts;
 using EidolonicBot.GraphQL;
 using EidolonicBot.Models;
 using EidolonicBot.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace EidolonicBot;
 
 public class Startup {
     public void ConfigureHost(IHostBuilder hostBuilder) {
+        hostBuilder.ConfigureHostConfiguration(builder => {
+            builder.AddInMemoryCollection(new Dictionary<string, string?> {
+                { "Wallet:SeedPhrase", "solar hint assume increase monitor enough front ankle inject laptop vicious fortune" }
+            });
+        });
         hostBuilder
             .ConfigureLogging(builder => {
                 builder.SetMinimumLevel(LogLevel.Trace);
                 builder.AddXunitOutput();
             })
-            .ConfigureServices(services => {
+            .ConfigureServices((context, services) => {
                 services.AddMemoryCache();
 
                 services.AddSingleton<NodeSeDockerContainer>()
@@ -23,30 +28,26 @@ public class Startup {
                     options.Network.Endpoints = new[] { endpoint };
                 });
 
-                services.AddHttpClient("GraphQLClient")
+                services.AddHttpClient(nameof(GraphQLClient))
                     .AddTypedClient<GraphQLClient>((client, sp) => {
                         var endpoint = sp.GetRequiredService<NodeSeDockerContainer>().Endpoint;
                         client.BaseAddress = new Uri(endpoint);
                         return new GraphQLClient(client);
                     });
 
-                services.AddSingleton<IEverGiver, EverGiverV3>();
-
                 services.AddSingleton<Secret>()
                     .AddHostedService<SecretInitService>();
 
-                services
-                    .AddTransient<EverWallet>()
-                    .AddSingleton<IConfigureOptions<EverWalletOptions>>(provider => {
-                        var secretPhraseService = provider.GetRequiredService<Secret>();
-                        return new ConfigureNamedOptions<EverWalletOptions>(null, options =>
-                            options.SeedPhrase = secretPhraseService.Phrase);
-                    })
-                    .AddSingleton<IEverWalletFactory, EverWalletFactory>();
+                services.AddSingleton<IEverGiver, EverGiverV3>();
 
                 services
-                    .AddTransient<ITokenRoot, TokenRoot>()
-                    .AddHostedService<TokenRootInitService>();
+                    .AddTransient<EverWallet>()
+                    .Configure<EverWalletOptions>(context.Configuration.GetSection("Wallet"))
+                    .AddSingleton<IEverWalletFactory, EverWalletFactory>();
+
+                // services
+                //     .AddTransient<ITokenRoot, TokenRoot>()
+                //     .AddHostedService<TokenRootInitService>();
 
                 services.AddTransient(_ => new CancellationTokenSource(TimeSpan.FromSeconds(10)));
             });

@@ -2,13 +2,13 @@ namespace EidolonicBot;
 
 public class EverWalletTests {
     private readonly CancellationToken _cancellationToken;
-    private readonly EverWallet _everWallet;
     private readonly IEverGiver _giver;
+    private readonly IServiceProvider _sp;
     private readonly IEverWalletFactory _walletFactory;
 
-    internal EverWalletTests(EverWallet everWallet, IEverWalletFactory walletFactory, IEverGiver giver,
+    public EverWalletTests(IServiceProvider sp, IEverWalletFactory walletFactory, IEverGiver giver,
         CancellationTokenSource cancellationTokenSource) {
-        _everWallet = everWallet;
+        _sp = sp;
         _walletFactory = walletFactory;
         _giver = giver;
         _cancellationToken = cancellationTokenSource.Token;
@@ -16,14 +16,16 @@ public class EverWalletTests {
 
     [Fact]
     public void AddressGet_ThrowsNotInitializedException() {
-        var act = () => _everWallet.Address;
+        var wallet = _sp.GetRequiredService<EverWallet>();
+
+        var act = () => wallet.Address;
 
         act.Should().Throw<NotInitializedException>();
     }
 
     [Fact]
     public async Task BalanceAndAccountType_ReturnsAddressAndNullBalanceAndNullType() {
-        var wallet = await _walletFactory.CreateWallet(long.MaxValue, _cancellationToken);
+        var wallet = await _walletFactory.GetWallet(long.MaxValue, _cancellationToken);
 
         var balance = await wallet.GetBalance(_cancellationToken);
         var type = await wallet.GetAccountType(_cancellationToken);
@@ -36,8 +38,8 @@ public class EverWalletTests {
 
     [Fact]
     public async Task SendCoins_DestinationAccountGetsEvers() {
-        var wallet = await _walletFactory.CreateWallet(1, _cancellationToken);
-        var secondWallet = await _walletFactory.CreateWallet(2, _cancellationToken);
+        var wallet = await _walletFactory.GetWallet(10, _cancellationToken);
+        var secondWallet = await _walletFactory.GetWallet(11, _cancellationToken);
 
         await _giver.SendTransaction(wallet.Address, 0.2m, cancellationToken: _cancellationToken);
 

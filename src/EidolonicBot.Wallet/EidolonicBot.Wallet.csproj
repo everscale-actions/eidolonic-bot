@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <PackageReference Include="EverscaleNet" />
+    <PackageReference Include="EverscaleNet.AppKit" />
     <PackageReference Include="EverscaleNet.Utils" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />

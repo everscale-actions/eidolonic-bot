@@ -17,11 +17,13 @@ public class TokenRootInitService : IHostedService {
     }
 
     public async Task StartAsync(CancellationToken cancellationToken) {
-        var tokenWalletCode = await _packageManager.LoadCode("TokenWallet", cancellationToken) ??
-                              throw new InvalidOperationException("TokenWallet code file should be provided");
-        var wallet = await _walletFactory.CreateWallet(1, cancellationToken);
-        await _tokenRoot.Init("Edolonic", "EDLC", 9, wallet.Address, tokenWalletCode, 0, ZeroAddress, cancellationToken);
-        await _giver.SendTransaction(_tokenRoot.Address, 5m.CoinsToNano(), cancellationToken: cancellationToken);
+        var tokenWalletTvc = await _packageManager.LoadTvc("TokenWallet", cancellationToken) ??
+                             throw new InvalidOperationException("TokenWallet code file should be provided");
+
+
+        var wallet = await _walletFactory.GetWallet(1, cancellationToken);
+        await _tokenRoot.Init(wallet, "Edolonic", "EDLC", 9, wallet.Address, tokenWalletTvc, 0, wallet.Address, cancellationToken);
+        await _giver.SendTransaction(_tokenRoot.Address, 10m.CoinsToNano(), cancellationToken: cancellationToken);
         await _tokenRoot.Deploy(ZeroAddress, 0m, 1m.CoinsToNano(), false, false, false, wallet.Address, cancellationToken);
     }
 
