@@ -3,11 +3,11 @@ using EverscaleNet;
 
 namespace EidolonicBot.Contracts;
 
-public class TokenRoot : AccountBase, ITokenRoot {
+public class TokenRootUpgradeable : AccountBase, ITokenRoot {
     private readonly IEverClient _everClient;
     private readonly IEverPackageManager _packageManager;
 
-    public TokenRoot(IEverClient everClient, IEverPackageManager packageManager) :
+    public TokenRootUpgradeable(IEverClient everClient, IEverPackageManager packageManager) :
         base(everClient, packageManager) {
         _everClient = everClient;
         _packageManager = packageManager;
@@ -51,11 +51,18 @@ public class TokenRoot : AccountBase, ITokenRoot {
 
     public async Task Init(IInternalSender sender, string name, string symbol, ushort decimals, string rootOwner,
         string deployer, CancellationToken cancellationToken) {
-        var tokenWalletTvc = await _packageManager.LoadTvc("TokenWallet", cancellationToken) ??
-                             throw new InvalidOperationException("TokenWallet code file should be provided");
+        var tokenWalletTvc = await _packageManager.LoadTvc("TokenWalletUpgradeable", cancellationToken) ??
+                             throw new InvalidOperationException("TokenWalletUpgradeable code file should be provided");
 
         var tokenWalletCode = (await _everClient.Boc.DecodeStateInit(new ParamsOfDecodeStateInit {
             StateInit = tokenWalletTvc
+        }, cancellationToken)).Code;
+
+        var tokenWalletPlatformTvc = await _packageManager.LoadTvc("TokenWalletPlatform", cancellationToken) ??
+                                     throw new InvalidOperationException("TokenWalletPlatform code file should be provided");
+
+        var tokenWalletPlatformCode = (await _everClient.Boc.DecodeStateInit(new ParamsOfDecodeStateInit {
+            StateInit = tokenWalletPlatformTvc
         }, cancellationToken)).Code;
 
         await base.Init(sender, new {
@@ -65,7 +72,8 @@ public class TokenRoot : AccountBase, ITokenRoot {
             rootOwner_ = rootOwner,
             walletCode_ = tokenWalletCode,
             randomNonce_ = Random.Shared.NextInt64(),
-            deployer_ = deployer
-        }, cancellationToken: cancellationToken);
+            deployer_ = deployer,
+            platformCode_ = tokenWalletPlatformCode
+        }, cancellationToken);
     }
 }

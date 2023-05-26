@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text.Json;
 using EidolonicBot.Exceptions;
 using EidolonicBot.GraphQL;
@@ -130,10 +131,9 @@ internal class EverWallet : IEverWallet {
         }
 
         ResultOfProcessMessage result;
-
         try {
             var payload = memo is null ? null : await GetPayloadBodyByMemo(memo);
-            result = await SendTransaction(address, coins, false, allBalance, payload, cancellationToken);
+            result = await SendTransaction(address, new BigInteger(coins) << 9, false, allBalance, payload, cancellationToken);
         } catch (EverClientException exception) when (exception.Code == (uint)TvmErrorCode.LowBalance) {
             var balanceEx = await GetBalance(cancellationToken) ?? throw new AccountInsufficientBalanceException(0);
             throw new AccountInsufficientBalanceException(balanceEx);
@@ -159,79 +159,34 @@ internal class EverWallet : IEverWallet {
 
     public string Address => _address ?? throw new NotInitializedException();
 
-    public async Task<ResultOfProcessMessage> Send(string dest, decimal coins, bool bounce, bool allBalance, string payload,
+    public async Task<ResultOfProcessMessage> Send(string dest, decimal valueCoins, bool bounce, bool allBalance, Abi abi, CallSet callSet,
         string? stateInit = null,
         CancellationToken cancellationToken = default) {
-        if (stateInit is null) {
-            return await SendTransaction(dest, coins, bounce, allBalance, payload, cancellationToken);
-        }
+        var value = valueCoins.CoinsToNano();
 
-        var value = $"{coins.CoinsToNano():0}";
-
-        // pub ihr_disabled: bool,
-        // pub bounce: bool,
-        // pub bounced: bool,
-        // pub src: MsgAddressIntOrNone,
-        // pub dst: MsgAddressInt,
-        // pub value: CurrencyCollection,
-        // pub ihr_fee: Grams,
-        // pub fwd_fee: Grams,
-        // pub created_lt: u64,
-        // pub created_at: UnixTime32,
-
-        // await _everClient.Abi.EncodeBoc(new ParamsOfAbiEncodeBoc() {
-        //     @params = new AbiParam[] {
-        //         new() { Name = "ihr_disabled", Type = "bool" },
-        //         new() { Name = "bounce", Type = "bool" },
-        //         new() { Name = "bounced", Type = "bool" },
-        //         new() { Name = "src", Type = "address" },
-        //         new() { Name = "dst", Type = "address" },
-        //         new() { Name = "value", Type = "uint128" },
-        //         new() { Name = "ihr_fee", Type = "uint128" },
-        //         new() { Name = "fwd_fee", Type = "uint128" },
-        //         new() { Name = "created_lt", Type = "uint128" },
-        //         new() { Name = "created_at", Type = "uint64" },
-        //     },
-        //     Data = new {
-        //         ihr_disabled = true,
-        //         bounce = bounce,
-        //         bounced = false,
-        //         src = "",
-        //         dst = dest[^2..],
-        //         value = value,
-        //         ihr_fee = "0"
-        //         
-        //     }.ToJsonElement()
-        // }, cancellationToken);
+        // if (stateInit is null) {
+        //     var resultOfEncodeMessageBody = await _everClient.Abi.EncodeMessageBody(new ParamsOfEncodeMessageBody {
+        //         Abi = abi,
+        //         CallSet = callSet,
+        //         IsInternal = true,
+        //         Signer = new Signer.None()
+        //     }, cancellationToken);
         //
+        //     var payload = resultOfEncodeMessageBody.Body;
         //
-        var messageHeader = (await _everClient.Boc.EncodeBoc(new ParamsOfEncodeBoc {
-            Builder = new[] {
-                true.ToBuilderOp(),
-                bounce.ToBuilderOp(),
-                false.ToBuilderOp(),
-                0.ToBuilderOp(),
-                dest.Substring(2, dest.Length - 2).ToBuilderOp(),
-                value.ToBuilderOp(),
-                new BuilderOp.Integer { Size = 128, Value = 0.ToJsonElement<int>() },
-                0.ToBuilderOp(),
-                0.ToBuilderOp(),
-                0L.ToBuilderOp(),
-                0.ToBuilderOp()
-            }
-        }, cancellationToken)).Boc;
+        //     return await SendTransaction(dest, value, bounce, allBalance, payload, cancellationToken);
+        // }
 
+        var body = (await _everClient.Abi.EncodeInternalMessage(new ParamsOfEncodeInternalMessage {
+            Abi = abi,
+            Value = value.ToString(),
+            Address = dest,
+            Bounce = bounce,
+            DeploySet = stateInit is not null ? new DeploySet { StateInit = stateInit } : null,
+            CallSet = callSet
+        }, cancellationToken)).Message;
 
-        var message = (await _everClient.Boc.EncodeBoc(new ParamsOfEncodeBoc {
-            Builder = new[] {
-                messageHeader.ToBuilderOp(),
-                stateInit.ToBuilderOp(),
-                payload.ToBuilderOp(),
-                "".ToBuilderOp(),
-                "".ToBuilderOp()
-            }
-        }, cancellationToken)).Boc;
-        return await SendTransactionRaw(allBalance, message, cancellationToken);
+        return await SendTransactionRaw(allBalance, body, cancellationToken);
     }
 
     private async Task<string> GetPayloadBodyByMemo(string memo) {
@@ -248,7 +203,7 @@ internal class EverWallet : IEverWallet {
         return result.Body;
     }
 
-    private async Task<ResultOfProcessMessage> SendTransaction(string dest, decimal coins, bool bounce,
+    private async Task<ResultOfProcessMessage> SendTransaction(string dest, BigInteger value, bool bounce,
         bool allBalance,
         string? payload,
         CancellationToken cancellationToken) {
@@ -256,7 +211,6 @@ internal class EverWallet : IEverWallet {
             throw new NotInitializedException();
         }
 
-        var value = $"{coins.CoinsToNano():0}";
         var flags = SendTransactionFlags.SenderWantsToPayTransferFeesSeparately | SendTransactionFlags.IgnoreSomeErrors;
         if (allBalance) {
             flags |= SendTransactionFlags.CarryAllRemainingBalance;
@@ -266,7 +220,7 @@ internal class EverWallet : IEverWallet {
             FunctionName = "sendTransaction",
             Input = new {
                 dest,
-                value,
+                value = value.ToString(),
                 bounce,
                 flags = (byte)flags,
                 payload = payload ?? EmptyPayloadBoc
@@ -298,7 +252,6 @@ internal class EverWallet : IEverWallet {
             ShardBlockId = shardBlockId
         }, cancellationToken: cancellationToken);
 
-
         return resultOfProcessMessage;
     }
 
@@ -323,8 +276,8 @@ internal class EverWallet : IEverWallet {
                 _logger.LogDebug("Getting StateInit for {UserId}", userId);
                 var userBoc = (await _everClient.Boc.EncodeBoc(new ParamsOfEncodeBoc {
                     Builder = new[] {
-                        userId.ToBuilderOp(),
-                        keyPair.Secret.ToBuilderOp()
+                        userId.ToBuilderOp()
+                        // keyPair.Secret.ToBuilderOp()
                     }
                 }, cancellationToken)).Boc;
                 var userHash = (await _everClient.Boc.GetBocHash(new ParamsOfGetBocHash {
@@ -338,10 +291,10 @@ internal class EverWallet : IEverWallet {
                         userHash = $"0x{userHash}"
                     }.ToJsonElement()
                 }, cancellationToken)).Boc;
-                var stateInitBoc = (await _everClient.Boc.EncodeTvc(new ParamsOfEncodeTvc {
+                var stateInitBoc = (await _everClient.Boc.EncodeStateInit(new ParamsOfEncodeStateInit {
                     Code = WalletContractCodeBoc,
                     Data = dataBoc
-                }, cancellationToken)).Tvc;
+                }, cancellationToken)).StateInit;
                 entity.Size = 1;
                 return stateInitBoc;
             });

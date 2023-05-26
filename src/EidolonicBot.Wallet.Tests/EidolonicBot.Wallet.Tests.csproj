@@ -1,23 +1,29 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <PackageReference Include="EverscaleNet.AppKit" />
-    <PackageReference Include="EverscaleNet.Client" />
-    <PackageReference Include="EverscaleNet.TestSuite" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
-    <PackageReference Include="Xunit.DependencyInjection" />
-    <PackageReference Include="Xunit.DependencyInjection.Logging" />
-  </ItemGroup>
+    <PropertyGroup>
+        <UserSecretsId>b9ce3baf-4f75-4285-b6b7-4fda10829fd5</UserSecretsId>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\EidolonicBot.Wallet\EidolonicBot.Wallet.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="EverscaleNet.AppKit"/>
+        <PackageReference Include="EverscaleNet.Client"/>
+        <PackageReference Include="EverscaleNet.TestSuite"/>
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory"/>
+        <PackageReference Include="Serilog.Extensions.Logging"/>
+        <PackageReference Include="Serilog.Sinks.XUnit"/>
+        <PackageReference Include="Xunit.DependencyInjection"/>
+        <PackageReference Include="Xunit.DependencyInjection.Logging"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="_contracts\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\EidolonicBot.Wallet\EidolonicBot.Wallet.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="_contracts\**">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
 
   <ItemGroup>
     <Folder Include="_contracts\" />
