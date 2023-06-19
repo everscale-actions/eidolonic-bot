@@ -40,5 +40,6 @@ public enum Command {
     [CommandArg("address", "account address", "add", "edit", "remove")]
     [CommandArg("full", "(optional) show full address", "list")]
     [CommandArg("min_delta", "(optional) minimum balance delta for notification", "add address", "edit address")]
+    [CommandArg("label", "(optional) subscription label without spaces", "add address min_delta", "edit address min_delta")]
     Subscription
 }

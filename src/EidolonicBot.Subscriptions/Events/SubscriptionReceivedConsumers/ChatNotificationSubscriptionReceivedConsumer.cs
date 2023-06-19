@@ -16,36 +16,38 @@ public class ChatNotificationSubscriptionReceivedConsumer : IConsumer<Subscripti
     }
 
     public async Task Consume(ConsumeContext<SubscriptionReceived> context) {
-        var transaction = context.Message;
+        var (transactionId, address, balanceDelta, from, to, balance) = context.Message;
         var cancellationToken = context.CancellationToken;
 
         var chatAndThreadIds = await _db.Subscription
-            .Where(s => s.Address == transaction.AccountAddr)
+            .Where(s => s.Address == address)
             .SelectMany(s => s.SubscriptionByChat
-                .Where(sbc => sbc.MinDelta <= Math.Abs(transaction.BalanceDelta))
-                .Select(sbc => new { sbc.ChatId, sbc.MessageThreadId, sbc.MinDelta }))
+                .Where(sbc => sbc.MinDelta <= Math.Abs(balanceDelta))
+                .Select(sbc => new { sbc.ChatId, sbc.MessageThreadId, sbc.MinDelta, sbc.Label }))
             .ToArrayAsync(cancellationToken);
 
-        var links = _linkFormatter.GetTransactionLinks(transaction.TransactionId);
+        var links = _linkFormatter.GetTransactionLinks(transactionId);
 
-        var from = transaction.From is not null ? $"from: {_linkFormatter.GetAddressLink(transaction.From)}\n" : null;
-        var to = transaction.To.Length > 0 ? $"to: {string.Join(',', transaction.To.Select(t => _linkFormatter.GetAddressLink(t)))}\n" : null;
-
-        var message =
-            $"❕Subscription alert ❕\n" +
-            $"address: {_linkFormatter.GetAddressLink(transaction.AccountAddr)}\n" +
-            from +
-            to +
-            $"balance: {transaction.Balance}{Constants.Currency}\n".ToEscapedMarkdownV2() +
-            $"delta: {transaction.BalanceDelta}{Constants.Currency}\n".ToEscapedMarkdownV2() +
-            string.Join(" \\| ", links);
+        var fromString = from is not null ? $"from: {_linkFormatter.GetAddressLink(from)}\n" : null;
+        var toString = to.Length > 0 ? $"to: {string.Join(',', to.Select(t => _linkFormatter.GetAddressLink(t)))}\n" : null;
 
         await Task.WhenAll(chatAndThreadIds.Select(chat =>
             _bot.SendTextMessageAsync(chat.ChatId,
-                message,
+                CreateMessage(address, balance, balanceDelta, chat.Label, fromString, toString, links),
                 chat.MessageThreadId,
                 ParseMode.MarkdownV2,
                 disableWebPagePreview: true,
                 cancellationToken: cancellationToken)));
+    }
+
+    private string CreateMessage(string address, decimal balance, decimal balanceDelta, string? label, string? fromString, string? toString, string[] links) {
+        var labelStr = label is not null ? $"label: {label}\n".ToEscapedMarkdownV2() : null;
+        return "\u2755Subscription alert \u2755\n" +
+               labelStr +
+               $"address: {_linkFormatter.GetAddressLink(address)}\n" +
+               fromString +
+               toString +
+               $"balance: {balance}{Constants.Currency}\n".ToEscapedMarkdownV2() +
+               $"delta: {balanceDelta}{Constants.Currency}\n".ToEscapedMarkdownV2() + string.Join(" \\| ", links);
     }
 }

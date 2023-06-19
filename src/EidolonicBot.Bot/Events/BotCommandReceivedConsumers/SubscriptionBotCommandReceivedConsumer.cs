@@ -24,10 +24,10 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
                 when _adminActions.Contains(action) && !isAdmin => "Only chat admin can control subscriptions".ToEscapedMarkdownV2(),
 
             ["add", { } address, ..] when Regex.TvmAddressRegex().IsMatch(address) =>
-                await Subscribe(address, chatId, messageThreadId, GetMinDeltaByArgs(args), cancellationToken),
+                await Subscribe(address, chatId, messageThreadId, GetMinDeltaByArgs(args), GetLabelByArgs(args), cancellationToken),
 
             ["edit", { } address, ..] when isAdmin && Regex.TvmAddressRegex().IsMatch(address) =>
-                await EditSubscription(address, chatId, messageThreadId, GetMinDeltaByArgs(args), cancellationToken),
+                await EditSubscription(address, chatId, messageThreadId, GetMinDeltaByArgs(args), GetLabelByArgs(args), cancellationToken),
 
             ["remove", { } address] when isAdmin && Regex.TvmAddressRegex().IsMatch(address) =>
                 await Unsubscribe(address, chatId, messageThreadId, cancellationToken),
@@ -38,11 +38,15 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
         };
     }
 
+    private static string? GetLabelByArgs(IReadOnlyList<string> args) {
+        return args.Count >= 4 ? args[3] : null;
+    }
+
     private static decimal GetMinDeltaByArgs(IReadOnlyList<string> args) {
         return args.Count >= 3 && decimal.TryParse(args[2].Replace(',', '.'), out var result1) ? result1 : 0;
     }
 
-    private async Task<string?> EditSubscription(string address, long chatId, int messageThreadId, decimal minDelta,
+    private async Task<string?> EditSubscription(string address, long chatId, int messageThreadId, decimal minDelta, string? label,
         CancellationToken cancellationToken) {
         var subscription = await _db.Subscription.SingleAsync(s => s.Address == address, cancellationToken);
 
@@ -55,8 +59,8 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
         }
 
         subscriptionByChat.MinDelta = minDelta;
+        subscriptionByChat.Label = label;
 
-        _db.SubscriptionByChat.Update(subscriptionByChat);
         var savedEntries = await _db.SaveChangesAsync(cancellationToken);
 
         return savedEntries > 0
@@ -68,12 +72,13 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
         var subscriptionStrings = (await _db.SubscriptionByChat.Where(s => s.ChatId == chatId && s.MessageThreadId == messageThreadId)
                 .Select(s => new {
                     s.Subscription.Address,
-                    MinDeltaStr = s.MinDelta.ToString(CultureInfo.CurrentCulture).ToEscapedMarkdownV2()
+                    MinDeltaStr = s.MinDelta.ToString(CultureInfo.CurrentCulture).ToEscapedMarkdownV2(),
+                    s.Label
                 })
                 .ToArrayAsync(cancellationToken))
             .Select(s => full
-                ? $"`{s.Address}`` | ``{s.MinDeltaStr}{Constants.Currency}`"
-                : $"{_linkFormatter.GetAddressLink(s.Address)} \\| {s.MinDeltaStr}{Constants.Currency}")
+                ? $"`{s.Address}`` | ``{s.MinDeltaStr}{Constants.Currency}`` | ``{s.Label}`"
+                : $"{_linkFormatter.GetAddressLink(s.Address)} \\| {s.MinDeltaStr}{Constants.Currency} \\| {s.Label?.ToEscapedMarkdownV2()}")
             .ToArray();
 
         if (subscriptionStrings.Length == 0) {
@@ -81,11 +86,11 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
                    " `/subscription add `address";
         }
 
-        return "Address \\| MinDelta\n" +
+        return "Address \\| MinDelta\\| Label\n" +
                $"{string.Join('\n', subscriptionStrings)}";
     }
 
-    private async Task<string> Subscribe(string address, long chatId, int messageThreadId, decimal minDelta,
+    private async Task<string> Subscribe(string address, long chatId, int messageThreadId, decimal minDelta, string? label,
         CancellationToken cancellationToken) {
         var subscription = await _db.Subscription.FirstOrDefaultAsync(s => s.Address == address, cancellationToken);
         subscription ??= (await _db.Subscription.AddAsync(new Subscription { Address = address }, cancellationToken)).Entity;
@@ -99,7 +104,8 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
                     SubscriptionId = subscription.Id,
                     ChatId = chatId,
                     MessageThreadId = messageThreadId,
-                    MinDelta = minDelta
+                    MinDelta = minDelta,
+                    Label = label
                 },
                 cancellationToken);
         }
