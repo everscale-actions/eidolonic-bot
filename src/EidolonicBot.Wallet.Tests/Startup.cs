@@ -1,4 +1,6 @@
 using EidolonicBot.Helper;
+using EverscaleNet.TestSuite.Giver;
+using EverscaleNet.TestSuite.Services;
 
 namespace EidolonicBot;
 
@@ -20,7 +22,7 @@ public class Startup {
                     options.Network.Endpoints = new[] { endpoint };
                 });
 
-                services.AddSingleton<IEverGiver, EverGiverV3>();
+                services.AddSingleton<IEverGiver, GiverV3>();
 
                 services.AddSingleton<SecretPhrase>()
                     .AddHostedService<SecretPhraseInitService>();

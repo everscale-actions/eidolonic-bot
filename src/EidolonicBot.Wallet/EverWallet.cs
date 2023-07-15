@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text.Json;
 using EidolonicBot.Exceptions;
 using EverscaleNet.Abstract;
@@ -135,7 +136,7 @@ internal class EverWallet : IEverWallet {
         return result.Body;
     }
 
-    private async Task<(string transactionId, decimal totalOutputCoins)> SendTransaction(string dest, decimal nanoCoins, bool bounce,
+    private async Task<(string transactionId, decimal totalOutputCoins)> SendTransaction(string dest, BigInteger nanoCoins, bool bounce,
         bool allBalance,
         string? payload,
         CancellationToken cancellationToken) {
@@ -221,10 +222,10 @@ internal class EverWallet : IEverWallet {
                         userHash = $"0x{userHash}"
                     }.ToJsonElement()
                 }, cancellationToken)).Boc;
-                var stateInitBoc = (await _everClient.Boc.EncodeTvc(new ParamsOfEncodeTvc {
+                var stateInitBoc = (await _everClient.Boc.EncodeStateInit(new ParamsOfEncodeStateInit {
                     Code = WalletContractCodeBoc,
                     Data = dataBoc
-                }, cancellationToken)).Tvc;
+                }, cancellationToken)).StateInit;
                 entity.Size = 1;
                 return stateInitBoc;
             });

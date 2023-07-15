@@ -1,3 +1,5 @@
+using EverscaleNet.TestSuite.Giver;
+
 namespace EidolonicBot;
 
 public class WalletTests {
