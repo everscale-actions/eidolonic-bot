@@ -1,3 +1,4 @@
+using EverscaleNet.Models;
 using EverscaleNet.TestSuite.Giver;
 
 namespace EidolonicBot;
@@ -31,8 +32,8 @@ public class WalletTests {
 
         using var scope = new AssertionScope();
         _wallet.Address.Should().HaveLength(66);
-        balance.Should().Be(null);
-        type.Should().Be(null);
+        balance.Should().Be(0);
+        type.Should().Be(AccountType.NonExist);
     }
 
     [Fact]
