@@ -7,23 +7,24 @@ on:
       - .github/workflows/ci.yaml
     branches:
       - main
+  pull_request:
+    paths:
+      - src/**
 
 concurrency:
   group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
   cancel-in-progress: true
 
 env:
-  CONTAINER_IMAGE_REGISTRY: ghcr.io
-  CONTAINER_IMAGE_NAME: everscale-actions/eidolonic-bot
+  REGISTRY: ghcr.io
+  IMAGE_NAME: everscale-actions/eidolonic-bot
+  ARCHITECTURES: x64,arm64
 jobs:
   build:
     name: Build, Tests, Publish
     runs-on: ubuntu-latest
     permissions:
       packages: write
-    strategy:
-      matrix:
-        arch: [ x64, arm64 ]
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-dotnet@v3
@@ -54,51 +55,27 @@ jobs:
           name: test-results
           path: '**/*.trx'
 
-      - name: Build image
+      - uses: docker/login-action@v2
+        if: github.event_name != 'pull_request'
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+
+      - name: Build, publish image and push manifest
+        if: github.event_name != 'pull_request'
         working-directory: src
-        env:
-          ContainerImageName: ${{ env.CONTAINER_IMAGE_NAME }}
-          ContainerImageTags: ${{ github.sha }}-${{ matrix.arch }}
         run: |
-          dotnet publish EidolonicBot --os linux --arch ${{ matrix.arch }} /t:PublishContainer -c Release
-
-      - uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
-
-      - name: Tag and push image to ghcr.io
-        env:
-          IMAGE_NAME: ${{ env.CONTAINER_IMAGE_NAME }}
-          IMAGE_TAG: ${{ github.sha }}-${{ matrix.arch }}
-          REGISTRY: ${{ env.CONTAINER_IMAGE_REGISTRY }}
-        run: |
-          docker tag $IMAGE_NAME:$IMAGE_TAG $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
-          docker push $REGISTRY/$IMAGE_NAME:$IMAGE_TAG
-  
-  manifest:
-    needs:
-      - build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
-
-      - name: Publish manifest
-        env:
-          REGISTRY: ${{ env.CONTAINER_IMAGE_REGISTRY }}
-          IMAGE_NAME: ${{ env.CONTAINER_IMAGE_NAME }}
-        run: |
-          docker manifest create $REGISTRY/$IMAGE_NAME:${{ github.sha }} \
-            --amend $REGISTRY/$IMAGE_NAME:${{ github.sha }}-x64 \
-            --amend $REGISTRY/$IMAGE_NAME:${{ github.sha }}-arm64
-          docker manifest push $REGISTRY/$IMAGE_NAME:${{ github.sha }}          
+          archImages=""
+          for arch in $(echo $ARCHITECTURES | sed "s/,/ /g"); do
+            tag=${{ github.sha }}-$arch
+            dotnet publish EidolonicBot --os linux --arch $arch /t:PublishContainer -c Release /p:ContainerImageName="$IMAGE_NAME" /p:ContainerImageTags="$tag"
           
-          docker manifest create $REGISTRY/$IMAGE_NAME:latest \
-            --amend $REGISTRY/$IMAGE_NAME:${{ github.sha }}-x64 \
-            --amend $REGISTRY/$IMAGE_NAME:${{ github.sha }}-arm64
-          docker manifest push $REGISTRY/$IMAGE_NAME:latest
+            remoteImage=$REGISTRY/$IMAGE_NAME:$tag
+            docker tag $IMAGE_NAME:$tag $remoteImage
+            docker push $remoteImage
+          
+            archImages+=" ${remoteImage}"
+          done
+          docker manifest create $REGISTRY/$IMAGE_NAME:${{ github.sha }} $archImages
+          docker manifest push $REGISTRY/$IMAGE_NAME:${{ github.sha }}     
