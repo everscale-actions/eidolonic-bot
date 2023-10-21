@@ -5,12 +5,12 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <ContainerImageName>everscale-actions/eidolonic-bot</ContainerImageName>
+    <ContainerRepository>everscale-actions/eidolonic-bot</ContainerRepository>
     <ContainerImageTags Condition="$(ContainerImageTags) == ''">latest</ContainerImageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <ContainerLabel Include="org.opencontainers.image.source" Value="https://github.com/$(ContainerImageName)" />
+    <ContainerLabel Include="org.opencontainers.image.source" Value="https://github.com/$(ContainerRepository)"/>
   </ItemGroup>
 
   <ItemGroup>

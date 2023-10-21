@@ -69,7 +69,7 @@ jobs:
           archImages=""
           for arch in $(echo $ARCHITECTURES | sed "s/,/ /g"); do
             tag=${{ github.sha }}-$arch
-            dotnet publish EidolonicBot --os linux --arch $arch /t:PublishContainer -c Release /p:ContainerImageName="$IMAGE_NAME" /p:ContainerImageTags="$tag"
+            dotnet publish EidolonicBot --os linux --arch $arch /t:PublishContainer -c Release /p:ContainerRepository="$IMAGE_NAME" /p:ContainerImageTags="$tag"
           
             remoteImage=$REGISTRY/$IMAGE_NAME:$tag
             docker tag $IMAGE_NAME:$tag $remoteImage
