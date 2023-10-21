@@ -1,0 +1,38 @@
+name: 'Publish image'
+inputs:
+  registry:
+    required: true
+  image-name:
+    required: true
+  architectures:
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-dotnet@v3
+
+    - uses: docker/login-action@v2
+      with:
+        registry: ${{ inputs.registry }}
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+
+    - name: Build, publish image and push manifest
+      working-directory: src
+      env:
+        ContainerImageName: ${{ inputs.image-name }}
+        ContainerImageTags: ${{ github.sha }}
+      run: |
+        arch-images=""
+        for arch in $(echo ${{ inputs.architectures }} | sed "s/,/ /g"); do
+          dotnet publish EidolonicBot --os linux --arch $arch /t:PublishContainer -c Release
+
+          image=$REGISTRY/$IMAGE_NAME:${{ github.sha }}-$arch
+          docker tag $IMAGE_NAME:$IMAGE_TAG $image
+          docker push $image
+        
+          archImages+=" ${image}"
+        done
+        docker manifest create $REGISTRY/$IMAGE_NAME:${{ github.sha }} $archImages
+        docker manifest push $REGISTRY/$IMAGE_NAME:${{ github.sha }}          
+    
