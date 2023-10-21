@@ -17,6 +17,7 @@ env:
   CONTAINER_IMAGE_NAME: everscale-actions/eidolonic-bot
 jobs:
   build:
+    name: Build, Tests, Publish
     runs-on: ubuntu-latest
     permissions:
       packages: write
