@@ -26,6 +26,7 @@
     <PackageReference Include="Microsoft.NET.Build.Containers" />
     <PackageReference Include="Sentry.Extensions.Logging" />
     <PackageReference Include="Serilog.Enrichers.Environment" />
+    <PackageReference Include="Serilog.Enrichers.Sensitive" />
     <PackageReference Include="Serilog.Extensions.Hosting" />
     <PackageReference Include="Serilog.Formatting.Compact" />
     <PackageReference Include="Serilog.Settings.Configuration" />

@@ -1,6 +1,7 @@
 using EidolonicBot.Events.SubscriptionReceivedConsumers;
 using EidolonicBot.Events.SubscriptionServiceActivatedConsumers;
 using EidolonicBot.Serilog;
+using Serilog.Enrichers.Sensitive;
 
 namespace EidolonicBot;
 
@@ -11,6 +12,13 @@ public static class HostApplicationBuilderExtensions {
             loggingBuilder.ClearProviders();
             loggingBuilder.AddSerilog(new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
+                .Enrich.WithSensitiveDataMasking(options => {
+                    options.MaskingOperators.Clear();
+                    options.MaskProperties.Clear();
+                    options.MaskingOperators.Add(
+                        new RegexWithSecretMaskingOperator(@"https:\/\/api.telegram.org\/bot(?'secret'.*?)\/")
+                    );
+                })
                 .Destructure.With<IncludePublicNotNullFieldsPolicy>()
                 .Destructure.With<SerializeJsonElementPolicy>()
                 .CreateLogger());
