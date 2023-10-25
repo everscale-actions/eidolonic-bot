@@ -1,3 +1,5 @@
+using Telegram.Bot.Exceptions;
+
 namespace EidolonicBot.Services;
 
 internal class BotUpdateHandler : IUpdateHandler {
@@ -26,7 +28,7 @@ internal class BotUpdateHandler : IUpdateHandler {
     public async Task HandlePollingErrorAsync(ITelegramBotClient _, Exception exception,
         CancellationToken cancellationToken) {
         _logger.LogError(exception, "Telegram API Error");
-        if (exception is RequestException) {
+        if (exception is ApiRequestException) {
             await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
         }
     }
