@@ -58,11 +58,15 @@ public class SendBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
             return $"You should send at least {MinimalCoins}{Constants.Currency}";
         }
 
-        using var _ = _logger.BeginScope(new {
-            FromUser = fromUser,
-            ToUser = toUser,
-            SendCoins = sendCoins,
-            AllBalance = allBalance
+        using var _ = _logger.BeginScope(new Dictionary<string, object> {
+            {
+                "@SendData", new {
+                    FromUser = fromUser,
+                    ToUser = toUser,
+                    SendCoins = sendCoins,
+                    AllBalance = allBalance
+                }
+            }
         });
 
         try {

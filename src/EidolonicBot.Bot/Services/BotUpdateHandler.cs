@@ -13,8 +13,8 @@ internal class BotUpdateHandler : IUpdateHandler {
 
     public async Task HandleUpdateAsync(ITelegramBotClient _, Update update,
         CancellationToken cancellationToken) {
-        using var updateScope = _logger.BeginScope(update);
-        _logger.LogDebug("Update received: {@Update}", update);
+        using var updateScope = _logger.BeginScope("{@Update}", update);
+        _logger.LogDebug("Update received");
 
         await using var scope = _serviceProvider.CreateAsyncScope();
         var mediator = scope.ServiceProvider.GetRequiredService<IScopedMediator>();

@@ -55,15 +55,17 @@ public class WithdrawBotCommandReceivedConsumer : BotCommandReceivedConsumerBase
             return "Provide valid destination address";
         }
 
-        using var _ = _logger.BeginScope(new {
-            FromUser = fromUser,
-            Dest = dest,
-            SendCoins = sendCoins,
-            AllBalance = allBalance
+        using var _ = _logger.BeginScope(new Dictionary<string, object> {
+            {
+                "@WithdrawData", new {
+                    FromUser = fromUser,
+                    Dest = dest,
+                    SendCoins = sendCoins,
+                    AllBalance = allBalance
+                }
+            }
         });
-
         var memo = args is [_, _, { } memoStr] && !string.IsNullOrWhiteSpace(memoStr) ? memoStr : null;
-
         try {
             var (_, coins) = await _wallet.SendCoins(dest, sendCoins, allBalance, memo, cancellationToken);
             return FormatSendMessage(fromUser, dest, coins);

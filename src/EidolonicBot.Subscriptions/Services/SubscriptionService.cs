@@ -111,8 +111,8 @@ internal class SubscriptionService : IHostedService, ISubscriptionService, IAsyn
                     }
                 };
                 var transaction = e.ToPrototype(prototype).result.transactions;
-                using var subscriptionScope = _logger.BeginScope(transaction);
-                _logger.LogInformation("Got transaction by subscription {@Transaction}", transaction);
+                using var subscriptionScope = _logger.BeginScope("{@Transaction}", transaction);
+                _logger.LogInformation("Got transaction by subscription");
                 try {
                     await using var scope = _scope.ServiceProvider.CreateAsyncScope();
                     var mediator = scope.ServiceProvider.GetRequiredService<IScopedMediator>();
