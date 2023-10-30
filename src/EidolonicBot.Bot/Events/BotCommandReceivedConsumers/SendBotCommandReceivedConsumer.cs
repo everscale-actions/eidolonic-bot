@@ -73,7 +73,7 @@ public class SendBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
             var (_, coins) = await _wallet.SendCoins(toUser.Id, sendCoins, allBalance, cancellationToken);
             return FormatSendMessage(fromUser, toUser, coins);
         } catch (AccountInsufficientBalanceException ex) {
-            return @$"You balance({ex.Balance:F}{Constants.Currency}) is too low";
+            return $"You balance({ex.Balance:F}{Constants.Currency}) is too low".ToEscapedMarkdownV2();
         } catch (Exception e) {
             _logger.LogError(e, "Something went wrong");
             return "Something went wrong";
