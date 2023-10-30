@@ -16,6 +16,7 @@
   <ItemGroup>
     <PackageReference Include="EverscaleNet.Client" />
     <PackageReference Include="MassTransit" />
+    <PackageReference Include="MassTransit.Newtonsoft" />
     <PackageReference Include="MassTransit.RabbitMQ" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>

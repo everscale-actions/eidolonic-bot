@@ -1,6 +1,6 @@
 ﻿namespace EidolonicBot.Events.UpdateReceivedConsumers;
 
-public class CommandUpdateReceivedConsumer : IConsumer<UpdateReceived>, IMediatorConsumer {
+public class CommandUpdateReceivedConsumer : IConsumer<UpdateReceived> {
     private readonly ITelegramBotClient _botClient;
     private readonly IMemoryCache _cache;
     private readonly IHostEnvironment _hostEnvironment;
