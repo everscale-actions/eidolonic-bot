@@ -47,7 +47,6 @@ public static class HostApplicationBuilderExtensions {
             .AddMassTransit(x => {
                 x.AddConsumers(type => !type.IsAssignableTo(typeof(IMediatorConsumer)),
                     typeof(ShutdownApplicationSubscriptionServiceActivatedConsumer).Assembly);
-
                 var amqpUri = builder.Configuration["AMQP_URI"];
                 if (amqpUri is not null) {
                     x.UsingRabbitMq((context, cfg) => {
