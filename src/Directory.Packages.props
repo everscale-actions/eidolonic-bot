@@ -36,16 +36,16 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Options" Version="7.0.1" />
     <PackageVersion Include="Microsoft.NET.Build.Containers" Version="7.0.403" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.11" />
     <PackageVersion Include="Polly" Version="8.1.0" />
-    <PackageVersion Include="Sentry.Extensions.Logging" Version="3.40.1" />
+    <PackageVersion Include="Sentry.Extensions.Logging" Version="3.41.0" />
     <PackageVersion Include="Serilog.Enrichers.Environment" Version="2.3.0" />
     <PackageVersion Include="Serilog.Enrichers.Sensitive" Version="1.7.3" />
     <PackageVersion Include="Serilog.Extensions.Hosting" Version="7.0.0" />
-    <PackageVersion Include="Serilog.Formatting.Compact" Version="1.1.0" />
+    <PackageVersion Include="Serilog.Formatting.Compact" Version="2.0.0" />
     <PackageVersion Include="Serilog.Settings.Configuration" Version="7.0.1" />
-    <PackageVersion Include="Serilog.Sinks.Console" Version="4.1.0" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="5.0.0" />
     <PackageVersion Include="Serilog.Sinks.Elasticsearch" Version="9.0.3" />
     <PackageVersion Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageVersion Include="Serilog.Sinks.XUnit" Version="3.0.5" />
