@@ -7,11 +7,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
-    <PackageVersion Include="EverscaleNet" Version="1.44.4.1" />
-    <PackageVersion Include="EverscaleNet.AppKit" Version="1.44.4.1" />
-    <PackageVersion Include="EverscaleNet.Client" Version="1.44.4.1" />
-    <PackageVersion Include="EverscaleNet.TestSuite" Version="1.44.4.1" />
-    <PackageVersion Include="EverscaleNet.Utils" Version="1.44.4.1" />
+    <PackageVersion Include="EverscaleNet" Version="1.44.4.4" />
+    <PackageVersion Include="EverscaleNet.AppKit" Version="1.44.4.4" />
+    <PackageVersion Include="EverscaleNet.Client" Version="1.44.4.4" />
+    <PackageVersion Include="EverscaleNet.TestSuite" Version="1.44.4.4" />
+    <PackageVersion Include="EverscaleNet.Utils" Version="1.44.4.4" />
     <PackageVersion Include="FluentAssertions" Version="6.12.0" />
     <PackageVersion Include="MassTransit" Version="8.1.2" />
     <PackageVersion Include="MassTransit.Abstractions" Version="8.1.2" />
