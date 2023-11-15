@@ -28,6 +28,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0'
 
       - name: Get Cache Month
         id: cache-month
@@ -38,9 +40,9 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: ~/.nuget/packages
-          key: nuget-net7-${{ steps.cache-month.outputs.date }}-${{ hashFiles('src/Directory.Packages.props') }}
+          key: nuget-net8-${{ steps.cache-month.outputs.date }}-${{ hashFiles('src/Directory.Packages.props') }}
           restore-keys: |
-            nuget-net7-${{ steps.cache-month.outputs.date }}-
+            nuget-net8-${{ steps.cache-month.outputs.date }}-
 
       - name: Run tests
         timeout-minutes: 10
