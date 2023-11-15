@@ -38,9 +38,9 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: ~/.nuget/packages
-          key: nuget-${{ steps.cache-month.outputs.date }}-${{ hashFiles('src/Directory.Packages.props') }}
+          key: nuget-net7-${{ steps.cache-month.outputs.date }}-${{ hashFiles('src/Directory.Packages.props') }}
           restore-keys: |
-            nuget-${{ steps.cache-month.outputs.date }}-
+            nuget-net7-${{ steps.cache-month.outputs.date }}-
 
       - name: Run tests
         timeout-minutes: 10
