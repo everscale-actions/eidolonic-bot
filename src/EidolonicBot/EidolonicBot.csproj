@@ -24,7 +24,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
     <PackageReference Include="Microsoft.Extensions.Hosting" />
-    <PackageReference Include="Microsoft.NET.Build.Containers" />
     <PackageReference Include="Sentry.Extensions.Logging" />
     <PackageReference Include="Serilog.Enrichers.Environment" />
     <PackageReference Include="Serilog.Enrichers.Sensitive" />
