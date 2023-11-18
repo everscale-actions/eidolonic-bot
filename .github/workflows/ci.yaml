@@ -17,8 +17,10 @@ concurrency:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: everscale-actions/eidolonic-bot
-  ARCHITECTURES: x64,arm64
+  RUNTIME_BASE_IMAGE: dotnet/runtime
+  RUNTIME_BASE_IMAGE_TAG: 8.0-bookworm-slim
+  IMAGE_NAME: ${{ github.repository }}
+  ARCH_PLATFORMS: x64-amd64,arm64-arm64
 jobs:
   build:
     name: Build, Tests, Publish
@@ -27,51 +29,51 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+      - uses: docker/login-action@v2
+        #        if: github.event_name != 'pull_request'
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      
       - uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '8.0'
-
+      
       - name: Get Cache Month
         id: cache-month
         run: |
           echo "date=$(/bin/date -u "+%Y%m")" >> $GITHUB_OUTPUT
         shell: bash
-
+      
       - uses: actions/cache@v3
         with:
           path: ~/.nuget/packages
           key: nuget-net8-${{ steps.cache-month.outputs.date }}-${{ hashFiles('src/Directory.Packages.props') }}
           restore-keys: |
             nuget-net8-${{ steps.cache-month.outputs.date }}-
-
+      
       - name: Run tests
         timeout-minutes: 10
         working-directory: src
         run: |
           dotnet test -c Release --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=results" -m
-
+      
       - name: Upload test results trx files
         uses: actions/upload-artifact@v3
         if: success() || failure()
         with:
           name: test-results
           path: '**/*.trx'
-
-      - uses: docker/login-action@v2
-        if: github.event_name != 'pull_request'
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ github.token }}
-
+      
       - name: Build, publish image and push manifest
-        if: github.event_name != 'pull_request'
-        working-directory: src
+        if: $${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'publish') }}
         run: |
           archImages=""
-          for arch in $(echo $ARCHITECTURES | sed "s/,/ /g"); do
-            tag=${{ github.sha }}-$arch
-            dotnet publish EidolonicBot --os linux --arch $arch /t:PublishContainer -c Release /p:ContainerRepository="$IMAGE_NAME" /p:ContainerImageTags="$tag"
+          for arch_platform in $(echo $ARCH_PLATFORMS | sed "s/,/ /g"); do
+            IFS=- read -r arch platform <<< $arch_platform
+            tag=${{ github.sha }}-$platform
+            dotnet publish src/EidolonicBot --os linux --arch $arch /t:PublishContainer -c Release /p:ContainerRepository=${{ env.IMAGE_NAME }} /p:ContainerImageTags="$tag" /p:ContainerBaseImage="${{ env.REGISTRY }}/${{ github.repository_owner }}/dotnet-runtime:${{ env.RUNTIME_BASE_IMAGE_TAG }}-$platform"
           
             remoteImage=$REGISTRY/$IMAGE_NAME:$tag
             docker tag $IMAGE_NAME:$tag $remoteImage
