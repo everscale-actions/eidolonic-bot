@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="EverscaleNet.AppKit" />
     <PackageReference Include="EverscaleNet.Client" />
     <PackageReference Include="EverscaleNet.TestSuite" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" />

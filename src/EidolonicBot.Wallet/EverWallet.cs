@@ -11,7 +11,12 @@ using Microsoft.Extensions.Options;
 
 namespace EidolonicBot;
 
-internal class EverWallet : IEverWallet {
+internal class EverWallet(
+    IEverClient everClient,
+    IOptions<EverWalletOptions> walletOptions,
+    IMemoryCache memoryCache,
+    ILogger<EverWallet> logger)
+    : IEverWallet {
     private const string WalletContractCodeBoc =
         "te6cckEBBgEA/AABFP8A9KQT9LzyyAsBAgEgAgMABNIwAubycdcBAcAA8nqDCNcY7UTQgwfXAdcLP8j4KM8WI88WyfkAA3HXAQHDAJqDB9cBURO68uBk3oBA1wGAINcBgCDXAVQWdfkQ8qj4I7vyeWa++COBBwiggQPoqFIgvLHydAIgghBM7mRsuuMPAcjL/8s/ye1UBAUAmDAC10zQ+kCDBtcBcdcBeNcB10z4AHCAEASqAhSxyMsFUAXPFlAD+gLLaSLQIc8xIddJoIQJuZgzcAHLAFjPFpcwcQHLABLM4skB+wAAPoIQFp4+EbqOEfgAApMg10qXeNcB1AL7AOjRkzLyPOI+zYS/";
 
@@ -35,25 +40,12 @@ internal class EverWallet : IEverWallet {
     private static readonly AbiParam[] DataAbiParams =
         JsonSerializer.Deserialize<AbiParam[]>(DataAbiParamsJson, JsonOptionsProvider.JsonSerializerOptions)!;
 
-    private readonly IEverClient _everClient;
-    private readonly ILogger<EverWallet> _logger;
-    private readonly IMemoryCache _memoryCache;
-    private readonly IOptions<EverWalletOptions> _walletOptions;
-
     private string? _address;
     private KeyPair? _keyPair;
     private string? _stateInitBoc;
 
-
-    public EverWallet(IEverClient everClient, IOptions<EverWalletOptions> walletOptions, IMemoryCache memoryCache, ILogger<EverWallet> logger) {
-        _everClient = everClient;
-        _walletOptions = walletOptions;
-        _memoryCache = memoryCache;
-        _logger = logger;
-    }
-
     public async Task<decimal?> GetBalance(CancellationToken cancellationToken) {
-        var result = await _everClient.Net.QueryCollection(new ParamsOfQueryCollection {
+        var result = await everClient.Net.QueryCollection(new ParamsOfQueryCollection {
             Collection = "accounts",
             Filter = new { id = new { eq = Address } }.ToJsonElement(),
             Result = "balance(format: DEC)",
@@ -66,7 +58,7 @@ internal class EverWallet : IEverWallet {
     }
 
     public async Task<AccountType?> GetAccountType(CancellationToken cancellationToken) {
-        var result = await _everClient.Net.QueryCollection(new ParamsOfQueryCollection {
+        var result = await everClient.Net.QueryCollection(new ParamsOfQueryCollection {
             Collection = "accounts",
             Filter = new { id = new { eq = Address } }.ToJsonElement(),
             Result = "acc_type",
@@ -108,7 +100,7 @@ internal class EverWallet : IEverWallet {
     }
 
     public async Task<IEverWallet> Init(long userId, CancellationToken cancellationToken) {
-        var phrase = _walletOptions.Value.SeedPhrase;
+        var phrase = walletOptions.Value.SeedPhrase;
         if (phrase is null or "YOUR_SEED_PHRASE_HERE") {
             throw new NullReferenceException("Wallet:SeedPhrase should be provided");
         }
@@ -123,7 +115,7 @@ internal class EverWallet : IEverWallet {
     public string Address => _address ?? throw new NotInitializedException();
 
     private async Task<string> GetPayloadBodyByMemo(string memo) {
-        var result = await _everClient.Abi.EncodeMessageBody(new ParamsOfEncodeMessageBody {
+        var result = await everClient.Abi.EncodeMessageBody(new ParamsOfEncodeMessageBody {
             Abi = TransferAbi,
             CallSet = new CallSet {
                 FunctionName = "transfer",
@@ -156,7 +148,7 @@ internal class EverWallet : IEverWallet {
             }.ToJsonElement()
         };
 
-        var bodyBoc = (await _everClient.Abi.EncodeMessageBody(new ParamsOfEncodeMessageBody {
+        var bodyBoc = (await everClient.Abi.EncodeMessageBody(new ParamsOfEncodeMessageBody {
             Address = _address,
             Abi = WalletAbi,
             CallSet = callSet,
@@ -165,17 +157,17 @@ internal class EverWallet : IEverWallet {
 
         var accountType = await GetAccountType(cancellationToken);
 
-        var callMessage = (await _everClient.Boc.EncodeExternalInMessage(new ParamsOfEncodeExternalInMessage {
+        var callMessage = (await everClient.Boc.EncodeExternalInMessage(new ParamsOfEncodeExternalInMessage {
             Dst = _address,
             Init = accountType is AccountType.Uninit ? _stateInitBoc : null,
             Body = bodyBoc
         }, cancellationToken)).Message;
 
-        var shardBlockId = (await _everClient.Processing.SendMessage(new ParamsOfSendMessage {
+        var shardBlockId = (await everClient.Processing.SendMessage(new ParamsOfSendMessage {
             Message = callMessage
         }, cancellationToken: cancellationToken)).ShardBlockId;
 
-        var resultOfProcessMessage = await _everClient.Processing.WaitForTransaction(new ParamsOfWaitForTransaction {
+        var resultOfProcessMessage = await everClient.Processing.WaitForTransaction(new ParamsOfWaitForTransaction {
             Message = callMessage,
             ShardBlockId = shardBlockId
         }, cancellationToken: cancellationToken);
@@ -187,10 +179,10 @@ internal class EverWallet : IEverWallet {
     }
 
     private async Task<KeyPair> GetKeyPair(string seedPhrase, CancellationToken cancellationToken) {
-        var keypair = await _memoryCache.GetOrCreateAsync($"KeyPairBySeedPhrase_{seedPhrase}", async entity => {
-            _logger.LogDebug("Getting keypair by seed phrase");
+        var keypair = await memoryCache.GetOrCreateAsync($"KeyPairBySeedPhrase_{seedPhrase}", async entity => {
+            logger.LogDebug("Getting keypair by seed phrase");
 
-            var keyPair = await _everClient.Crypto.MnemonicDeriveSignKeys(new ParamsOfMnemonicDeriveSignKeys {
+            var keyPair = await everClient.Crypto.MnemonicDeriveSignKeys(new ParamsOfMnemonicDeriveSignKeys {
                 Phrase = seedPhrase
             }, cancellationToken);
 
@@ -202,19 +194,19 @@ internal class EverWallet : IEverWallet {
 
     private async Task<string> GetStateInitBoc(long userId, KeyPair keyPair,
         CancellationToken cancellationToken) {
-        var stateInit = await _memoryCache.GetOrCreateAsync<string>($"StateInitBocByUserIdByPublicKey_{userId}_{keyPair.Public}",
+        var stateInit = await memoryCache.GetOrCreateAsync<string>($"StateInitBocByUserIdByPublicKey_{userId}_{keyPair.Public}",
             async entity => {
-                _logger.LogDebug("Getting StateInit for {UserId}", userId);
-                var userBoc = (await _everClient.Boc.EncodeBoc(new ParamsOfEncodeBoc {
+                logger.LogDebug("Getting StateInit for {UserId}", userId);
+                var userBoc = (await everClient.Boc.EncodeBoc(new ParamsOfEncodeBoc {
                     Builder = new[] {
                         userId.ToBuilderOp(),
                         keyPair.Secret.ToBuilderOp()
-                    }
+                    },
                 }, cancellationToken)).Boc;
-                var userHash = (await _everClient.Boc.GetBocHash(new ParamsOfGetBocHash {
+                var userHash = (await everClient.Boc.GetBocHash(new ParamsOfGetBocHash {
                     Boc = userBoc
                 }, cancellationToken)).Hash;
-                var dataBoc = (await _everClient.Abi.EncodeBoc(new ParamsOfAbiEncodeBoc {
+                var dataBoc = (await everClient.Abi.EncodeBoc(new ParamsOfAbiEncodeBoc {
                     @params = DataAbiParams,
                     Data = new {
                         pubkey = $"0x{keyPair.Public}",
@@ -222,7 +214,7 @@ internal class EverWallet : IEverWallet {
                         userHash = $"0x{userHash}"
                     }.ToJsonElement()
                 }, cancellationToken)).Boc;
-                var stateInitBoc = (await _everClient.Boc.EncodeStateInit(new ParamsOfEncodeStateInit {
+                var stateInitBoc = (await everClient.Boc.EncodeStateInit(new ParamsOfEncodeStateInit {
                     Code = WalletContractCodeBoc,
                     Data = dataBoc
                 }, cancellationToken)).StateInit;
@@ -233,10 +225,10 @@ internal class EverWallet : IEverWallet {
     }
 
     private async Task<string> GetAddress(string stateInitBoc, CancellationToken cancellationToken) {
-        var address = await _memoryCache.GetOrCreateAsync<string>($"AddressByStateInitBoc_{stateInitBoc}", async entity => {
-            _logger.LogDebug("Getting Address for {StateInit}", stateInitBoc);
+        var address = await memoryCache.GetOrCreateAsync<string>($"AddressByStateInitBoc_{stateInitBoc}", async entity => {
+            logger.LogDebug("Getting Address for {StateInit}", stateInitBoc);
             var resultOfGetBocHash =
-                await _everClient.Boc.GetBocHash(new ParamsOfGetBocHash { Boc = stateInitBoc }, cancellationToken);
+                await everClient.Boc.GetBocHash(new ParamsOfGetBocHash { Boc = stateInitBoc }, cancellationToken);
             entity.Size = 1;
             return $"0:{resultOfGetBocHash.Hash}";
         });
