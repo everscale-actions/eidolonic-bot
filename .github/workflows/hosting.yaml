@@ -40,7 +40,7 @@ jobs:
 
       - name: Nx set SHAs
         id: setSHAs
-        uses: nrwl/nx-set-shas@v4.0.3
+        uses: nrwl/nx-set-shas@v4.0.4
         with:
           workflow-id: ci.yaml
           set-environment-variables-for-job: false
@@ -52,7 +52,7 @@ jobs:
 
       - name: Logs to artifact
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: logs
           path: .hosting/logs/**
