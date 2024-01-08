@@ -36,7 +36,7 @@
     <PackageVersion Include="Microsoft.NET.Build.Containers" Version="8.0.100" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
-    <PackageVersion Include="Polly" Version="8.2.0" />
+    <PackageVersion Include="Polly" Version="8.2.1" />
     <PackageVersion Include="Sentry.Extensions.Logging" Version="3.41.2" />
     <PackageVersion Include="Serilog.Enrichers.Environment" Version="2.3.0" />
     <PackageVersion Include="Serilog.Enrichers.Sensitive" Version="1.7.3" />
