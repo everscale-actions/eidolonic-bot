@@ -40,7 +40,7 @@ jobs:
           echo "date=$(/bin/date -u "+%Y%m")" >> $GITHUB_OUTPUT
         shell: bash
       
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
           key: nuget-net8-${{ steps.cache-month.outputs.date }}-${{ hashFiles('src/Directory.Packages.props') }}
