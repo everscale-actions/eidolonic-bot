@@ -21,6 +21,9 @@ updates:
     open-pull-requests-limit: 1
     rebase-strategy: "auto"
     groups:
+      EverscaleNet:
+        patterns:
+          - "EverscaleNet.*"
       All:
         patterns:
           - "*"
