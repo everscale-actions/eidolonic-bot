@@ -79,7 +79,7 @@ jobs:
           for arch_platform in $(echo $ARCH_PLATFORMS | sed "s/,/ /g"); do
             IFS=- read -r arch platform <<< $arch_platform
             tag=${{ github.sha }}-$platform
-            dotnet publish src/EidolonicBot --os linux --arch $arch /t:PublishContainer -c Release /p:ContainerRepository=${{ env.IMAGE_NAME }} /p:ContainerImageTags="$tag" /p:ContainerBaseImage="${{ env.REGISTRY }}/${{ github.repository_owner }}/dotnet-runtime:${{ env.RUNTIME_BASE_IMAGE_TAG }}-$platform"
+            dotnet publish src/EidolonicBot --os linux --arch $arch /t:PublishContainer -c Release /p:ContainerRepository=${{ env.IMAGE_NAME }} /p:ContainerImageTags="$tag"
           
             remoteImage=$REGISTRY/$IMAGE_NAME:$tag
             docker tag $IMAGE_NAME:$tag $remoteImage
