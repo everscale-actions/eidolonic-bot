@@ -32,11 +32,14 @@
     <PackageReference Include="Serilog.Settings.Configuration" />
     <PackageReference Include="Serilog.Sinks.Console" />
     <PackageReference Include="Serilog.Sinks.File" />
-    <PackageReference Include="Serilog.Sinks.Elasticsearch" />
+    <PackageReference Include="Serilog.Sinks.SyslogMessages" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Update="appsettings.Development.json">
+      <DependentUpon>appsettings.json</DependentUpon>
+    </Content>
+    <Content Update="appsettings.Production.json">
       <DependentUpon>appsettings.json</DependentUpon>
     </Content>
   </ItemGroup>
