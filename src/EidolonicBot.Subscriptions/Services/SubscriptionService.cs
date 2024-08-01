@@ -142,7 +142,10 @@ internal class SubscriptionService : IHostedService, ISubscriptionService, IAsyn
 
                     var balanceDeltaCoins = transaction.balance_delta.NanoToCoins();
                     var from = string.IsNullOrEmpty(transaction.in_message.src) ? null : transaction.in_message.src;
-                    var to = transaction.out_messages?.Select(m => m.dst).ToArray() ?? [];
+                    var to = transaction.out_messages?
+                        .Where(m => !string.IsNullOrWhiteSpace(m.dst))
+                        .Select(m => m.dst)
+                        .ToArray() ?? [];
 
                     await mediator.Publish(new SubscriptionReceived(
                         transaction.id,
