@@ -1,29 +1,37 @@
 namespace EidolonicBot.Services;
 
-internal class PullingService : BackgroundService {
+internal class PullingService : BackgroundService
+{
     private readonly ITelegramBotClient _client;
     private readonly ILogger<PullingService> _logger;
     private readonly ReceiverOptions _receiverOptions;
     private readonly IUpdateHandler _updateHandler;
 
     public PullingService(ILogger<PullingService> logger, IUpdateHandler updateHandler, ITelegramBotClient client,
-        IHostEnvironment hostEnvironment) {
+        IHostEnvironment hostEnvironment)
+    {
         _logger = logger;
         _updateHandler = updateHandler;
         _client = client;
-        _receiverOptions = new ReceiverOptions {
-            AllowedUpdates = Array.Empty<UpdateType>(),
+        _receiverOptions = new ReceiverOptions
+        {
+            AllowedUpdates = [],
             ThrowPendingUpdates = hostEnvironment.IsDevelopment()
         };
     }
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
-        while (!stoppingToken.IsCancellationRequested) {
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
             _logger.LogInformation("Starting polling service");
 
-            try {
+            try
+            {
                 await _client.ReceiveAsync(_updateHandler, _receiverOptions, stoppingToken);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 _logger.LogError(ex, "Polling failed");
                 await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
             }

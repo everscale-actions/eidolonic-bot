@@ -4,22 +4,27 @@ using EverscaleNet.TestSuite.Services;
 
 namespace EidolonicBot;
 
-public class Startup {
-    public void ConfigureHost(IHostBuilder hostBuilder) {
+public class Startup
+{
+    public void ConfigureHost(IHostBuilder hostBuilder)
+    {
         hostBuilder
-            .ConfigureLogging(builder => {
+            .ConfigureLogging(builder =>
+            {
                 builder.SetMinimumLevel(LogLevel.Trace);
                 builder.AddXunitOutput();
             })
-            .ConfigureServices(services => {
+            .ConfigureServices(services =>
+            {
                 services.AddMemoryCache();
 
                 services.AddSingleton<NodeSeDockerContainer>()
                     .AddHostedService<InitNodeSeService>();
 
-                services.AddEverClient((sp, options) => {
+                services.AddEverClient((sp, options) =>
+                {
                     var endpoint = sp.GetRequiredService<NodeSeDockerContainer>().Endpoint;
-                    options.Network.Endpoints = new[] { endpoint };
+                    options.Network.Endpoints = [endpoint];
                 });
 
                 services.AddSingleton<IEverGiver, GiverV3>();
@@ -29,7 +34,8 @@ public class Startup {
 
                 services
                     .AddTransient<IEverWallet, EverWallet>()
-                    .AddSingleton<IConfigureOptions<EverWalletOptions>>(provider => {
+                    .AddSingleton<IConfigureOptions<EverWalletOptions>>(provider =>
+                    {
                         var secretPhraseService = provider.GetRequiredService<SecretPhrase>();
                         return new ConfigureNamedOptions<EverWalletOptions>(null, options =>
                             options.SeedPhrase = secretPhraseService.Phrase);

@@ -1,6 +1,7 @@
 ﻿namespace EidolonicBot.Events.UpdateReceivedConsumers;
 
-public class CommandUpdateReceivedConsumer : IConsumer<UpdateReceived> {
+public class CommandUpdateReceivedConsumer : IConsumer<UpdateReceived>
+{
     private readonly ITelegramBotClient _botClient;
     private readonly IMemoryCache _cache;
     private readonly IHostEnvironment _hostEnvironment;
@@ -9,7 +10,8 @@ public class CommandUpdateReceivedConsumer : IConsumer<UpdateReceived> {
 
     public CommandUpdateReceivedConsumer(IScopedMediator mediator,
         ILogger<CommandUpdateReceivedConsumer> logger, IHostEnvironment hostEnvironment,
-        ITelegramBotClient botClient, IMemoryCache cache) {
+        ITelegramBotClient botClient, IMemoryCache cache)
+    {
         _mediator = mediator;
         _logger = logger;
         _hostEnvironment = hostEnvironment;
@@ -17,28 +19,35 @@ public class CommandUpdateReceivedConsumer : IConsumer<UpdateReceived> {
         _cache = cache;
     }
 
-    public async Task Consume(ConsumeContext<UpdateReceived> context) {
+    public async Task Consume(ConsumeContext<UpdateReceived> context)
+    {
         var update = context.Message.Update;
         var cancellationToken = context.CancellationToken;
 
-        if (update is not {
-                Message : {
+        if (update is not
+            {
+                Message :
+                {
                     Text: { } messageText,
                     MessageId: var messageId,
                     Chat.Id: var chatId
                 }
-            } || !messageText.StartsWith('/')) {
+            } || !messageText.StartsWith('/'))
+        {
             return;
         }
 
         var commandAndArgs = messageText.Split(' ');
         var commandAndUserName = commandAndArgs[0].Split('@', 2);
-        switch (commandAndUserName.Length) {
+        switch (commandAndUserName.Length)
+        {
             case 1 when update.Message.Chat.Type is not ChatType.Private && _hostEnvironment.IsDevelopment():
                 return;
-            case 2: {
+            case 2:
+            {
                 var botUsername = await GetBotUsername(cancellationToken);
-                if (commandAndUserName[1] != botUsername) {
+                if (commandAndUserName[1] != botUsername)
+                {
                     _logger.LogDebug(
                         "Command ignored die to wrong bot username Expected: {ExpectedUserName} Actual: {ActualUserName}",
                         botUsername, commandAndUserName[1]);
@@ -52,13 +61,15 @@ public class CommandUpdateReceivedConsumer : IConsumer<UpdateReceived> {
         var command = CommandHelpers.CommandByText.TryGetValue(commandAndUserName[0], out var cmd)
             ? cmd
             : Command.Unknown;
-        var args = commandAndArgs.Length >= 2 ? commandAndArgs[1..] : Array.Empty<string>();
+        var args = commandAndArgs.Length >= 2 ? commandAndArgs[1..] : [];
 
         using var _ = _logger.BeginScope("Command:{Command} Args:{args}", command, string.Join(' ', args));
 
-        if (args.Length == 1 && args[0].Equals("help", StringComparison.InvariantCultureIgnoreCase)) {
+        if (args.Length == 1 && args[0].Equals("help", StringComparison.InvariantCultureIgnoreCase))
+        {
             var help = CommandHelpers.HelpByCommand[command];
-            if (help is not null) {
+            if (help is not null)
+            {
                 await _botClient.SendTextMessageAsync(
                     chatId,
                     help,
@@ -77,8 +88,10 @@ public class CommandUpdateReceivedConsumer : IConsumer<UpdateReceived> {
         ), cancellationToken);
     }
 
-    private async Task<string?> GetBotUsername(CancellationToken cancellationToken) {
-        return await _cache.GetOrCreateAsync("BotUsername", async entry => {
+    private async Task<string?> GetBotUsername(CancellationToken cancellationToken)
+    {
+        return await _cache.GetOrCreateAsync("BotUsername", async entry =>
+        {
             entry.Size = 1;
             entry.Priority = CacheItemPriority.NeverRemove;
             return (await _botClient.GetMeAsync(cancellationToken)).Username;

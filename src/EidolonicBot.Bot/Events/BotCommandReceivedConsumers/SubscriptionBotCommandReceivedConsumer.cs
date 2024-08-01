@@ -1,7 +1,8 @@
 namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 
-public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumerBase {
-    private readonly string[] _adminActions = { "add", "edit", "remove" };
+public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumerBase
+{
+    private readonly string[] _adminActions = ["add", "edit", "remove"];
 
     private readonly AppDbContext _db;
     private readonly ILinkFormatter _linkFormatter;
@@ -11,7 +12,8 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
         AppDbContext db,
         IScopedMediator mediator, ILinkFormatter linkFormatter) : base(
         Command.Subscription, botClient,
-        memoryCache) {
+        memoryCache)
+    {
         _db = db;
         _mediator = mediator;
         _linkFormatter = linkFormatter;
@@ -19,8 +21,10 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
 
     protected override async Task<string?> ConsumeAndGetReply(string[] args, Message message, long chatId,
         int messageThreadId, bool isAdmin,
-        CancellationToken cancellationToken) {
-        return args switch {
+        CancellationToken cancellationToken)
+    {
+        return args switch
+        {
             [{ } action, ..]
                 when _adminActions.Contains(action) && !isAdmin => "Only chat admin can control subscriptions"
                     .ToEscapedMarkdownV2(),
@@ -44,24 +48,28 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
         };
     }
 
-    private static string? GetLabelByArgs(IReadOnlyList<string> args) {
+    private static string? GetLabelByArgs(IReadOnlyList<string> args)
+    {
         return args.Count >= 4 ? args[3] : null;
     }
 
-    private static decimal GetMinDeltaByArgs(IReadOnlyList<string> args) {
+    private static decimal GetMinDeltaByArgs(IReadOnlyList<string> args)
+    {
         return args.Count >= 3 && decimal.TryParse(args[2].Replace(',', '.'), out var result1) ? result1 : 0;
     }
 
     private async Task<string?> EditSubscription(string address, long chatId, int messageThreadId, decimal minDelta,
         string? label,
-        CancellationToken cancellationToken) {
+        CancellationToken cancellationToken)
+    {
         var subscription = await _db.Subscription.SingleAsync(s => s.Address == address, cancellationToken);
 
         var subscriptionByChat = await _db.SubscriptionByChat.FindAsync(
-            new object?[] { chatId, messageThreadId, subscription.Id, cancellationToken },
+            [chatId, messageThreadId, subscription.Id, cancellationToken],
             cancellationToken);
 
-        if (subscriptionByChat is null) {
+        if (subscriptionByChat is null)
+        {
             return "Subscription wasn't found\\. Add new one first";
         }
 
@@ -76,10 +84,12 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
     }
 
     private async Task<string?> GetSubscriptionList(long chatId, int messageThreadId, bool full,
-        CancellationToken cancellationToken) {
+        CancellationToken cancellationToken)
+    {
         var subscriptionStrings = (await _db.SubscriptionByChat
                 .Where(s => s.ChatId == chatId && s.MessageThreadId == messageThreadId)
-                .Select(s => new {
+                .Select(s => new
+                {
                     s.Subscription.Address,
                     MinDeltaStr = s.MinDelta.ToString(CultureInfo.CurrentCulture).ToEscapedMarkdownV2(),
                     s.Label
@@ -90,7 +100,8 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
                 : $"{_linkFormatter.GetAddressLink(s.Address)} \\| {s.MinDeltaStr}{Constants.Currency} \\| {s.Label?.ToEscapedMarkdownV2()}")
             .ToArray();
 
-        if (subscriptionStrings.Length == 0) {
+        if (subscriptionStrings.Length == 0)
+        {
             return "Get your first subscription with\n" +
                    " `/subscription add `address";
         }
@@ -101,17 +112,20 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
 
     private async Task<string> Subscribe(string address, long chatId, int messageThreadId, decimal minDelta,
         string? label,
-        CancellationToken cancellationToken) {
+        CancellationToken cancellationToken)
+    {
         var subscription = await _db.Subscription.FirstOrDefaultAsync(s => s.Address == address, cancellationToken);
         subscription ??= (await _db.Subscription.AddAsync(new Subscription { Address = address }, cancellationToken))
             .Entity;
 
         var subscriptionByChat = await _db.SubscriptionByChat.FindAsync(
-            new object?[] { chatId, messageThreadId, subscription.Id, cancellationToken },
+            [chatId, messageThreadId, subscription.Id, cancellationToken],
             cancellationToken);
-        if (subscriptionByChat is null) {
+        if (subscriptionByChat is null)
+        {
             await _db.SubscriptionByChat.AddAsync(
-                new SubscriptionByChat {
+                new SubscriptionByChat
+                {
                     SubscriptionId = subscription.Id,
                     ChatId = chatId,
                     MessageThreadId = messageThreadId,
@@ -131,14 +145,17 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
     }
 
     private async Task<string> Unsubscribe(string address, long chatId, int messageThreadId,
-        CancellationToken cancellationToken) {
+        CancellationToken cancellationToken)
+    {
         var subscription = await _db.Subscription.FirstOrDefaultAsync(s => s.Address == address, cancellationToken);
-        if (subscription is null) {
+        if (subscription is null)
+        {
             return "Subscription not found";
         }
 
         switch (await _db.SubscriptionByChat.CountAsync(s => s.SubscriptionId == subscription.Id,
-                    cancellationToken)) {
+                    cancellationToken))
+        {
             case 0:
                 return "Subscription not found";
             case 1:
@@ -146,7 +163,7 @@ public class SubscriptionBotCommandReceivedConsumer : BotCommandReceivedConsumer
                 break;
             default:
                 var subscriptionByChat = await _db.SubscriptionByChat.FindAsync(
-                    new object?[] { chatId, messageThreadId, subscription.Id, cancellationToken },
+                    [chatId, messageThreadId, subscription.Id, cancellationToken],
                     cancellationToken) ?? throw new InvalidOperationException();
                 _db.SubscriptionByChat.Remove(subscriptionByChat);
                 break;
