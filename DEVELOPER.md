@@ -1,5 +1,11 @@
 # EF Core
 
+## Docker container to dump DB from rider
+
+```shell
+docker run --rm -it --name psql -v $(echo -n ~$USER)/_backups/eidolonic-db/:$(echo -n ~$USER)/_backups/eidolonic-db/ postgres bash
+```
+
 ## Migrations
 
 ### Restore Tools
