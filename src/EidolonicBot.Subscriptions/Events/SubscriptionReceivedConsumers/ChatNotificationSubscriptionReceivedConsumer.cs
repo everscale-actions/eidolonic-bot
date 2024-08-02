@@ -4,18 +4,22 @@ using Telegram.Bot.Types.Enums;
 
 namespace EidolonicBot.Events.SubscriptionReceivedConsumers;
 
-public class ChatNotificationSubscriptionReceivedConsumer : IConsumer<SubscriptionReceived>, IMediatorConsumer {
+public class ChatNotificationSubscriptionReceivedConsumer : IConsumer<SubscriptionReceived>, IMediatorConsumer
+{
     private readonly ITelegramBotClient _bot;
     private readonly AppDbContext _db;
     private readonly ILinkFormatter _linkFormatter;
 
-    public ChatNotificationSubscriptionReceivedConsumer(AppDbContext db, ITelegramBotClient bot, ILinkFormatter linkFormatter) {
+    public ChatNotificationSubscriptionReceivedConsumer(AppDbContext db, ITelegramBotClient bot,
+        ILinkFormatter linkFormatter)
+    {
         _db = db;
         _bot = bot;
         _linkFormatter = linkFormatter;
     }
 
-    public async Task Consume(ConsumeContext<SubscriptionReceived> context) {
+    public async Task Consume(ConsumeContext<SubscriptionReceived> context)
+    {
         var (transactionId, address, balanceDelta, from, to, balance) = context.Message;
         var cancellationToken = context.CancellationToken;
 
@@ -29,18 +33,22 @@ public class ChatNotificationSubscriptionReceivedConsumer : IConsumer<Subscripti
         var links = _linkFormatter.GetTransactionLinks(transactionId);
 
         var fromString = from is not null ? $"from: {_linkFormatter.GetAddressLink(from)}\n" : null;
-        var toString = to.Length > 0 ? $"to: {string.Join(',', to.Select(t => _linkFormatter.GetAddressLink(t)))}\n" : null;
+        var toString = to.Length > 0
+            ? $"to: {string.Join(',', to.Select(t => _linkFormatter.GetAddressLink(t)))}\n"
+            : null;
 
         await Task.WhenAll(chatAndThreadIds.Select(chat =>
             _bot.SendTextMessageAsync(chat.ChatId,
                 CreateMessage(address, balance, balanceDelta, chat.Label, fromString, toString, links),
                 chat.MessageThreadId,
                 ParseMode.MarkdownV2,
-                disableWebPagePreview: true,
+                linkPreviewOptions: true,
                 cancellationToken: cancellationToken)));
     }
 
-    private string CreateMessage(string address, decimal balance, decimal balanceDelta, string? label, string? fromString, string? toString, string[] links) {
+    private string CreateMessage(string address, decimal balance, decimal balanceDelta, string? label,
+        string? fromString, string? toString, string[] links)
+    {
         var labelStr = label is not null ? $"label: {label}\n".ToEscapedMarkdownV2() : null;
         return "\u2755Subscription alert \u2755\n" +
                labelStr +

@@ -74,7 +74,7 @@ public class CommandUpdateReceivedConsumer : IConsumer<UpdateReceived>
                     chatId,
                     help,
                     parseMode: ParseMode.MarkdownV2,
-                    replyToMessageId: messageId,
+                    replyParameters: messageId,
                     replyMarkup: new ReplyKeyboardRemove(),
                     cancellationToken: context.CancellationToken);
                 return;
