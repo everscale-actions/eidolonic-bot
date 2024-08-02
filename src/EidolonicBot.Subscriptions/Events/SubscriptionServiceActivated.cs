@@ -1,3 +1,5 @@
 namespace EidolonicBot.Events;
 
-public record SubscriptionServiceActivated(DateTimeOffset ApplicationStartDate);
+public record SubscriptionServiceActivated(
+  DateTimeOffset ApplicationStartDate
+);

@@ -1,3 +1,5 @@
 namespace EidolonicBot.Events;
 
-public record UpdateReceived(Update Update);
+public record UpdateReceived(
+  Update Update
+);

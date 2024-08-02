@@ -2,42 +2,30 @@ using Telegram.Bot.Exceptions;
 
 namespace EidolonicBot.Services;
 
-internal class BotUpdateHandler : IUpdateHandler
-{
-    private readonly ILogger<BotUpdateHandler> _logger;
-    private readonly IServiceProvider _serviceProvider;
+internal class BotUpdateHandler(
+  ILogger<BotUpdateHandler> logger,
+  IServiceProvider serviceProvider
+) : IUpdateHandler {
+  public async Task HandleUpdateAsync(ITelegramBotClient _, Update update,
+    CancellationToken cancellationToken) {
+    using var updateScope = logger.BeginScope("{@Update}", update);
+    logger.LogDebug("Update received");
 
-    public BotUpdateHandler(ILogger<BotUpdateHandler> logger, IServiceProvider serviceProvider)
-    {
-        _logger = logger;
-        _serviceProvider = serviceProvider;
+    await using var scope = serviceProvider.CreateAsyncScope();
+    var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
+    try {
+      await publishEndpoint.Publish(new UpdateReceived(update), cancellationToken);
     }
-
-    public async Task HandleUpdateAsync(ITelegramBotClient _, Update update,
-        CancellationToken cancellationToken)
-    {
-        using var updateScope = _logger.BeginScope("{@Update}", update);
-        _logger.LogDebug("Update received");
-
-        await using var scope = _serviceProvider.CreateAsyncScope();
-        var publishEndpoint = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
-        try
-        {
-            await publishEndpoint.Publish(new UpdateReceived(update), cancellationToken);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "UpdateReceived failed: {@Update}", update);
-        }
+    catch (Exception ex) {
+      logger.LogError(ex, "UpdateReceived failed: {@Update}", update);
     }
+  }
 
-    public async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, HandleErrorSource source,
-        CancellationToken cancellationToken)
-    {
-        _logger.LogError(exception, "Telegram API Error");
-        if (exception is ApiRequestException)
-        {
-            await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
-        }
+  public async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, HandleErrorSource source,
+    CancellationToken cancellationToken) {
+    logger.LogError(exception, "Telegram API Error");
+    if (exception is ApiRequestException) {
+      await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
     }
+  }
 }

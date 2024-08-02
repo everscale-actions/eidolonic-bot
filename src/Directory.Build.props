@@ -1,14 +1,14 @@
 <Project>
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <RootNamespace>EidolonicBot</RootNamespace>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>EidolonicBot</RootNamespace>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <InternalsVisibleTo Include="$(AssemblyName).Tests" />
-  </ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="$(AssemblyName).Tests" />
+    </ItemGroup>
 
-  <Import Project="Tests.props" Condition="$(MSBuildProjectFile.EndsWith('Tests.csproj'))" />
+    <Import Project="Tests.props" Condition="$(MSBuildProjectFile.EndsWith('Tests.csproj'))" />
 </Project>

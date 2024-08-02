@@ -1,11 +1,11 @@
 namespace EidolonicBot;
 
-public class SqliteDbContext : AppDbContext {
-    public SqliteDbContext(DbContextOptions<SqliteDbContext> options) : base(options) { }
+public class SqliteDbContext(
+  DbContextOptions<SqliteDbContext> options
+) : AppDbContext(options) {
+  protected override void OnModelCreating(ModelBuilder modelBuilder) {
+    modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder) {
-        modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
-
-        base.OnModelCreating(modelBuilder);
-    }
+    base.OnModelCreating(modelBuilder);
+  }
 }

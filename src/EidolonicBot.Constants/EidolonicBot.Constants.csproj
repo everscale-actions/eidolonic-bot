@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <RootNamespace>EidolonicBot</RootNamespace>
-  </PropertyGroup>
+    <PropertyGroup>
+        <RootNamespace>EidolonicBot</RootNamespace>
+    </PropertyGroup>
 </Project>

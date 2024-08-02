@@ -1,13 +1,13 @@
 namespace EidolonicBot;
 
-public class PostgresDbContext : AppDbContext {
-    public PostgresDbContext(DbContextOptions<PostgresDbContext> options) : base(options) { }
+public class PostgresDbContext(
+  DbContextOptions<PostgresDbContext> options
+) : AppDbContext(options) {
+  protected override void OnModelCreating(ModelBuilder modelBuilder) {
+    modelBuilder.HasCollation("case_insensitive", "en-u-ks-primary", "icu", false);
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder) {
-        modelBuilder.HasCollation("case_insensitive", "en-u-ks-primary", "icu", false);
+    modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
 
-        modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);
-
-        base.OnModelCreating(modelBuilder);
-    }
+    base.OnModelCreating(modelBuilder);
+  }
 }

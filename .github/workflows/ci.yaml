@@ -29,49 +29,49 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
-      
+
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0'
-      
+
       - name: Get Cache Month
         id: cache-month
         run: |
           echo "date=$(/bin/date -u "+%Y%m")" >> $GITHUB_OUTPUT
         shell: bash
-      
+
       - uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
           key: nuget-net8-${{ steps.cache-month.outputs.date }}-${{ hashFiles('src/Directory.Packages.props') }}
           restore-keys: |
             nuget-net8-${{ steps.cache-month.outputs.date }}-
-      
+
       - name: Build
         working-directory: src
         run: |
           dotnet build -c Release
-      
+
       - name: Run tests
         timeout-minutes: 10
         working-directory: src
         run: |
           dotnet test --no-build -c Release --logger "console;verbosity=normal" --logger "trx;LogFilePrefix=results" -m
-      
+
       - name: Upload test results trx files
         uses: actions/upload-artifact@v4
         if: success() || failure()
         with:
           name: test-results
           path: '**/*.trx'
-      
+
       - uses: docker/login-action@v3
         if: $${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'publish') }}
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ github.token }}
-      
+
       - name: Build, publish image and push manifest
         if: $${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'publish') }}
         run: |

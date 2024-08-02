@@ -1,26 +1,30 @@
 namespace EidolonicBot;
 
 public static class HostApplicationBuilderExtensions {
-    public static HostApplicationBuilder AddDatabase(this HostApplicationBuilder builder) {
-        var provider = builder.Configuration.GetValue("Provider", "Postgres");
+  public static HostApplicationBuilder AddDatabase(this HostApplicationBuilder builder) {
+    var provider = builder.Configuration.GetValue("Provider", "Postgres");
 
-        switch (provider) {
-            case "Sqlite":
-                builder.Services
-                    .AddDbContext<AppDbContext, SqliteDbContext>(options =>
-                        options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite")));
-                break;
+    switch (provider) {
+      case "Sqlite":
+        builder.Services
+          .AddDbContext<AppDbContext, SqliteDbContext>(
+            options =>
+              options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite")));
 
-            case "Postgres":
-                builder.Services
-                    .AddDbContext<AppDbContext, PostgresDbContext>(options =>
-                        options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
-                break;
+        break;
 
-            default:
-                throw new Exception($"Unsupported provider: {provider}");
-        }
+      case "Postgres":
+        builder.Services
+          .AddDbContext<AppDbContext, PostgresDbContext>(
+            options =>
+              options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
 
-        return builder;
+        break;
+
+      default:
+        throw new Exception($"Unsupported provider: {provider}");
     }
+
+    return builder;
+  }
 }

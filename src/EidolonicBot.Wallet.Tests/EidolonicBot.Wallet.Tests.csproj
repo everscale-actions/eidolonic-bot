@@ -1,21 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <PackageReference Include="EverscaleNet.Client" />
-    <PackageReference Include="EverscaleNet.TestSuite" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
-    <PackageReference Include="Xunit.DependencyInjection" />
-    <PackageReference Include="Xunit.DependencyInjection.Logging" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="EverscaleNet.Client" />
+        <PackageReference Include="EverscaleNet.TestSuite" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+        <PackageReference Include="Xunit.DependencyInjection" />
+        <PackageReference Include="Xunit.DependencyInjection.Logging" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\EidolonicBot.Wallet\EidolonicBot.Wallet.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\EidolonicBot.Wallet\EidolonicBot.Wallet.csproj" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="_contracts\**">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+    <ItemGroup>
+        <Content Include="_contracts\**">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
 
 </Project>

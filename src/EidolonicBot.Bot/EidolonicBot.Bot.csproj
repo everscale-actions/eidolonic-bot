@@ -1,21 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <PackageReference Include="MassTransit.Abstractions" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" />
-    <PackageReference Include="Microsoft.Extensions.Http" />
-    <PackageReference Include="Telegram.Bot" />
-    <PackageReference Include="Telegram.Bot.Extensions.Markup" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="MassTransit.Abstractions" />
+        <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" />
+        <PackageReference Include="Microsoft.Extensions.Http" />
+        <PackageReference Include="Telegram.Bot" />
+        <PackageReference Include="Telegram.Bot.Extensions.Markup" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\EidolonicBot.Abstract\EidolonicBot.Abstract.csproj" />
-    <ProjectReference Include="..\EidolonicBot.Constants\EidolonicBot.Constants.csproj" />
-    <ProjectReference Include="..\EidolonicBot.Database.Models\EidolonicBot.Database.Models.csproj" />
-    <ProjectReference Include="..\EidolonicBot.Subscriptions\EidolonicBot.Subscriptions.csproj" />
-    <ProjectReference Include="..\EidolonicBot.Utils\EidolonicBot.Utils.csproj" />
-    <ProjectReference Include="..\EidolonicBot.Wallet\EidolonicBot.Wallet.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\EidolonicBot.Abstract\EidolonicBot.Abstract.csproj" />
+        <ProjectReference Include="..\EidolonicBot.Constants\EidolonicBot.Constants.csproj" />
+        <ProjectReference Include="..\EidolonicBot.Database.Models\EidolonicBot.Database.Models.csproj" />
+        <ProjectReference Include="..\EidolonicBot.Subscriptions\EidolonicBot.Subscriptions.csproj" />
+        <ProjectReference Include="..\EidolonicBot.Utils\EidolonicBot.Utils.csproj" />
+        <ProjectReference Include="..\EidolonicBot.Wallet\EidolonicBot.Wallet.csproj" />
+    </ItemGroup>
 
 </Project>
