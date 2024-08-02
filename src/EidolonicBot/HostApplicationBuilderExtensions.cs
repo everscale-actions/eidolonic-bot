@@ -1,10 +1,10 @@
+using System.Text.Json;
 using EidolonicBot.Events.BotCommandReceivedConsumers;
 using EidolonicBot.Events.SubscriptionReceivedConsumers;
 using EidolonicBot.Events.SubscriptionServiceActivatedConsumers;
 using EidolonicBot.Serilog;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Serilog.Enrichers.Sensitive;
+using Telegram.Bot;
 
 namespace EidolonicBot;
 
@@ -74,7 +74,7 @@ public static class HostApplicationBuilderExtensions
                     x.UsingRabbitMq((context, cfg) =>
                     {
                         cfg.Host(amqpUri);
-                        ConfigureNewtonsoft(cfg);
+                        cfg.ConfigureJsonSerializerOptions(AddJsonBotApiJsonSerializerOptions);
                         cfg.ConfigureEndpoints(context);
                     });
                 }
@@ -82,7 +82,7 @@ public static class HostApplicationBuilderExtensions
                 {
                     x.UsingInMemory((context, cfg) =>
                     {
-                        ConfigureNewtonsoft(cfg);
+                        cfg.ConfigureJsonSerializerOptions(AddJsonBotApiJsonSerializerOptions);
                         cfg.ConfigureEndpoints(context);
                     });
                 }
@@ -98,19 +98,9 @@ public static class HostApplicationBuilderExtensions
         return builder;
     }
 
-    private static void ConfigureNewtonsoft(IBusFactoryConfigurator cfg)
+    private static JsonSerializerOptions AddJsonBotApiJsonSerializerOptions(JsonSerializerOptions options)
     {
-        cfg.UseNewtonsoftJsonSerializer();
-        cfg.ConfigureNewtonsoftJsonSerializer(_ => new JsonSerializerSettings
-        {
-            NullValueHandling = NullValueHandling.Include,
-            ContractResolver = new CamelCasePropertyNamesContractResolver
-            {
-                IgnoreSerializableAttribute = true,
-                IgnoreShouldSerializeMembers = true
-            },
-            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-            DateTimeZoneHandling = DateTimeZoneHandling.Unspecified
-        });
+        JsonBotAPI.Configure(options);
+        return options;
     }
 }
