@@ -18,7 +18,7 @@ namespace EidolonicBot.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:CollationDefinition:case_insensitive", "en-u-ks-primary,en-u-ks-primary,icu,False")
-                .HasAnnotation("ProductVersion", "7.0.5")
+                .HasAnnotation("ProductVersion", "8.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -31,7 +31,8 @@ namespace EidolonicBot.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(66)
+                        .HasColumnType("character varying(66)")
                         .UseCollation("case_insensitive");
 
                     b.HasKey("Id");
@@ -54,7 +55,8 @@ namespace EidolonicBot.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Label")
-                        .HasColumnType("text");
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
 
                     b.Property<decimal>("MinDelta")
                         .HasColumnType("numeric");
