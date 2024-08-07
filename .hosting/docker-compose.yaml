@@ -1,5 +1,3 @@
-version: '3.4'
-
 services:
   app:
     image: ghcr.io/everscale-actions/eidolonic-bot:${TAG:-latest}
