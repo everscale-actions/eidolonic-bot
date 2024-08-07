@@ -72,7 +72,7 @@ public class SendBotCommandReceivedConsumer(
       return FormatSendMessage(fromUser, toUser, coins);
     }
     catch (AccountInsufficientBalanceException ex) {
-      return $"You balance({ex.Balance.ToEvers()}) is too low";
+      return $@"You balance\({ex.Balance.ToEvers()}\) is too low";
     }
     catch (Exception e) {
       logger.LogError(e, "Something went wrong");
