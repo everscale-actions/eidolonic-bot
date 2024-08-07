@@ -22,11 +22,8 @@ public class ChatNotificationSubscriptionReceivedConsumer(
       .ToArrayAsync(cancellationToken);
 
     var links = linkFormatter.GetTransactionLinks(transactionId);
-
-    var fromString = from is not null ? $"from: {linkFormatter.GetAddressLink(from)}\n" : null;
-    var toString = to.Length > 0
-      ? $"to: {string.Join(',', to.Select(t => linkFormatter.GetAddressLink(t)))}\n"
-      : null;
+    var fromString = from is not null ? $"from       {linkFormatter.GetAddressLink(from)}\n" : null;
+    var toString = to.Length > 0 ? $"to            {string.Join(',', to.Select(t => linkFormatter.GetAddressLink(t)))}\n" : null;
 
     await Task.WhenAll(
       chatAndThreadIds.Select(
@@ -40,15 +37,19 @@ public class ChatNotificationSubscriptionReceivedConsumer(
             cancellationToken: cancellationToken)));
   }
 
-  private string CreateMessage(string address, decimal balance, decimal balanceDelta, string? label,
-    string? fromString, string? toString, string[] links) {
-    var labelStr = label is not null ? $"label: {label}\n".ToEscapedMarkdownV2() : null;
-    return "\u2755Subscription alert \u2755\n" +
-           labelStr +
-           $"address: {linkFormatter.GetAddressLink(address)}\n" +
+  private string CreateMessage(string address, decimal balance, decimal balanceDelta, string? label, string? fromString, string? toString, string[] links) {
+    var addressLink = label is null
+      ? linkFormatter.GetAddressLink(address)
+      : linkFormatter.GetAddressLink(address, label);
+
+
+    var direction = balanceDelta > 0 ? "📥" : "\ud83d\udce4";
+    return $"\ud83d\udd7a Subscription alert {direction}\n" +
+           $"address {addressLink}\n" +
            fromString +
            toString +
-           $"balance: {balance}{Constants.Currency}\n".ToEscapedMarkdownV2() +
-           $"delta: {balanceDelta}{Constants.Currency}\n".ToEscapedMarkdownV2() + string.Join(" \\| ", links);
+           $"balance {balance.ToEvers()}\n" +
+           $"delta      {balanceDelta.ToEvers()}\n" +
+           string.Join(" \\| ", links);
   }
 }

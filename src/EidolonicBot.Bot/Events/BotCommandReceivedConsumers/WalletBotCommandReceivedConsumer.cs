@@ -11,7 +11,7 @@ public class WalletBotCommandReceivedConsumer(
   private static string FormatInfoMessage(WalletInfo info) {
     return
       $"`{info.Address}`\n" +
-      $"Balance {info.Balance ?? 0:F}{Constants.Currency}".ToEscapedMarkdownV2();
+      $"Balance {(info.Balance ?? 0).ToEvers()}";
   }
 
 

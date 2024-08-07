@@ -9,15 +9,15 @@ public class SendBotCommandReceivedConsumer(
   : BotCommandReceivedConsumerBase(Command.Send, bot, memoryCache) {
   private const decimal MinimalCoins = 0.1m;
 
-  private const string SendMessage = "{0} sent to {1} {2}{3}";
+  private const string SendMessage = "{0} sent to {1} {2}";
 
   private static string FormatSendMessage(User fromUser, User toUser, decimal coins) {
     return string.Format(
       SendMessage,
       fromUser.ToMentionMarkdownV2(),
       toUser.ToMentionMarkdownV2(),
-      coins.ToString("F").ToEscapedMarkdownV2(),
-      Constants.Currency);
+      coins.ToEvers()
+    );
   }
 
   protected override async Task<string?> ConsumeAndGetReply(string[] args, Message message, long chatId,
@@ -52,7 +52,7 @@ public class SendBotCommandReceivedConsumer(
     }
 
     if (sendCoins < MinimalCoins) {
-      return $"You should send at least {MinimalCoins}{Constants.Currency}";
+      return $"You should send at least {MinimalCoins.ToEvers()}";
     }
 
     using var _ = logger.BeginScope(
@@ -72,7 +72,7 @@ public class SendBotCommandReceivedConsumer(
       return FormatSendMessage(fromUser, toUser, coins);
     }
     catch (AccountInsufficientBalanceException ex) {
-      return $"You balance({ex.Balance:F}{Constants.Currency}) is too low".ToEscapedMarkdownV2();
+      return $"You balance({ex.Balance.ToEvers()}) is too low";
     }
     catch (Exception e) {
       logger.LogError(e, "Something went wrong");

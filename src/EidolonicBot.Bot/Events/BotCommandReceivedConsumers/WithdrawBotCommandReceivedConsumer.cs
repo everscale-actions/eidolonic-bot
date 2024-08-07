@@ -10,15 +10,15 @@ public class WithdrawBotCommandReceivedConsumer(
   : BotCommandReceivedConsumerBase(Command.Withdraw, bot, memoryCache) {
   private const decimal MinimalCoins = 0.1m;
 
-  private const string WithdrawalMessage = "{0} withdrew to {1} {2}{3}";
+  private const string WithdrawalMessage = "{0} withdrew to {1} {2}";
 
   private string FormatSendMessage(User fromUser, string dest, decimal coins) {
     return string.Format(
       WithdrawalMessage,
       fromUser.ToMentionMarkdownV2(),
       $"{linkFormatter.GetAddressLink(dest)}",
-      coins.ToString("F").ToEscapedMarkdownV2(),
-      Constants.Currency);
+      coins.ToEvers()
+    );
   }
 
   protected override async Task<string?> ConsumeAndGetReply(string[] args, Message message, long chatId,
@@ -44,7 +44,7 @@ public class WithdrawBotCommandReceivedConsumer(
     }
 
     if (sendCoins < MinimalCoins) {
-      return $"You should send at least {MinimalCoins}{Constants.Currency}";
+      return $"You should send at least {MinimalCoins.ToEvers()}";
     }
 
     if (args is not [_, { } dest, ..] || !Regex.TvmAddressRegex().IsMatch(dest)) {
@@ -69,7 +69,7 @@ public class WithdrawBotCommandReceivedConsumer(
       return FormatSendMessage(fromUser, dest, coins);
     }
     catch (AccountInsufficientBalanceException ex) {
-      return @$"You balance({ex.Balance:F}{Constants.Currency}) is too low";
+      return $"You balance({ex.Balance.ToEvers()}) is too low";
     }
     catch (Exception e) {
       logger.LogError(e, "Something went wrong");

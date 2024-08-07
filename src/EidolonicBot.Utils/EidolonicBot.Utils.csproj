@@ -2,4 +2,7 @@
     <ItemGroup>
         <PackageReference Include="Telegram.Bot.Extensions.Markup" />
     </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\EidolonicBot.Constants\EidolonicBot.Constants.csproj" />
+    </ItemGroup>
 </Project>

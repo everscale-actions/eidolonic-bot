@@ -80,14 +80,14 @@ public class SubscriptionBotCommandReceivedConsumer(
         .Select(
           s => new {
             s.Subscription.Address,
-            MinDeltaStr = s.MinDelta.ToString(CultureInfo.CurrentCulture).ToEscapedMarkdownV2(),
+            MinDeltaStr = s.MinDelta.ToEvers(),
             s.Label
           })
         .ToArrayAsync(cancellationToken))
       .Select(
         s => full
-          ? $"`{s.Address}`` | ``{s.MinDeltaStr}{Constants.Currency}`` | ``{s.Label}`"
-          : $"{linkFormatter.GetAddressLink(s.Address)} \\| {s.MinDeltaStr}{Constants.Currency} \\| {s.Label?.ToEscapedMarkdownV2()}")
+          ? $@"`{s.Address}`` \| ``{s.MinDeltaStr}`` \| ``{s.Label?.ToEscapedMarkdownV2()}`"
+          : $@"{linkFormatter.GetAddressLink(s.Address)} \| {s.MinDeltaStr} \| {s.Label?.ToEscapedMarkdownV2()}")
       .ToArray();
 
     if (subscriptionStrings.Length == 0) {
