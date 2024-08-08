@@ -53,8 +53,8 @@ public class ChatNotificationSubscriptionReceivedConsumer(
       .ToArrayAsync(cancellationToken);
 
     var links = linkFormatter.GetTransactionLinks(transactionId);
-    var fromString = from is not null ? $"\u2b05\ufe0f {linkFormatter.GetAddressLink(from)}" : null;
-    var toString = to.Length > 0 ? $"\u27a1\ufe0f {string.Join(',', to.Select(t => linkFormatter.GetAddressLink(t)))}" : null;
+    var fromString = from is not null ? $" \u2b05\ufe0f {linkFormatter.GetAddressLink(from)}" : null;
+    var toString = from is null && to.Length > 0 ? $" \u27a1\ufe0f {string.Join(',', to.Select(t => linkFormatter.GetAddressLink(t)))}" : null;
 
     await Task.WhenAll(
       chatAndThreadIds.Select(
@@ -76,7 +76,7 @@ public class ChatNotificationSubscriptionReceivedConsumer(
     var direction = balanceDelta > 0 ? "\u2795" : "\u2796";
     var message = _alertMessages[Random.Shared.Next(0, _alertMessages.Length - 1)].ToEscapedMarkdownV2();
     return $"\ud83d\udd75\ufe0f {message}\n" +
-           $"\ud83c\udfe0 {addressLink} " + fromString + toString + "\n" +
+           $"\ud83c\udfe0 {addressLink}" + fromString + toString + "\n" +
            $"{direction} {Math.Abs(balanceDelta).ToEvers()} {GetWhileScale(balanceDelta)}\n" +
            $"\ud83d\udcb0 {balance.ToEvers()} {GetWhileScale(balance)}\n" +
            string.Join(" \\| ", links);
