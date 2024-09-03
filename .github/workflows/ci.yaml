@@ -66,14 +66,14 @@ jobs:
           path: '**/*.trx'
 
       - uses: docker/login-action@v3
-        if: $${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'publish') }}
+        if: ${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'publish') }}
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ github.token }}
 
       - name: Build, publish image and push manifest
-        if: $${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'publish') }}
+        if: ${{ github.event_name != 'pull_request' || contains(github.event.pull_request.labels.*.name, 'publish') }}
         run: |
           archImages=""
           for arch_platform in $(echo $ARCH_PLATFORMS | sed "s/,/ /g"); do

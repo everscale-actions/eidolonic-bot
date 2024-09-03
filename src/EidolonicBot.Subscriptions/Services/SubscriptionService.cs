@@ -5,7 +5,7 @@ namespace EidolonicBot.Services;
 
 internal class SubscriptionService : IHostedService, ISubscriptionService, IAsyncDisposable {
   private const string SubscriptionQuery =
-    @"subscription($addresses:StringFilter){transactions(filter:{account_addr:$addresses,balance_delta:{ne:""0""}}){id account_addr account{balance(format:DEC)} balance_delta(format:DEC) out_messages{dst} in_message{src}}}";
+    """subscription($addresses:StringFilter){transactions(filter:{account_addr:$addresses,balance_delta:{ne:"0"}}){id account_addr account{balance(format:DEC)} balance_delta(format:DEC) out_messages{dst} in_message{src}}}""";
 
   private readonly ILogger<SubscriptionService> _logger;
   private readonly IPublishEndpoint _publishEndpoint;
@@ -92,12 +92,11 @@ internal class SubscriptionService : IHostedService, ISubscriptionService, IAsyn
 
     _handler = resultOfSubscribeCollection.Handle;
 
-    // notify another instances of application 
+    // notify another instances of application
     await _publishEndpoint.Publish(
       new SubscriptionServiceActivated(Constants.ApplicationStartDate),
       cancellationToken);
   }
-
 
   private async Task SubscriptionCallback(JsonElement e, uint responseType, CancellationToken cancellationToken) {
     switch ((SubscriptionResponseType)responseType) {
