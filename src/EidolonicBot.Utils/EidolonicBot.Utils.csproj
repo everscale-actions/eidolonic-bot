@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <ItemGroup>
-        <PackageReference Include="Telegram.Bot.Extensions.Markup" />
+        <ProjectReference Include="..\EidolonicBot.Constants\EidolonicBot.Constants.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\EidolonicBot.Constants\EidolonicBot.Constants.csproj" />
+        <PackageReference Include="Telegram.Bot" />
     </ItemGroup>
 </Project>

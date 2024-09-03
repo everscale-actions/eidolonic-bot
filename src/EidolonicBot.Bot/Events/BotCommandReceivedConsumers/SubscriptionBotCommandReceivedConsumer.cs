@@ -20,17 +20,17 @@ public class SubscriptionBotCommandReceivedConsumer(
         when _adminActions.Contains(action) && !isAdmin => "Only chat admin can control subscriptions"
           .ToEscapedMarkdownV2(),
 
-      ["add", { } address, ..] when Regex.TvmAddressRegex().IsMatch(address) =>
+      ["add", { } address, ..] when RegexList.TvmAddressRegex().IsMatch(address) =>
         await Subscribe(
           address, chatId, messageThreadId, GetMinDeltaByArgs(args), GetLabelByArgs(args),
           cancellationToken),
 
-      ["edit", { } address, ..] when isAdmin && Regex.TvmAddressRegex().IsMatch(address) =>
+      ["edit", { } address, ..] when isAdmin && RegexList.TvmAddressRegex().IsMatch(address) =>
         await EditSubscription(
           address, chatId, messageThreadId, GetMinDeltaByArgs(args), GetLabelByArgs(args),
           cancellationToken),
 
-      ["remove", { } address] when isAdmin && Regex.TvmAddressRegex().IsMatch(address) =>
+      ["remove", { } address] when isAdmin && RegexList.TvmAddressRegex().IsMatch(address) =>
         await Unsubscribe(address, chatId, messageThreadId, cancellationToken),
 
       ["list", ..] => await GetSubscriptionList(

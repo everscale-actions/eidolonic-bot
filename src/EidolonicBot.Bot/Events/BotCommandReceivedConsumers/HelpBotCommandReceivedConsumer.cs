@@ -1,5 +1,3 @@
-using Telegram.Bot.Extensions.Markup;
-
 namespace EidolonicBot.Events.BotCommandReceivedConsumers;
 
 public class HelpBotCommandReceivedConsumer(
@@ -16,6 +14,6 @@ public class HelpBotCommandReceivedConsumer(
                    .Select(c => c.Value!)
                    .Select(a => $"{a.Text} - {a.Description}"));
 
-    return Task.FromResult((string?)Tools.EscapeMarkdown(text, ParseMode.MarkdownV2));
+    return Task.FromResult<string?>(text.ToEscapedMarkdownV2());
   }
 }

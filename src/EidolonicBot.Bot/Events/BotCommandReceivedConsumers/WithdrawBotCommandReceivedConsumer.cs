@@ -47,7 +47,7 @@ public class WithdrawBotCommandReceivedConsumer(
       return $"You should send at least {MinimalCoins.ToEvers()}";
     }
 
-    if (args is not [_, { } dest, ..] || !Regex.TvmAddressRegex().IsMatch(dest)) {
+    if (args is not [_, { } dest, ..] || !RegexList.TvmAddressRegex().IsMatch(dest)) {
       return "Provide valid destination address";
     }
 
