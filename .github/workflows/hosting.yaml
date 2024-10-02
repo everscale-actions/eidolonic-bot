@@ -32,7 +32,7 @@ jobs:
           Bot__Token=${{ secrets.BOT_TOKEN }}
           Wallet__SeedPhrase=${{ secrets.WALLET_SEED_PHRASE }}
           EverClient__Network__Endpoints__0=${{ secrets.NETWORK_ENDPOINT }}
-          Serilog__WriteTo__TcpSyslog__Args__appName=${{ secrets.SEMATEXT_WRITE_TOKEN }}
+          Serilog__WriteTo__NewRelicLogs__Args__licenseKey=${{ secrets.NEWRELIC_LICENCEKEY }}
           SENTRY_DSN=${{ secrets.SENTRY_DSN }}
           ConnectionStrings__Postgres=${{ secrets.SUPABASE_CONNECTION_STRING }}
           AMQP_URI=${{ secrets.AMQP_URI }}
