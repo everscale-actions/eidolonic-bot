@@ -5,7 +5,7 @@ using Telegram.Bot.Types.Enums;
 namespace EidolonicBot;
 
 public static class StringExtensions {
-  private static ImmutableDictionary<(ParseMode parseMode, MessageEntityType? entityType), string> Escaped => new Dictionary<(ParseMode parseMode, MessageEntityType? entityType), string>() {
+  private static ImmutableDictionary<(ParseMode parseMode, MessageEntityType? entityType), string> Escaped => new Dictionary<(ParseMode parseMode, MessageEntityType? entityType), string> {
     { (ParseMode.Markdown, null), Regex.Escape("""_*`[""") },
     { (ParseMode.MarkdownV2, MessageEntityType.Pre), Regex.Escape("""\`""") },
     { (ParseMode.MarkdownV2, MessageEntityType.Code), Regex.Escape("""\`""") },

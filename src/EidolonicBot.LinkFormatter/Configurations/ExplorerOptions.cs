@@ -1,7 +1,8 @@
 namespace EidolonicBot.Configurations;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public record ExplorerOptions {
-  public string Name { get; init; } = null!;
-  public string TransactionLinkTemplate { get; init; } = null!;
-  public string AccountLinkTemplate { get; init; } = null!;
+  public required string Name { get; init; }
+  public required string TransactionLinkTemplate { get; init; }
+  public required string AccountLinkTemplate { get; init; }
 }

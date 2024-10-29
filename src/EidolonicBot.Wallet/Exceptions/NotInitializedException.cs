@@ -1,3 +1,3 @@
 namespace EidolonicBot.Exceptions;
 
-public class NotInitializedException : Exception { }
+public class NotInitializedException : Exception;

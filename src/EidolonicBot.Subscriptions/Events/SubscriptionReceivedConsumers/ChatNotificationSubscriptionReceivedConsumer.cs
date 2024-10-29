@@ -42,7 +42,10 @@ public class ChatNotificationSubscriptionReceivedConsumer(
           .Select(sbc => new { sbc.ChatId, sbc.MessageThreadId, sbc.MinDelta, sbc.Label }))
       .ToArrayAsync(cancellationToken);
 
-    var links = linkFormatter.GetTransactionLinks(transactionId);
+    var links = linkFormatter.GetTransactionLinks(transactionId)
+      .Append(linkFormatter.GetAddressLink(address, true, "snipa.finance"))
+      .ToArray();
+
     var fromString = from is not null ? $" \u2b05\ufe0f {linkFormatter.GetAddressLink(from)}" : null;
     var toString = from is null && to.Length > 0 ? $" \u27a1\ufe0f {string.Join(',', to.Select(t => linkFormatter.GetAddressLink(t)))}" : null;
 

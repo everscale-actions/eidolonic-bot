@@ -1,6 +1,6 @@
 namespace EidolonicBot.Configurations;
 
 public record BlockchainOptions {
-  public string DefaultExplorer { get; init; } = null!;
-  public ExplorerOptions[] Explorers { get; init; } = null!;
+  public required string DefaultExplorer { get; init; }
+  public required IReadOnlyCollection<ExplorerOptions> Explorers { get; init; }
 }
