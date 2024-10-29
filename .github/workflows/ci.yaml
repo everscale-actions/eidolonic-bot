@@ -17,8 +17,6 @@ concurrency:
 
 env:
   REGISTRY: ghcr.io
-  RUNTIME_BASE_IMAGE: dotnet/runtime
-  RUNTIME_BASE_IMAGE_TAG: 8.0-bookworm-slim
   IMAGE_NAME: ${{ github.repository }}
   ARCH_PLATFORMS: x64-amd64,arm64-arm64
 jobs:
@@ -28,24 +26,21 @@ jobs:
     permissions:
       packages: write
     steps:
+      - name: Get Cache Month
+        id: cache-month
+        run: echo "dateYYYYMM=$(/bin/date -u "+%Y%m")" >> $GITHUB_OUTPUT
+        shell: bash
+
       - uses: actions/checkout@v4
 
       - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0'
-
-      - name: Get Cache Month
-        id: cache-month
-        run: |
-          echo "date=$(/bin/date -u "+%Y%m")" >> $GITHUB_OUTPUT
-        shell: bash
 
       - uses: actions/cache@v4
         with:
           path: ~/.nuget/packages
-          key: nuget-net8-${{ steps.cache-month.outputs.date }}-${{ hashFiles('src/Directory.Packages.props') }}
+          key: nuget-${{ steps.cache-month.outputs.dateYYYYMM }}-${{ hashFiles('src/Directory.Packages.props') }}
           restore-keys: |
-            nuget-net8-${{ steps.cache-month.outputs.date }}-
+            nuget-${{ steps.cache-month.outputs.dateYYYYMM }}-
 
       - name: Build
         working-directory: src

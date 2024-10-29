@@ -6,7 +6,6 @@ updates:
       interval: "monthly"
     reviewers:
       - "ch1seL"
-    open-pull-requests-limit: 1
     rebase-strategy: "auto"
     groups:
       All:
@@ -18,7 +17,6 @@ updates:
       interval: "monthly"
     reviewers:
       - "ch1seL"
-    open-pull-requests-limit: 1
     rebase-strategy: "auto"
     groups:
       EverscaleNet:
