@@ -72,7 +72,7 @@ public class ChatNotificationSubscriptionReceivedConsumer(
            $"\ud83c\udfe0 {addressLink}" + fromString + toString + "\n" +
            $"{direction} {Math.Abs(balanceDelta).ToEvers()} {GetWhileScale(balanceDelta)}\n" +
            $"\ud83d\udcb0 {balance.ToEvers()} {GetWhileScale(balance)}\n" +
-           string.Join(" \\| ", links);
+           string.Join(" \\- ", links);
   }
 
   private static string GetWhileScale(decimal amount) {
