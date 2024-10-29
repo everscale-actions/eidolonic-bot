@@ -24,7 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          filter: ${{ env.HOSTING_PATH }}
+          sparse-checkout: ${{ env.HOSTING_PATH }}
+          sparse-checkout-cone-mode: false
 
       - name: Create .env file
         working-directory: ${{ env.HOSTING_PATH }}
