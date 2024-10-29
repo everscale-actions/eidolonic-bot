@@ -43,7 +43,7 @@ public class ChatNotificationSubscriptionReceivedConsumer(
       .ToArrayAsync(cancellationToken);
 
     var links = linkFormatter.GetTransactionLinks(transactionId)
-      .Append(linkFormatter.GetAddressLink(address, true, "snipa.finance"))
+      .Append(linkFormatter.GetAddressLink(address, "snipa.finance", "snipa.finance"))
       .ToArray();
 
     var fromString = from is not null ? $" \u2b05\ufe0f {linkFormatter.GetAddressLink(from)}" : null;
