@@ -1,5 +1,5 @@
 namespace EidolonicBot.Helper;
 
-public class SecretPhrase {
-  public string Phrase { get; set; } = null!;
+public record SecretPhrase {
+  public required string Phrase { get; set; }
 }

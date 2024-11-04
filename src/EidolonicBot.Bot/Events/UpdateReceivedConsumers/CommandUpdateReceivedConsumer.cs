@@ -47,13 +47,14 @@ public class CommandUpdateReceivedConsumer(
     if (args.Length == 1 && args[0].Equals("help", StringComparison.InvariantCultureIgnoreCase)) {
       var help = CommandHelpers.HelpByCommand[command];
       if (help is not null) {
-        await botClient.SendTextMessageAsync(
+        await botClient.SendMessage(
           chatId,
           help,
           parseMode: ParseMode.MarkdownV2,
           replyParameters: messageId,
           replyMarkup: new ReplyKeyboardRemove(),
-          cancellationToken: context.CancellationToken);
+          cancellationToken: context.CancellationToken
+        );
 
         return;
       }
@@ -72,7 +73,7 @@ public class CommandUpdateReceivedConsumer(
       "BotUsername", async entry => {
         entry.Size = 1;
         entry.Priority = CacheItemPriority.NeverRemove;
-        return (await botClient.GetMeAsync(cancellationToken)).Username;
+        return (await botClient.GetMe(cancellationToken)).Username;
       });
   }
 }

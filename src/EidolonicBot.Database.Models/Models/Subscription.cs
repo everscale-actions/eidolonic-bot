@@ -1,6 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace EidolonicBot.Models;
 
 [Index(nameof(Address), IsUnique = true)]
+[SuppressMessage("ReSharper", "NullableWarningSuppressionIsUsed")]
+[SuppressMessage("ReSharper", "PropertyCanBeMadeInitOnly.Global")]
 public class Subscription {
   [Key] public Guid Id { get; set; }
 

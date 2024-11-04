@@ -39,7 +39,7 @@ public class WalletTests(
 
     var secondBefore = await secondWallet.GetBalance(_cancellationToken) ?? 0;
     await wallet.SendCoins(2, 1m.NanoToCoins(), false, _cancellationToken);
-    var walletAfterSendAndInit = await wallet.GetBalance(_cancellationToken);
+    var walletAfterSendAndInit = await wallet.GetBalance(_cancellationToken) ?? 0;
     await wallet.SendCoins(2, 2m.NanoToCoins(), false, _cancellationToken);
     var walletAfterSecondSend = await wallet.GetBalance(_cancellationToken);
     var secondAfter = await secondWallet.GetBalance(_cancellationToken);
@@ -47,6 +47,6 @@ public class WalletTests(
     using var scope = new AssertionScope();
     (secondAfter - secondBefore).Should().Be(3m.NanoToCoins());
     (0.1m - walletAfterSendAndInit).Should().BeLessThan(0.01m);
-    (walletAfterSendAndInit - walletAfterSecondSend).Should().BeLessThan(0.2m - walletAfterSendAndInit!.Value);
+    (walletAfterSendAndInit - walletAfterSecondSend).Should().BeLessThan(0.2m - walletAfterSendAndInit);
   }
 }

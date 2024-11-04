@@ -18,10 +18,10 @@ internal class BotInit(
       .Where(d => d is { IsBotInitCommand: true })
       .Select(
         d => new BotCommand {
-          Command = d!.Text,
+          Command = d.Text,
           Description = d.Description ?? string.Empty
         });
 
-    await botClient.SetMyCommandsAsync(commands, cancellationToken: cancellationToken);
+    await botClient.SetMyCommands(commands, cancellationToken: cancellationToken);
   }
 }

@@ -1,6 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace EidolonicBot.Models;
 
 [PrimaryKey(nameof(ChatId), nameof(MessageThreadId), nameof(SubscriptionId))]
+[SuppressMessage("ReSharper", "NullableWarningSuppressionIsUsed")]
+[SuppressMessage("ReSharper", "PropertyCanBeMadeInitOnly.Global")]
 public class SubscriptionByChat {
   public long ChatId { get; set; }
   public int MessageThreadId { get; set; }

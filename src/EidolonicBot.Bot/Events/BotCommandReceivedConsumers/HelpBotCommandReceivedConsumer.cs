@@ -10,8 +10,7 @@ public class HelpBotCommandReceivedConsumer(
     var text = "Usage:\n" +
                string.Join(
                  '\n', CommandHelpers.CommandAttributeByCommand
-                   .Where(c => c.Value is not null)
-                   .Select(c => c.Value!)
+                   .Select(c => c.Value)
                    .Select(a => $"{a.Text} - {a.Description}"));
 
     return Task.FromResult<string?>(text.ToEscapedMarkdownV2());
