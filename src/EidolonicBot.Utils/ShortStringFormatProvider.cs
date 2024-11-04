@@ -15,7 +15,7 @@ public class ShortStringFormatProvider : IFormatProvider, ICustomFormatter {
             => ((FormattableString)$"{str[..start]}..{str[^end..]}").ToString(Instance),
           _ => str
         },
-      _ => arg.ToString()!
+      _ => arg.ToString() ?? string.Empty
     };
   }
 

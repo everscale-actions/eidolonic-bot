@@ -41,7 +41,8 @@ internal class EverWallet(
   };
 
   private static readonly AbiParam[] DataAbiParams =
-    JsonSerializer.Deserialize<AbiParam[]>(DataAbiParamsJson, JsonOptionsProvider.JsonSerializerOptions)!;
+    JsonSerializer.Deserialize<AbiParam[]>(DataAbiParamsJson, JsonOptionsProvider.JsonSerializerOptions)
+    ?? throw new InvalidOperationException();
 
   private string? _address;
   private KeyPair? _keyPair;
@@ -186,7 +187,7 @@ internal class EverWallet(
         ShardBlockId = shardBlockId
       }, cancellationToken: cancellationToken);
 
-    var transactionId = resultOfProcessMessage.Transaction!.Get<string>("id");
+    var transactionId = resultOfProcessMessage?.Transaction?.Get<string>("id") ?? throw new InvalidOperationException();
     var totalOutputCoins = resultOfProcessMessage.Fees.TotalOutput.NanoToCoins();
 
     return (transactionId, totalOutputCoins);

@@ -56,7 +56,7 @@ public static class HostApplicationBuilderExtensions {
       .Configure<FilePackageManagerOptions>(
         options =>
           options.PackagesPath =
-            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "_contracts"));
+            Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? throw new InvalidOperationException(), "_contracts"));
 
     return builder;
   }

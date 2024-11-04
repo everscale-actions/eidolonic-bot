@@ -52,11 +52,11 @@ public class ChatNotificationSubscriptionReceivedConsumer(
     await Task.WhenAll(
       chatAndThreadIds.Select(
         chat =>
-          bot.SendTextMessageAsync(
+          bot.SendMessage(
             chat.ChatId,
             CreateMessage(address, balance, balanceDelta, chat.Label, fromString, toString, links),
-            chat.MessageThreadId,
             ParseMode.MarkdownV2,
+            messageThreadId: chat.MessageThreadId,
             linkPreviewOptions: true,
             cancellationToken: cancellationToken)));
   }

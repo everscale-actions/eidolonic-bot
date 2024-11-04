@@ -29,7 +29,7 @@ public abstract class BotCommandReceivedConsumerBase(
       return;
     }
 
-    await bot.SendTextMessageAsync(
+    await bot.SendMessage(
       message.Chat.Id,
       replyText,
       parseMode: ParseMode.MarkdownV2,
@@ -45,7 +45,7 @@ public abstract class BotCommandReceivedConsumerBase(
       $"AdminIdsByChatId_{chatId}", async entry => {
         entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(1));
         entry.SetSize(1);
-        var admins = await bot.GetChatAdministratorsAsync(chatId, cancellationToken);
+        var admins = await bot.GetChatAdministrators(chatId, cancellationToken);
         return admins.Select(a => a.User.Id).ToArray();
       });
 
