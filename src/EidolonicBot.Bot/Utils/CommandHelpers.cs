@@ -3,8 +3,9 @@ namespace EidolonicBot.Utils;
 public static class CommandHelpers {
   public static readonly IReadOnlyDictionary<Command, CommandAttribute> CommandAttributeByCommand =
     Enum.GetValues<Command>()
-      .ToDictionary(c => c, c => c.GetAttributeOfType<CommandAttribute>()
-                                 ?? new CommandAttribute($"/{c.ToString().ToLower()}"));
+      .Select(c => new { Command = c, Attributes = c.GetAttributesOfType<CommandAttribute>() })
+      .Where(c => c.Attributes.Length == 1)
+      .ToDictionary(c => c.Command, c => c.Attributes[0]);
 
   public static readonly IReadOnlyDictionary<string, Command> CommandByText =
     CommandAttributeByCommand
