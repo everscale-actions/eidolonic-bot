@@ -21,7 +21,11 @@ updates:
     groups:
       EverscaleNet:
         patterns:
-          - "EverscaleNet.*"
+          - "Microsoft.EntityFrameworkCore*"
+          - "Npgsql.EntityFrameworkCore*"
+      EFCore:
+        patterns:
+          - "*"
       All:
         patterns:
           - "*"
