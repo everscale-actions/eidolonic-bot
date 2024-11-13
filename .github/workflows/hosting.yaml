@@ -3,6 +3,7 @@ name: Hosting
 on:
   push:
     paths:
+      - .hosting/**
       - .github/workflows/hosting.yaml
     branches:
       - main
