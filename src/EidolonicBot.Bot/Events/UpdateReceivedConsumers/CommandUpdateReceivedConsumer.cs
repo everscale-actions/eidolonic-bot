@@ -40,6 +40,10 @@ public class CommandUpdateReceivedConsumer(
 
     var command = CommandHelpers.CommandByText.GetValueOrDefault(commandAndUserName[0], Command.Unknown);
 
+    if (command is Command.Unknown) {
+      return;
+    }
+
     var args = commandAndArgs.Length >= 2 ? commandAndArgs[1..] : [];
 
     using var _ = logger.BeginScope("Command:{Command} Args:{args}", command, string.Join(' ', args));
