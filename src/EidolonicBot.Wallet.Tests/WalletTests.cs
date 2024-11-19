@@ -39,8 +39,10 @@ public class WalletTests(
 
     var secondBefore = await secondWallet.GetBalance(_cancellationToken) ?? 0;
     await wallet.SendCoins(2, 1m.NanoToCoins(), false, _cancellationToken);
+    await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken: _cancellationToken);
     var walletAfterSendAndInit = await wallet.GetBalance(_cancellationToken) ?? 0;
     await wallet.SendCoins(2, 2m.NanoToCoins(), false, _cancellationToken);
+    await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken: _cancellationToken);
     var walletAfterSecondSend = await wallet.GetBalance(_cancellationToken);
     var secondAfter = await secondWallet.GetBalance(_cancellationToken);
 
