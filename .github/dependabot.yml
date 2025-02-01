@@ -18,6 +18,9 @@ updates:
     reviewers:
       - "ch1seL"
     rebase-strategy: "auto"
+    ignore:
+      - dependency-name: "FluentAssertions"
+        versions: [ "*" ]
     groups:
       EverscaleNet:
         patterns:
