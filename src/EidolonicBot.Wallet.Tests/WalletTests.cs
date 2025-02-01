@@ -33,8 +33,8 @@ public class WalletTests(
 
   [Fact]
   public async Task SendCoins_DestinationAccountGetsEvers() {
-    await wallet.Init(1, default);
-    await secondWallet.Init(2, default);
+    await wallet.Init(1, TestContext.Current.CancellationToken);
+    await secondWallet.Init(2, TestContext.Current.CancellationToken);
     await giver.SendTransaction(wallet.Address, 0.2m, cancellationToken: _cancellationToken);
 
     var secondBefore = await secondWallet.GetBalance(_cancellationToken) ?? 0;

@@ -3,7 +3,6 @@
 global using EidolonicBot.Exceptions;
 global using EverscaleNet.Abstract;
 global using EverscaleNet.Client.Models;
-global using EverscaleNet.TestSuite;
 global using EverscaleNet.Utils;
 global using FluentAssertions.Execution;
 global using Microsoft.Extensions.Hosting;
