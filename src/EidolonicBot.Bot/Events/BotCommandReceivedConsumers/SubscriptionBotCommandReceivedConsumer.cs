@@ -77,17 +77,15 @@ public class SubscriptionBotCommandReceivedConsumer(
     CancellationToken cancellationToken) {
     var subscriptionStrings = (await db.SubscriptionByChat
         .Where(s => s.ChatId == chatId && s.MessageThreadId == messageThreadId)
-        .Select(
-          s => new {
-            s.Subscription.Address,
-            MinDeltaStr = s.MinDelta.ToEvers(),
-            s.Label
-          })
+        .Select(s => new {
+          s.Subscription.Address,
+          MinDeltaStr = s.MinDelta.ToEvers(),
+          s.Label
+        })
         .ToArrayAsync(cancellationToken))
-      .Select(
-        s => full
-          ? $@"`{s.Address}`` \| ``{s.MinDeltaStr}`` \| ``{s.Label?.ToEscapedMarkdownV2()}`"
-          : $@"{linkFormatter.GetAddressLink(s.Address)} \| {s.MinDeltaStr} \| {s.Label?.ToEscapedMarkdownV2()}")
+      .Select(s => full
+        ? $@"`{s.Address}`` \| ``{s.MinDeltaStr}`` \| ``{s.Label?.ToEscapedMarkdownV2()}`"
+        : $@"{linkFormatter.GetAddressLink(s.Address)} \| {s.MinDeltaStr} \| {s.Label?.ToEscapedMarkdownV2()}")
       .ToArray();
 
     if (subscriptionStrings.Length == 0) {

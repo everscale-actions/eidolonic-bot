@@ -7,17 +7,15 @@ public static class HostApplicationBuilderExtensions {
     switch (provider) {
       case "Sqlite":
         builder.Services
-          .AddDbContext<AppDbContext, SqliteDbContext>(
-            options =>
-              options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite")));
+          .AddDbContext<AppDbContext, SqliteDbContext>(options =>
+            options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite")));
 
         break;
 
       case "Postgres":
         builder.Services
-          .AddDbContext<AppDbContext, PostgresDbContext>(
-            options =>
-              options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
+          .AddDbContext<AppDbContext, PostgresDbContext>(options =>
+            options.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
 
         break;
 

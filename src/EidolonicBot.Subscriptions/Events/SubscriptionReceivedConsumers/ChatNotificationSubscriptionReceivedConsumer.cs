@@ -36,10 +36,9 @@ public class ChatNotificationSubscriptionReceivedConsumer(
 
     var chatAndThreadIds = await db.Subscription
       .Where(s => s.Address == address)
-      .SelectMany(
-        s => s.SubscriptionByChat
-          .Where(sbc => sbc.MinDelta <= Math.Abs(balanceDelta))
-          .Select(sbc => new { sbc.ChatId, sbc.MessageThreadId, sbc.MinDelta, sbc.Label }))
+      .SelectMany(s => s.SubscriptionByChat
+        .Where(sbc => sbc.MinDelta <= Math.Abs(balanceDelta))
+        .Select(sbc => new { sbc.ChatId, sbc.MessageThreadId, sbc.MinDelta, sbc.Label }))
       .ToArrayAsync(cancellationToken);
 
     var links = linkFormatter.GetTransactionLinks(transactionId)
@@ -50,15 +49,14 @@ public class ChatNotificationSubscriptionReceivedConsumer(
     var toString = from is null && to.Length > 0 ? $" \u27a1\ufe0f {string.Join(',', to.Select(t => linkFormatter.GetAddressLink(t)))}" : null;
 
     await Task.WhenAll(
-      chatAndThreadIds.Select(
-        chat =>
-          bot.SendMessage(
-            chat.ChatId,
-            CreateMessage(address, balance, balanceDelta, chat.Label, fromString, toString, links),
-            ParseMode.MarkdownV2,
-            messageThreadId: chat.MessageThreadId,
-            linkPreviewOptions: true,
-            cancellationToken: cancellationToken)));
+      chatAndThreadIds.Select(chat =>
+        bot.SendMessage(
+          chat.ChatId,
+          CreateMessage(address, balance, balanceDelta, chat.Label, fromString, toString, links),
+          ParseMode.MarkdownV2,
+          messageThreadId: chat.MessageThreadId,
+          linkPreviewOptions: true,
+          cancellationToken: cancellationToken)));
   }
 
   private string CreateMessage(string address, decimal balance, decimal balanceDelta, string? label, string? fromString, string? toString, string[] links) {

@@ -16,11 +16,10 @@ internal class BotInit(
   private async Task InitCommands(CancellationToken cancellationToken) {
     var commands = CommandHelpers.CommandAttributeByCommand.Values
       .Where(d => d is { IsBotInitCommand: true })
-      .Select(
-        d => new BotCommand {
-          Command = d.Text,
-          Description = d.Description ?? string.Empty
-        });
+      .Select(d => new BotCommand {
+        Command = d.Text,
+        Description = d.Description ?? string.Empty
+      });
 
     await botClient.SetMyCommands(commands, cancellationToken: cancellationToken);
   }
