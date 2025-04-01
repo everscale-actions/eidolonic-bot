@@ -18,20 +18,20 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
     <PackageVersion Include="MassTransit.RabbitMQ" Version="8.3.6" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.2">
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.3">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.3" />
     <PackageVersion Include="Microsoft.Extensions.Configuration" Version="9.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.3" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.2" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.2" />
-    <PackageVersion Include="Microsoft.Extensions.Options" Version="9.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="9.0.3" />
     <PackageVersion Include="Microsoft.NET.Build.Containers" Version="8.0.100" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
