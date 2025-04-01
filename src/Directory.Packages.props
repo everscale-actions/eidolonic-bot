@@ -10,7 +10,7 @@
     <PackageVersion Include="EverscaleNet.Client" Version="1.49.1" />
     <PackageVersion Include="EverscaleNet.TestSuite" Version="1.49.1" />
     <PackageVersion Include="EverscaleNet.Utils" Version="1.49.1" />
-    <PackageVersion Include="FluentAssertions" Version="7.0.0" />
+    <PackageVersion Include="FluentAssertions" Version="7.2.0" />
     <PackageVersion Include="MassTransit" Version="8.3.6" />
     <PackageVersion Include="MassTransit.Abstractions" Version="8.3.6" />
     <PackageVersion Include="MassTransit.Analyzers" Version="8.3.6">
