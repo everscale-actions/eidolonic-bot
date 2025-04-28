@@ -23,9 +23,10 @@ internal class BotUpdateHandler(
 
   public async Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, HandleErrorSource source,
     CancellationToken cancellationToken) {
-    logger.LogError(exception, "Telegram API Error");
-    if (exception is ApiRequestException) {
-      await Task.Delay(TimeSpan.FromSeconds(2), cancellationToken);
+    if (exception is ApiRequestException { ErrorCode: 409 }) {
+      logger.LogWarning(exception, "Telegram API Error");
+      await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
     }
+    logger.LogError(exception, "Telegram API Error");
   }
 }
