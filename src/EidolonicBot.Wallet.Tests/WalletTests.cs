@@ -15,7 +15,7 @@ public class WalletTests(
   public void AddressGet_ThrowsNotInitializedException() {
     var act = () => wallet.Address;
 
-    act.Should().Throw<NotInitializedException>();
+    act.ShouldThrow<NotInitializedException>();
   }
 
   [Fact]
@@ -25,10 +25,11 @@ public class WalletTests(
     var balance = await wallet.GetBalance(_cancellationToken);
     var type = await wallet.GetAccountType(_cancellationToken);
 
-    using var scope = new AssertionScope();
-    wallet.Address.Should().HaveLength(66);
-    balance.Should().Be(0);
-    type.Should().Be(AccountType.NonExist);
+    wallet.ShouldSatisfyAllConditions(
+      () => wallet.Address.Length.ShouldBe(66),
+      () => balance.ShouldBe(0),
+      () => type.ShouldBe(AccountType.NonExist)
+    );
   }
 
   [Fact]
@@ -46,9 +47,10 @@ public class WalletTests(
     var walletAfterSecondSend = await wallet.GetBalance(_cancellationToken);
     var secondAfter = await secondWallet.GetBalance(_cancellationToken);
 
-    using var scope = new AssertionScope();
-    (secondAfter - secondBefore).Should().Be(3m.NanoToCoins());
-    (0.1m - walletAfterSendAndInit).Should().BeLessThan(0.01m);
-    (walletAfterSendAndInit - walletAfterSecondSend).Should().BeLessThan(0.2m - walletAfterSendAndInit);
+    wallet.ShouldSatisfyAllConditions(
+      () => (secondAfter - secondBefore).ShouldBe(3m.NanoToCoins()),
+      () => (0.1m - walletAfterSendAndInit).ShouldBeLessThan(0.01m),
+      () => (walletAfterSendAndInit - walletAfterSecondSend)!.Value.ShouldBeLessThan(0.2m - walletAfterSendAndInit)
+    );
   }
 }
