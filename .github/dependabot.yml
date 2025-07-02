@@ -3,9 +3,7 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "monthly"
-    reviewers:
-      - "ch1seL"
+      interval: "monthly"      
     rebase-strategy: "auto"
     groups:
       All:
@@ -15,8 +13,6 @@ updates:
     directory: "/src"
     schedule:
       interval: "monthly"
-    reviewers:
-      - "ch1seL"
     rebase-strategy: "auto"
     groups:
       EverscaleNet:
