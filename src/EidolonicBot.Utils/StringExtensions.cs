@@ -20,7 +20,7 @@ public static class StringExtensions {
   public static string EscapeMarkdown(
     string text,
     ParseMode parseMode = ParseMode.Markdown,
-    MessageEntityType? entityType = default) {
+    MessageEntityType? entityType = null) {
     var escaped = (parseMode, entityType) switch {
       (ParseMode.Markdown, _) => Escaped[(ParseMode.Markdown, null)],
       (ParseMode.MarkdownV2, MessageEntityType.Pre) => Escaped[(ParseMode.MarkdownV2, MessageEntityType.Pre)],

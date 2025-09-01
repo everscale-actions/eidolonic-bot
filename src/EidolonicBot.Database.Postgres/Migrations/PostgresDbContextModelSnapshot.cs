@@ -18,10 +18,32 @@ namespace EidolonicBot.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Npgsql:CollationDefinition:case_insensitive", "en-u-ks-primary,en-u-ks-primary,icu,False")
-                .HasAnnotation("ProductVersion", "8.0.6")
+                .HasAnnotation("ProductVersion", "9.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("EidolonicBot.Models.LabelByChat", b =>
+                {
+                    b.Property<long>("ChatId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("MessageThreadId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(66)
+                        .HasColumnType("character varying(66)");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("ChatId", "MessageThreadId", "Address");
+
+                    b.ToTable("LabelByChat");
+                });
 
             modelBuilder.Entity("EidolonicBot.Models.Subscription", b =>
                 {
@@ -53,10 +75,6 @@ namespace EidolonicBot.Migrations
 
                     b.Property<Guid>("SubscriptionId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Label")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
 
                     b.Property<decimal>("MinDelta")
                         .HasColumnType("numeric");

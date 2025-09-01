@@ -46,5 +46,17 @@ public enum Command {
   [CommandArg("full", "(optional) show full address", "list")]
   [CommandArg("min_delta", "(optional) minimum balance delta for notification", "add address", "edit address")]
   [CommandArg("label", "(optional) subscription label without spaces", "add address min_delta", "edit address min_delta")]
-  Subscription
+  Subscription,
+
+  [Command(
+    "/label",
+    Description = "Get or control list of labels",
+    IsBotInitCommand = true)]
+  [CommandArg("list", "show labels for this chat")]
+  [CommandArg("assign", "assign label for address")]
+  [CommandArg("unassign", "unassign label for address")]
+  [CommandArg("address", "account address", "assign", "unassign")]
+  [CommandArg("full", "(optional) show full address", "list")]
+  [CommandArg("label", "label without spaces", "assign address")]
+  Label
 }

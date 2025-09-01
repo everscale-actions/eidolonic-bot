@@ -56,7 +56,7 @@ public class SubscriptionBotCommandReceivedConsumer(
     var subscription = await db.Subscription.SingleAsync(s => s.Address == address, cancellationToken);
 
     var subscriptionByChat = await db.SubscriptionByChat.FindAsync(
-      [chatId, messageThreadId, subscription.Id, cancellationToken],
+      [chatId, messageThreadId, subscription.Id],
       cancellationToken);
 
     if (subscriptionByChat is null) {
@@ -64,7 +64,21 @@ public class SubscriptionBotCommandReceivedConsumer(
     }
 
     subscriptionByChat.MinDelta = minDelta;
-    subscriptionByChat.Label = label;
+
+    if (!string.IsNullOrWhiteSpace(label)) {
+      var labelByChat = await db.LabelByChat.FindAsync([chatId, messageThreadId, address], cancellationToken);
+      if (labelByChat is null) {
+        await db.LabelByChat.AddAsync(new LabelByChat {
+          ChatId = chatId,
+          MessageThreadId = messageThreadId,
+          Address = address,
+          Label = label
+        }, cancellationToken);
+      }
+      else {
+        labelByChat.Label = label;
+      }
+    }
 
     var savedEntries = await db.SaveChangesAsync(cancellationToken);
 
@@ -75,18 +89,33 @@ public class SubscriptionBotCommandReceivedConsumer(
 
   private async Task<string?> GetSubscriptionList(long chatId, int messageThreadId, bool full,
     CancellationToken cancellationToken) {
-    var subscriptionStrings = (await db.SubscriptionByChat
-        .Where(s => s.ChatId == chatId && s.MessageThreadId == messageThreadId)
-        .Select(s => new {
-          s.Subscription.Address,
-          MinDeltaStr = s.MinDelta.ToEvers(),
-          s.Label
-        })
-        .ToArrayAsync(cancellationToken))
-      .Select(s => full
-        ? $@"`{s.Address}`` \| ``{s.MinDeltaStr}`` \| ``{s.Label?.ToEscapedMarkdownV2()}`"
-        : $@"{linkFormatter.GetAddressLink(s.Address)} \| {s.MinDeltaStr} \| {s.Label?.ToEscapedMarkdownV2()}")
-      .ToArray();
+    var labelsByChat = await db.LabelByChat
+      .Where(s => s.ChatId == chatId && s.MessageThreadId == messageThreadId)
+      .ToArrayAsync(cancellationToken: cancellationToken);
+
+    var subscriptionByChat = await db.SubscriptionByChat
+      .Where(s => s.ChatId == chatId && s.MessageThreadId == messageThreadId)
+      .Select(s => new { s.Subscription.Address, s.MinDelta })
+      .ToArrayAsync(cancellationToken);
+
+    var subscriptionStrings =
+      subscriptionByChat
+        .GroupJoin(labelsByChat, s => s.Address, l => l.Address,
+          (s, labels) => new {
+            s.Address,
+            s.MinDelta,
+            Labels = labels
+          })
+        .SelectMany(x => x.Labels.DefaultIfEmpty(),
+          (s, l) => new {
+            s.Address,
+            s.MinDelta,
+            l?.Label
+          })
+        .Select(s => full
+          ? $@"`{s.Address}`` \| ``{s.MinDelta.ToEvers()}`` \| ``{s.Label?.ToEscapedMarkdownV2()}`"
+          : $@"{linkFormatter.GetAddressLink(s.Address)} \| {s.MinDelta.ToEvers()} \| {s.Label?.ToEscapedMarkdownV2()}")
+        .ToArray();
 
     if (subscriptionStrings.Length == 0) {
       return "Get your first subscription with\n" +
@@ -104,9 +133,7 @@ public class SubscriptionBotCommandReceivedConsumer(
     subscription ??= (await db.Subscription.AddAsync(new Subscription { Address = address }, cancellationToken))
       .Entity;
 
-    var subscriptionByChat = await db.SubscriptionByChat.FindAsync(
-      [chatId, messageThreadId, subscription.Id, cancellationToken],
-      cancellationToken);
+    var subscriptionByChat = await db.SubscriptionByChat.FindAsync([chatId, messageThreadId, subscription.Id], cancellationToken);
 
     if (subscriptionByChat is null) {
       await db.SubscriptionByChat.AddAsync(
@@ -114,10 +141,24 @@ public class SubscriptionBotCommandReceivedConsumer(
           SubscriptionId = subscription.Id,
           ChatId = chatId,
           MessageThreadId = messageThreadId,
-          MinDelta = minDelta,
-          Label = label
+          MinDelta = minDelta
         },
         cancellationToken);
+    }
+
+    if (!string.IsNullOrWhiteSpace(label)) {
+      var labelByChat = await db.LabelByChat.FindAsync([chatId, messageThreadId, address], cancellationToken);
+      if (labelByChat is null) {
+        await db.LabelByChat.AddAsync(new LabelByChat {
+          ChatId = chatId,
+          MessageThreadId = messageThreadId,
+          Address = address,
+          Label = label
+        }, cancellationToken);
+      }
+      else {
+        labelByChat.Label = label;
+      }
     }
 
     var savedEntries = await db.SaveChangesAsync(cancellationToken);
@@ -145,9 +186,8 @@ public class SubscriptionBotCommandReceivedConsumer(
         db.Subscription.Remove(subscription);
         break;
       default:
-        var subscriptionByChat = await db.SubscriptionByChat.FindAsync(
-          [chatId, messageThreadId, subscription.Id, cancellationToken],
-          cancellationToken) ?? throw new InvalidOperationException();
+        var subscriptionByChat = await db.SubscriptionByChat.FindAsync([chatId, messageThreadId, subscription.Id], cancellationToken)
+                                 ?? throw new InvalidOperationException();
 
         db.SubscriptionByChat.Remove(subscriptionByChat);
         break;
