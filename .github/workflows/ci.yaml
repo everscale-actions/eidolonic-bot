@@ -83,4 +83,8 @@ jobs:
             archImages+=" ${remoteImage}"
           done
           docker manifest create $REGISTRY/$IMAGE_NAME:${{ github.sha }} $archImages
-          docker manifest push $REGISTRY/$IMAGE_NAME:${{ github.sha }}     
+          docker manifest push $REGISTRY/$IMAGE_NAME:${{ github.sha }}
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            docker manifest create $REGISTRY/$IMAGE_NAME:latest $archImages
+            docker manifest push $REGISTRY/$IMAGE_NAME:latest
+          fi
