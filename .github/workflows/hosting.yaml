@@ -1,0 +1,87 @@
+name: Hosting
+
+concurrency:
+  cancel-in-progress: true
+  group: production_deployment
+
+on:
+  push:
+    paths:
+      - .hosting/**
+      - .github/workflows/hosting.yaml
+    branches:
+      - main
+  workflow_run:
+    workflows: [ CI ]
+    types: [ completed ]
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  HOSTING_PATH: .hosting
+
+jobs:
+  run-app:
+    if: ${{ github.event.workflow_run == null || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: ${{ env.HOSTING_PATH }}
+          sparse-checkout-cone-mode: false
+
+      - name: Create .env file
+        working-directory: ${{ env.HOSTING_PATH }}
+        run: |
+          cat <<EOT > .env
+          Bot__Token=${{ secrets.BOT_TOKEN }}
+          Wallet__SeedPhrase=${{ secrets.WALLET_SEED_PHRASE }}
+          EverClient__Network__Endpoints__0=${{ secrets.NETWORK_ENDPOINT }}
+          Serilog__WriteTo__NewRelicLogs__Args__licenseKey=${{ secrets.NEWRELIC_LICENCEKEY }}
+          SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+          ConnectionStrings__Postgres=${{ secrets.SUPABASE_CONNECTION_STRING }}
+          AMQP_URI=${{ secrets.AMQP_URI }}
+          EOT
+
+      - name: Nx set SHAs
+        id: setSHAs
+        uses: nrwl/nx-set-shas@v4.3.0
+        with:
+          workflow-id: ci.yaml
+          set-environment-variables-for-job: false
+
+      - name: Deploy to Production server
+        uses: easingthemes/ssh-deploy@main
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          ARGS: "-rlgoDzvc -i"
+          SOURCE: "${{ env.HOSTING_PATH }}/"
+          REMOTE_HOST: ${{ vars.SSH_HOST }}
+          REMOTE_USER: ${{ vars.SSH_USER }}
+          TARGET: "${{ vars.TARGET_PATH }}/"
+          EXCLUDE: "/logs"
+          SCRIPT_BEFORE: |
+            ls -al "${{ vars.TARGET_PATH }}"
+          SCRIPT_AFTER: |
+            echo $RSYNC_STDOUT
+            cd "${{ vars.TARGET_PATH }}"
+            ls -al "${{ vars.TARGET_PATH }}"
+            TAG=${{ steps.setSHAs.outputs.base }} docker compose up --pull=always -d
+#
+#      - name: Upload hosting dir to server
+#        uses: appleboy/scp-action@v1
+#        with:
+#          host: ${{ vars.SSH_HOST }}
+#          username: ${{ vars.SSH_USER }}
+#          key: ${{ secrets.SSH_KEY }}
+#          source: "${{ env.HOSTING_PATH }}/*"
+#          target: "${{ vars.TARGET_PATH }}"
+#
+#      - name: Update and Start/Restart app
+#        uses: appleboy/ssh-action@v1
+#        with:
+#          host: ${{ vars.SSH_HOST }}
+#          username: ${{ vars.SSH_USER }}
+#          key: ${{ secrets.SSH_KEY }}
+#          script: cd /root/eidolonic-bot; TAG=${{ steps.setSHAs.outputs.base }} docker compose up --pull=always -d
