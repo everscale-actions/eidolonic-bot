@@ -39,16 +39,16 @@ public class WalletTests(
     await giver.SendTransaction(wallet.Address, 0.2m, cancellationToken: _cancellationToken);
 
     var secondBefore = await secondWallet.GetBalance(_cancellationToken) ?? 0;
-    await wallet.SendCoins(2, 1m.NanoToCoins(), false, _cancellationToken);
-    await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken: _cancellationToken);
+    await wallet.SendCoins(2, 10m.NanoToCoins(), false, _cancellationToken);
+    await Task.Delay(TimeSpan.FromMilliseconds(50), _cancellationToken);
     var walletAfterSendAndInit = await wallet.GetBalance(_cancellationToken) ?? 0;
-    await wallet.SendCoins(2, 2m.NanoToCoins(), false, _cancellationToken);
-    await Task.Delay(TimeSpan.FromMilliseconds(100), cancellationToken: _cancellationToken);
+    await wallet.SendCoins(2, 20m.NanoToCoins(), false, _cancellationToken);
+    await Task.Delay(TimeSpan.FromMilliseconds(50), _cancellationToken);
     var walletAfterSecondSend = await wallet.GetBalance(_cancellationToken);
     var secondAfter = await secondWallet.GetBalance(_cancellationToken);
 
     wallet.ShouldSatisfyAllConditions(
-      () => (secondAfter - secondBefore).ShouldBe(3m.NanoToCoins()),
+      () => (secondAfter - secondBefore).ShouldBe(30m.NanoToCoins()),
       () => (0.1m - walletAfterSendAndInit).ShouldBeLessThan(0.01m),
       () => (walletAfterSendAndInit - walletAfterSecondSend)!.Value.ShouldBeLessThan(0.2m - walletAfterSendAndInit)
     );
