@@ -55,6 +55,8 @@ public enum Command {
   [CommandArg("list", "show labels for this chat")]
   [CommandArg("assign", "assign label for address")]
   [CommandArg("unassign", "unassign label for address")]
+  [CommandArg("export", "export labels list as plain text")]
+  [CommandArg("import", "plain text(insert the list from a new line)")]
   [CommandArg("address", "account address", "assign", "unassign")]
   [CommandArg("full", "(optional) show full address", "list")]
   [CommandArg("label", "label without spaces", "assign address")]

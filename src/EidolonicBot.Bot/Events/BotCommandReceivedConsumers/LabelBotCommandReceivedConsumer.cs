@@ -24,7 +24,8 @@ public class LabelBotCommandReceivedConsumer(
 
       ["unassign", { } address] when RegexList.TvmAddressRegex().IsMatch(address) =>
         await Unassign(address, chatId, messageThreadId, cancellationToken),
-
+      ["export", ..] => await Export(chatId, messageThreadId, cancellationToken),
+      ["import", .., { } text] => await Import(chatId, messageThreadId, text, cancellationToken),
       ["list", ..] => await GetLabelList(
         chatId, messageThreadId,
         args is [_, "full", ..] or [_, "true", ..],
@@ -32,6 +33,45 @@ public class LabelBotCommandReceivedConsumer(
 
       _ => CommandHelpers.HelpByCommand[Command.Label]
     };
+  }
+
+  private async Task<string?> Export(long chatId, int messageThreadId, CancellationToken cancellationToken) {
+    var labelsByChat = await db.LabelByChat
+      .Where(s => s.ChatId == chatId && s.MessageThreadId == messageThreadId)
+      .ToArrayAsync(cancellationToken: cancellationToken);
+
+    var exportText = string.Join('\n', labelsByChat.Select(l => $"{l.Address};{l.Label}"));
+
+    return $"`{exportText}`";
+  }
+
+  private async Task<string?> Import(long chatId, int messageThreadId, string text, CancellationToken cancellationToken) {
+    var list = text.TrimStart().Split('\n');
+    var labels = list.Select(l => l.Split(';', 2))
+      .Where(l => l.Length == 2 && RegexList.TvmAddressRegex().IsMatch(l[0]) && !string.IsNullOrWhiteSpace(l[1]))
+      .ToDictionary(l => l[0], l => l[1]);
+
+    foreach (var (address, label) in labels) {
+      var labelByChat = await db.LabelByChat.FindAsync([chatId, messageThreadId, address], cancellationToken);
+      if (labelByChat is null) {
+        await db.LabelByChat.AddAsync(
+          new LabelByChat {
+            ChatId = chatId,
+            MessageThreadId = messageThreadId,
+            Address = address,
+            Label = label
+          },
+          cancellationToken);
+      }
+      else {
+        labelByChat.Label = label;
+      }
+    }
+
+    var savedEntries = await db.SaveChangesAsync(cancellationToken);
+    return savedEntries > 0
+      ? $"{savedEntries} labels has been updated"
+      : "all labels is up to date";
   }
 
   private async Task<string?> GetLabelList(long chatId, int messageThreadId, bool full,

@@ -21,6 +21,9 @@ public class CommandUpdateReceivedConsumer(
       return;
     }
 
+    // split command from text arg passed as multiline plain text
+    messageText = string.Join(' ', messageText.Split('\n', 2));
+
     var commandAndArgs = messageText.Split(' ');
     var commandAndUserName = commandAndArgs[0].Split('@', 2);
     switch (commandAndUserName.Length) {
