@@ -46,25 +46,33 @@ public class ChatNotificationSubscriptionReceivedConsumer(
       .ToArray();
 
 
+    var list = new List<(long ChatId, int MessageThreadId, decimal MinDelta, string? Label, IReadOnlyCollection<(string Address, string? Label)> ToLabels, string? FromLabel)>();
+
+    foreach (var chatAndThreadId in chatAndThreadIds) {
+      var label = (await db.LabelByChat.FindAsync([chatAndThreadId.ChatId, chatAndThreadId.MessageThreadId, address], cancellationToken))?.Label;
+      var toLabels = new List<(string Address, string? Label)>();
+      foreach (var t in to) {
+        var l = await db.LabelByChat.FindAsync([chatAndThreadId.ChatId, chatAndThreadId.MessageThreadId, t], cancellationToken);
+        toLabels.Add((t, l?.Label));
+      }
+      var fromLabel = from is not null ? (await db.LabelByChat.FindAsync([chatAndThreadId.ChatId, chatAndThreadId.MessageThreadId, from], cancellationToken))?.Label : null;
+      list.Add((chatAndThreadId.ChatId, chatAndThreadId.MessageThreadId, chatAndThreadId.MinDelta, Label: label, ToLabels: toLabels, FromLabel: fromLabel));
+    }
+
     await Task.WhenAll(
-      chatAndThreadIds.Select(async chat => {
-        var label = (await db.LabelByChat.FindAsync([chat.ChatId, chat.MessageThreadId, address], cancellationToken))?.Label;
-        var toLabels = await Task.WhenAll(to.Select(async t => new { address = t, label = (await db.LabelByChat.FindAsync([chat.ChatId, chat.MessageThreadId, t], cancellationToken))?.Label }));
-        var fromLabel = from is not null ? (await db.LabelByChat.FindAsync([chat.ChatId, chat.MessageThreadId, from], cancellationToken))?.Label : null;
-
-
-        var addressLink = label is null
+      list.Select(async c => {
+        var addressLink = c.Label is null
           ? linkFormatter.GetAddressLink(address)
-          : linkFormatter.GetAddressLink(address, label);
-        var fromLink = from is not null ? $" \u2b05\ufe0f {(fromLabel is null ? linkFormatter.GetAddressLink(from) : linkFormatter.GetAddressLink(from, fromLabel))}" : null;
-        var toLink = from is null && to.Length > 0 ? $" \u27a1\ufe0f {string.Join(',', toLabels.Select(t => t.label is null ? linkFormatter.GetAddressLink(t.address) : linkFormatter.GetAddressLink(t.address, t.label)))}" : null;
+          : linkFormatter.GetAddressLink(address, c.Label);
+        var fromLink = from is not null ? $" \u2b05\ufe0f {(c.FromLabel is null ? linkFormatter.GetAddressLink(from) : linkFormatter.GetAddressLink(from, c.FromLabel))}" : null;
+        var toLink = from is null && to.Length > 0 ? $" \u27a1\ufe0f {string.Join(',', c.ToLabels.Select(t => t.Label is null ? linkFormatter.GetAddressLink(t.Address) : linkFormatter.GetAddressLink(t.Address, t.Label)))}" : null;
         var correspondentLink = fromLink + toLink;
 
         await bot.SendMessage(
-          chat.ChatId,
+          c.ChatId,
           CreateMessage(address, balance, balanceDelta, addressLink, correspondentLink, links),
           ParseMode.MarkdownV2,
-          messageThreadId: chat.MessageThreadId,
+          messageThreadId: c.MessageThreadId,
           linkPreviewOptions: true,
           cancellationToken: cancellationToken);
       }));
