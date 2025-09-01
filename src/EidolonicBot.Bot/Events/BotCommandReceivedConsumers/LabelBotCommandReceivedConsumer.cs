@@ -74,8 +74,8 @@ public class LabelBotCommandReceivedConsumer(
     var savedEntries = await db.SaveChangesAsync(cancellationToken);
 
     return savedEntries > 0
-      ? $"{label} updated for {linkFormatter.GetAddressLink(address)}"
-      : $"{label} was already assigned to {linkFormatter.GetAddressLink(address)} earlier";
+      ? $"{label.ToEscapedMarkdownV2()} updated for {linkFormatter.GetAddressLink(address)}"
+      : $"{label.ToEscapedMarkdownV2()} was already assigned to {linkFormatter.GetAddressLink(address)} earlier";
   }
 
   private async Task<string> Unassign(string address, long chatId, int messageThreadId, CancellationToken cancellationToken) {
