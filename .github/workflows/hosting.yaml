@@ -68,6 +68,7 @@ jobs:
             cd "${{ vars.TARGET_PATH }}"
             ls -al "${{ vars.TARGET_PATH }}"
             TAG=${{ steps.setSHAs.outputs.base }} docker compose up --pull=always -d
+            docker image prune -a -f
 #
 #      - name: Upload hosting dir to server
 #        uses: appleboy/scp-action@v1
