@@ -69,20 +69,3 @@ jobs:
             ls -al "${{ vars.TARGET_PATH }}"
             TAG=${{ steps.setSHAs.outputs.base }} docker compose up --pull=always -d
             docker image prune -a -f
-#
-#      - name: Upload hosting dir to server
-#        uses: appleboy/scp-action@v1
-#        with:
-#          host: ${{ vars.SSH_HOST }}
-#          username: ${{ vars.SSH_USER }}
-#          key: ${{ secrets.SSH_KEY }}
-#          source: "${{ env.HOSTING_PATH }}/*"
-#          target: "${{ vars.TARGET_PATH }}"
-#
-#      - name: Update and Start/Restart app
-#        uses: appleboy/ssh-action@v1
-#        with:
-#          host: ${{ vars.SSH_HOST }}
-#          username: ${{ vars.SSH_USER }}
-#          key: ${{ secrets.SSH_KEY }}
-#          script: cd /root/eidolonic-bot; TAG=${{ steps.setSHAs.outputs.base }} docker compose up --pull=always -d
