@@ -7,11 +7,12 @@ internal class SubscriptionService : IHostedService, ISubscriptionService, IAsyn
   private const string SubscriptionQuery =
     """subscription($addresses:StringFilter){transactions(filter:{account_addr:$addresses,balance_delta:{ne:"0"}}){id account_addr account{balance(format:DEC)} balance_delta(format:DEC) out_messages{dst} in_message{src}}}""";
 
+  private readonly AppDbContext? _db;
+  private readonly IEverClient? _everClient;
+
   private readonly ILogger<SubscriptionService> _logger;
   private readonly IPublishEndpoint _publishEndpoint;
   private readonly AsyncServiceScope _scope;
-  private AppDbContext? _db;
-  private IEverClient? _everClient;
   private uint? _handler;
 
   public SubscriptionService(ILogger<SubscriptionService> logger, IServiceProvider serviceProvider) {
