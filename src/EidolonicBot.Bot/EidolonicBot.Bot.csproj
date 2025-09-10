@@ -9,6 +9,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" VersionOverride="9.0.9" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" VersionOverride="9.0.9" />
         <ProjectReference Include="..\EidolonicBot.Abstract\EidolonicBot.Abstract.csproj" />
         <ProjectReference Include="..\EidolonicBot.Constants\EidolonicBot.Constants.csproj" />
         <ProjectReference Include="..\EidolonicBot.Database.Models\EidolonicBot.Database.Models.csproj" />
