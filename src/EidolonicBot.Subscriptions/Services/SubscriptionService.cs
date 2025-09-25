@@ -149,6 +149,7 @@ internal class SubscriptionService : IHostedService, ISubscriptionService, IAsyn
       }
       case SubscriptionResponseType.Error:
         _logger.LogWarning("Subscription error {@Error}", e.ToObject<ClientError>());
+        await Reload(cancellationToken);
         break;
       default:
         throw new ArgumentOutOfRangeException(nameof(responseType), responseType, null);
