@@ -14,6 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore" VersionOverride="10.0.0" />
         <ProjectReference Include="..\EidolonicBot.Abstract\EidolonicBot.Abstract.csproj" />
         <ProjectReference Include="..\EidolonicBot.Constants\EidolonicBot.Constants.csproj" />
         <ProjectReference Include="..\EidolonicBot.Database.Models\EidolonicBot.Database.Models.csproj" />
