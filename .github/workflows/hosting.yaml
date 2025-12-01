@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           sparse-checkout: ${{ env.HOSTING_PATH }}
           sparse-checkout-cone-mode: false
@@ -46,7 +46,7 @@ jobs:
 
       - name: Nx set SHAs
         id: setSHAs
-        uses: nrwl/nx-set-shas@v4.3.3
+        uses: nrwl/nx-set-shas@v4.4.0
         with:
           workflow-id: ci.yaml
           set-environment-variables-for-job: false
