@@ -65,7 +65,7 @@ public class ChatNotificationSubscriptionReceivedConsumer(
           ? linkFormatter.GetAddressLink(address)
           : linkFormatter.GetAddressLink(address, c.Label);
         var fromLink = from is not null ? $" \u2b05\ufe0f {(c.FromLabel is null ? linkFormatter.GetAddressLink(from) : linkFormatter.GetAddressLink(from, c.FromLabel))}" : null;
-        var toLink = from is null && to.Length > 0 ? $" \u27a1\ufe0f {string.Join(',', c.ToLabels.Select(t => t.Label is null ? linkFormatter.GetAddressLink(t.Address) : linkFormatter.GetAddressLink(t.Address, t.Label)))}" : null;
+        var toLink = to is not null && to.Length > 0 ? $" \u27a1\ufe0f {string.Join(',', c.ToLabels.Select(t => t.Label is null ? linkFormatter.GetAddressLink(t.Address) : linkFormatter.GetAddressLink(t.Address, t.Label)))}" : null;
         var correspondentLink = fromLink + toLink;
 
         await bot.SendMessage(
