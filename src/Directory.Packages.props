@@ -47,7 +47,7 @@
     <PackageVersion Include="Shouldly" Version="4.3.0" />
     <PackageVersion Include="Telegram.Bot" Version="22.7.6" />
     <PackageVersion Include="xunit.analyzers" Version="1.26.0" />
-    <PackageVersion Include="Xunit.DependencyInjection" Version="11.1.0" />
+    <PackageVersion Include="Xunit.DependencyInjection" Version="11.1.1" />
     <PackageVersion Include="Xunit.DependencyInjection.Logging" Version="11.0.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5">
       <PrivateAssets>all</PrivateAssets>
