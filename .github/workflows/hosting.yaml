@@ -66,6 +66,8 @@ jobs:
           SCRIPT_AFTER: |
             echo $RSYNC_STDOUT
             cd "${{ vars.TARGET_PATH }}"
+            mkdir -p logs
+            chown 1654:1654 logs
             ls -al "${{ vars.TARGET_PATH }}"
             TAG=${{ steps.setSHAs.outputs.base }} docker compose up --pull=always -d
             docker image prune -a -f
