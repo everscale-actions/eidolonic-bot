@@ -14,6 +14,15 @@ updates:
     schedule:
       interval: "monthly"
     rebase-strategy: "auto"
+    ignore:
+      - dependency-name: "FluentAssertions"
+        versions: [ ">=8.0.0" ]
+      - dependency-name: "AutoMapper"
+        versions: [ ">=15.0.0" ]
+      - dependency-name: "MassTransit*"
+        versions: [ ">=9.0.0" ]
+      - dependency-name: "MediatR"
+        versions: [ ">=13.0.0" ]
     groups:
       EverscaleNet:
         patterns:
