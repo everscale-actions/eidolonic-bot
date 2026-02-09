@@ -9,8 +9,21 @@ public class ChatNotificationSubscriptionReceivedConsumer(
   ITelegramBotClient bot,
   ILinkFormatter linkFormatter
 ) : IConsumer<SubscriptionReceived>, IMediatorConsumer {
-  private const string WhaleSymbol = "\ud83d\udc33";
-  private const string DolphinSymbol = "\ud83d\udc0b";
+  private static class EmojiMarineAnimals {
+    // Константы с понятными именами
+    public const string SpoutingWhale = "\uD83D\uDC33"; // 🐳 U+1F433
+    public const string Whale = "\uD83D\uDC0B"; // 🐋 U+1F40B
+    public const string Shark = "\uD83E\uDD88"; // 🦈 U+1F988
+    public const string Dolphin = "\uD83D\uDC2C"; // 🐬 U+1F42C
+    public const string Seal = "\uD83E\uDDAD"; // 🦭 U+1F9AD
+    public const string Fish = "\uD83D\uDC1F"; // 🐟 U+1F41F
+    public const string TropicalFish = "\uD83D\uDC20"; // 🐠 U+1F420
+    public const string Blowfish = "\uD83D\uDC21"; // 🐡 U+1F421
+    public const string Octopus = "\uD83D\uDC19"; // 🐙 U+1F419
+    public const string SpiralShell = "\uD83D\uDC1A"; // 🐚 U+1F41Aб
+    public const string Squid = "\ud83e\udd91"; // 🦑 U+1F991
+    public const string Oyster = "\ud83e\uddaa"; // 🦪 U+1F9AA
+  }
 
   private readonly string[] _alertMessages = [
     "Dude, check this out!",
@@ -90,7 +103,7 @@ public class ChatNotificationSubscriptionReceivedConsumer(
 
         await bot.SendMessage(
           c.ChatId,
-          CreateMessage(address, balance, balanceDelta, addressLink, correspondentLink, links),
+          CreateMessage(balance, balanceDelta, addressLink, correspondentLink, links),
           ParseMode.MarkdownV2,
           messageThreadId: c.MessageThreadId,
           linkPreviewOptions: true,
@@ -98,7 +111,7 @@ public class ChatNotificationSubscriptionReceivedConsumer(
       }));
   }
 
-  private string CreateMessage(string address, decimal balance, decimal balanceDelta, string addressLink, string? correspondentLink, string[] links) {
+  private string CreateMessage(decimal balance, decimal balanceDelta, string addressLink, string? correspondentLink, string[] links) {
     var direction = balanceDelta > 0 ? "\u2795" : "\u2796";
     var message = _alertMessages[Random.Shared.Next(0, _alertMessages.Length - 1)].ToEscapedMarkdownV2();
     return $"\ud83d\udd75\ufe0f {message}\n" +
@@ -110,23 +123,19 @@ public class ChatNotificationSubscriptionReceivedConsumer(
 
   private static string GetWhileScale(decimal amount) {
     return Math.Round(Math.Abs(amount), 2) switch {
-      >= 500_000_000M => GetFishString(6, WhaleSymbol),
-      >= 100_000_000M => GetFishString(5, WhaleSymbol),
-      >= 50_000_000M => GetFishString(4, WhaleSymbol),
-      >= 10_000_000M => GetFishString(3, WhaleSymbol),
-      >= 5_000_000M => GetFishString(2, WhaleSymbol),
-      >= 1_000_000M => GetFishString(1, WhaleSymbol),
-      >= 500_000M => GetFishString(6, DolphinSymbol),
-      >= 100_000M => GetFishString(5, DolphinSymbol),
-      >= 50_000M => GetFishString(4, DolphinSymbol),
-      >= 10_000M => GetFishString(3, DolphinSymbol),
-      >= 1_000M => GetFishString(2, DolphinSymbol),
-      >= 0M => GetFishString(1, DolphinSymbol),
+      >= 500_000_000M => EmojiMarineAnimals.SpoutingWhale,
+      >= 100_000_000M => EmojiMarineAnimals.Whale,
+      >= 50_000_000M => EmojiMarineAnimals.Shark,
+      >= 10_000_000M => EmojiMarineAnimals.Dolphin,
+      >= 5_000_000M => EmojiMarineAnimals.Seal,
+      >= 1_000_000M => EmojiMarineAnimals.Octopus,
+      >= 500_000M => EmojiMarineAnimals.SpiralShell,
+      >= 100_000M => EmojiMarineAnimals.Blowfish,
+      >= 50_000M => EmojiMarineAnimals.TropicalFish,
+      >= 10_000M => EmojiMarineAnimals.Fish,
+      >= 1_000M => EmojiMarineAnimals.Squid,
+      >= 0M => EmojiMarineAnimals.Oyster,
       _ => string.Empty
     };
-  }
-
-  private static string GetFishString(int count, string symbol) {
-    return string.Join(string.Empty, Enumerable.Repeat(0, count).Select(_ => symbol).ToArray());
   }
 }
