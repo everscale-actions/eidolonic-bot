@@ -27,7 +27,27 @@ public class ChatNotificationSubscriptionReceivedConsumer(
     "Check this out, bro!",
     "Man, you need to see this!",
     "Yo, take a look at this!",
-    "Bro, you won’t believe this!"
+    "Bro, you won’t believe this!",
+    "Whoa, check this out, man!",
+    "Hey, get a load of this!",
+    "Yo, scope this out, dude!",
+    "Bro, you have to see this!",
+    "Man, cast your eyes on this!",
+    "Dude, wait till you see this!",
+    "Hey buddy, look what we have here!",
+    "Yo, witness this!",
+    "Brother, check this madness out!",
+    "Mate, take a peek at this!",
+    "Homie, look at this right here!",
+    "Amigo, echa un vistazo a esto!",
+    "Chief, you gotta check this!",
+    "My guy, look at this!",
+    "Listen, look at this thing!",
+    "No way, look!",
+    "Okay, focus – look at this!",
+    "Hold up, look at this!",
+    "Check it, check it, check it!",
+    "Ay, look at this joint!"
   ];
 
   public async Task Consume(ConsumeContext<SubscriptionReceived> context) {
