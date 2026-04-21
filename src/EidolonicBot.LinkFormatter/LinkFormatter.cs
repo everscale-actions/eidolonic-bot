@@ -8,10 +8,10 @@ internal class LinkFormatter(
 ) : ILinkFormatter {
   private readonly BlockchainOptions _blockchainOptions = blockchainOptionsAccessor.Value;
 
-  public string GetAddressLink(string address, string label, string? explorerName = default) {
+  public string GetAddressLink(string address, string label, string? explorerName = null) {
     var explorer = _blockchainOptions.Explorers.Single(e => e.Name == (explorerName ?? _blockchainOptions.DefaultExplorer));
     var link = string.Format(explorer.AccountLinkTemplate, address);
-    return string.Format($"[{label.ToEscapedMarkdownV2()}]({link})");
+    return $"[{label.ToEscapedMarkdownV2()}]({link})";
   }
 
   public string[] GetTransactionLinks(string transactionId) {
