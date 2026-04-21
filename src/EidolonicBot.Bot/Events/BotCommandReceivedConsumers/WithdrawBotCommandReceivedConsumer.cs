@@ -63,7 +63,7 @@ public class WithdrawBotCommandReceivedConsumer(
         }
       });
 
-    var memo = args is [_, _, { } memoStr] && !string.IsNullOrWhiteSpace(memoStr) ? memoStr : null;
+    var memo = args.Length >= 3 ? string.Join(' ', args[2..]) : null;
     try {
       var (_, coins) = await wallet.SendCoins(dest, sendCoins, allBalance, memo, cancellationToken);
       return FormatSendMessage(fromUser, dest, coins);
