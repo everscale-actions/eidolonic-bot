@@ -45,7 +45,7 @@ public abstract class BotCommandReceivedConsumerBase(
       $"AdminIdsByChatId_{chatId}", async entry => {
         entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(1));
         entry.SetSize(1);
-        var admins = await bot.GetChatAdministrators(chatId, cancellationToken);
+        var admins = await bot.GetChatAdministrators(chatId, cancellationToken: cancellationToken);
         return admins.Select(a => a.User.Id).ToArray();
       });
 
