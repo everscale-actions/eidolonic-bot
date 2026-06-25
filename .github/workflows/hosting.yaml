@@ -21,10 +21,26 @@ env:
   HOSTING_PATH: .hosting
 
 jobs:
-  run-app:
+  setSHAs:
     if: ${{ github.event.workflow_run == null || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
-    environment: production
+    outputs:
+      base: ${{ steps.setSHAs.outputs.base }}
+    steps:
+      - name: Nx set SHAs
+        id: setSHAs
+        uses: nrwl/nx-set-shas@v5
+        with:
+          workflow-id: ci.yaml
+          set-environment-variables-for-job: false
+  run-app:
+    if: ${{ github.event.workflow_run == null || github.event.workflow_run.conclusion == 'success' }}
+    needs: [ setSHAs ]
+    strategy:
+      matrix:
+        env: [ production-eidolonic, production-capybara ]
+    runs-on: ubuntu-latest
+    environment: ${{ matrix.env }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -40,16 +56,10 @@ jobs:
           EverClient__Network__Endpoints__0=${{ secrets.NETWORK_ENDPOINT }}
           Serilog__WriteTo__NewRelicLogs__Args__licenseKey=${{ secrets.NEWRELIC_LICENCEKEY }}
           SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+          SENTRY_ENVIRONMENT=${{ matrix.env }}
           ConnectionStrings__Postgres=${{ secrets.SUPABASE_CONNECTION_STRING }}
           AMQP_URI=${{ secrets.AMQP_URI }}
           EOT
-
-      - name: Nx set SHAs
-        id: setSHAs
-        uses: nrwl/nx-set-shas@v5
-        with:
-          workflow-id: ci.yaml
-          set-environment-variables-for-job: false
 
       - name: Deploy to Production server
         uses: easingthemes/ssh-deploy@main
@@ -69,5 +79,5 @@ jobs:
             mkdir -p logs
             chown 1654:1654 logs
             ls -al "${{ vars.TARGET_PATH }}"
-            TAG=${{ steps.setSHAs.outputs.base }} docker compose up --pull=always -d
+            TAG=${{ needs.setSHAs.outputs.base }} docker compose up --pull=always -d
             docker image prune -a -f
