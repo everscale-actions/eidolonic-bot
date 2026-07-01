@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ matrix.env }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           sparse-checkout: ${{ env.HOSTING_PATH }}
           sparse-checkout-cone-mode: false
