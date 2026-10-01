@@ -1,15 +1,25 @@
 <Project>
-    <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <RootNamespace>EidolonicBot</RootNamespace>
-        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<RootNamespace>EidolonicBot</RootNamespace>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	</PropertyGroup>
 
-    <ItemGroup>
-        <InternalsVisibleTo Include="$(AssemblyName).Tests" />
-    </ItemGroup>
+	<ItemGroup>
+		<InternalsVisibleTo Include="$(AssemblyName).Tests" />
+	</ItemGroup>
 
-    <Import Project="Tests.props" Condition="$(MSBuildProjectFile.EndsWith('Tests.csproj'))" />
+	<ItemGroup>
+		<!-- SSH.NET 2024.2.0 (moderate) -->
+		<NuGetAuditSuppress Include="https://github.com/advisories/GHSA-mggc-4xg6-vcxf"
+							PackageId="SSH.NET"
+							Version="2024.2.0" />
+		<NuGetAuditSuppress Include="https://github.com/advisories/GHSA-q939-rpr3-3284"
+							PackageId="SSH.NET"
+							Version="2024.2.0" />
+	</ItemGroup>
+
+	<Import Project="Tests.props" Condition="$(MSBuildProjectFile.EndsWith('Tests.csproj'))" />
 </Project>
