@@ -1,5 +1,6 @@
 using MassTransit;
 using Telegram.Bot;
+using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 
 namespace EidolonicBot.Events.SubscriptionReceivedConsumers;
@@ -74,10 +75,7 @@ public class ChatNotificationSubscriptionReceivedConsumer(
         .Select(sbc => new { sbc.ChatId, sbc.MessageThreadId, sbc.MinDelta }))
       .ToArrayAsync(cancellationToken);
 
-    var links = linkFormatter.GetTransactionLinks(transactionId)
-      .Append(linkFormatter.GetAddressLink(address, "snipa.finance", "snipa.finance"))
-      .ToArray();
-
+    var links = linkFormatter.GetTransactionLinks(transactionId);
 
     var list = new List<(long ChatId, int MessageThreadId, decimal MinDelta, string? Label, IReadOnlyCollection<(string Address, string? Label)> ToLabels, string? FromLabel)>();
 
@@ -106,7 +104,7 @@ public class ChatNotificationSubscriptionReceivedConsumer(
           CreateMessage(balance, balanceDelta, addressLink, correspondentLink, links),
           ParseMode.MarkdownV2,
           messageThreadId: c.MessageThreadId,
-          linkPreviewOptions: true,
+          linkPreviewOptions: new LinkPreviewOptions { IsDisabled = true},
           cancellationToken: cancellationToken);
       }));
   }

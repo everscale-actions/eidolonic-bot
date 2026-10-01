@@ -33,7 +33,7 @@ public abstract class BotCommandReceivedConsumerBase(
       message.Chat.Id,
       replyText,
       parseMode: ParseMode.MarkdownV2,
-      linkPreviewOptions: true,
+      linkPreviewOptions: new LinkPreviewOptions { IsDisabled = true },
       disableNotification: true,
       replyParameters: message.MessageId,
       cancellationToken: cancellationToken
